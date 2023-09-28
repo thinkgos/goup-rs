@@ -5,9 +5,6 @@ mod search;
 mod set;
 mod upgrade;
 
-// use std::path::PathBuf;
-
-use anyhow::anyhow;
 use clap::{ArgAction, Args};
 use clap::{Parser, Subcommand};
 // use derive_more::Display;
@@ -19,6 +16,7 @@ use self::search::Search;
 use self::set::Set;
 use self::upgrade::Upgrade;
 
+// run command.
 pub trait Run {
     fn run(&self) -> Result<(), anyhow::Error>;
 }
@@ -46,15 +44,17 @@ pub enum Command {
     /// Install Go with a version
     Install(Install),
     /// List all installed Go
-    #[command(alias = "ls")]
+    #[command(visible_alias = "ls")]
     List(List),
     /// Remove Go with a version
+    #[command(visible_alias = "rm")]
     Remove(Remove),
     /// Search Go versions to install
     Search(Search),
-    /// Set the default Go version
+    /// Set the default Go version to one specified.
+    /// If no version is provided, a prompt will show to select a installed Go version.
     Set(Set),
-    /// Upgrade godl
+    /// Upgrade goup
     Upgrade(Upgrade),
 }
 
