@@ -1,17 +1,25 @@
 use clap::Args;
 use prettytable::{row, Table};
+use which::which;
 
 use super::Run;
-use crate::pkg::go_version::{show_go_if_exist, GoVersion};
+use crate::pkg::version::Version;
 
 #[derive(Args, Debug)]
 pub struct List;
 
 impl Run for List {
     fn run(&self) -> Result<(), anyhow::Error> {
-        let vers = GoVersion::list()?;
+        let vers = Version::list()?;
         if vers.is_empty() {
-            show_go_if_exist()
+            println!(
+                "No Go is installed by goup.{}",
+                if let Ok(go_bin) = which("go") {
+                    format!(" Using system Go {}.", go_bin.to_string_lossy())
+                } else {
+                    "".to_owned()
+                }
+            );
         } else {
             let mut table = Table::new();
 
