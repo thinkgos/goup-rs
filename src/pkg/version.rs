@@ -14,9 +14,9 @@ pub struct Version {
 
 impl Version {
     pub fn list() -> Result<Vec<Version>, anyhow::Error> {
-        let home = dirs::home_dir().ok_or_else(|| anyhow!(""))?;
-
+        let home = dirs::home_dir().ok_or_else(|| anyhow!("where is home"))?;
         let current = Dir::new(&home).current().read_link()?;
+
         let dir: Result<Vec<DirEntry>, _> = Dir::new(&home).read_dir()?.collect();
         let mut vers: Vec<_> = dir?
             .iter()

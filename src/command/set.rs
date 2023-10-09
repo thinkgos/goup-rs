@@ -45,6 +45,7 @@ impl Run for Set {
             }
             println!("Default Go is set to '{version}'")
         } else {
+            // TODO: implement me
             // let mut term = Terminal::new(CrosstermBackend::new(io::stdout()))?;
             // _ = term
         }
