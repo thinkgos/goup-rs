@@ -76,20 +76,23 @@ impl Run for Cli {
     }
 }
 
-fn switch_version(version: &str) -> Result<(), anyhow::Error> {
+fn get_latest_go_version() -> Result<String, anyhow::Error> {
+    Ok("go1.21.1".to_owned())
+}
+
+fn switch_go_version(version: &str) -> Result<(), anyhow::Error> {
     let version = if version.starts_with("go") {
         version.to_string()
     } else {
         format!("go{}", version)
     };
-    let home = dirs::home_dir().ok_or_else(|| anyhow!("where is home"))?;
-
-    let version_dir = Dir::new(&home).version(&version);
-    if !version_dir.exists() {
+    let home: std::path::PathBuf = Dir::home_dir()?;
+    if !Dir::is_dot_unpacked_success_exists(&home, &version) {
         return Err(anyhow!(
             "Go version {version} is not installed. Install it with `goup install`."
         ));
     }
+    let version_dir = Dir::new(&home).version(&version);
     let current = Dir::new(&home).current();
     fs::remove_file(&current)?;
     #[cfg(unix)]

@@ -3,6 +3,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use anyhow::anyhow;
+
 /// Dir contain a `PathBuf`
 #[derive(Debug, Clone, PartialEq)]
 pub struct Dir {
@@ -10,6 +12,16 @@ pub struct Dir {
 }
 
 impl Dir {
+    /// current home dir
+    pub fn home_dir() -> Result<PathBuf, anyhow::Error> {
+        dirs::home_dir().ok_or_else(|| anyhow!("where is home"))
+    }
+    /// Allocates a Dir with home_dir as `${home}/.go`
+    pub fn new_with_home_dir() -> Result<Self, anyhow::Error> {
+        let mut path = Self::home_dir()?;
+        path.push(".go");
+        Ok(Self { path })
+    }
     /// Allocates a Dir as `${path}/.go`
     pub fn new<P: AsRef<Path>>(p: P) -> Self {
         let mut path: PathBuf = p.as_ref().into();
@@ -43,10 +55,16 @@ impl Dir {
         self
     }
     /// `${path}/.go/{version}/.unpacked-success`
-    pub fn version_dot_unpacked_success<P: AsRef<Path>>(mut self, p: P) -> Self {
+    fn version_dot_unpacked_success<P: AsRef<Path>>(mut self, p: P) -> Self {
         self.path.push(p);
         self.path.push(".unpacked-success");
         self
+    }
+    pub fn is_dot_unpacked_success_exists<P: AsRef<Path>, P1: AsRef<Path>>(
+        home: P,
+        ver: P1,
+    ) -> bool {
+        Self::new(home).version_dot_unpacked_success(ver).exists()
     }
 }
 

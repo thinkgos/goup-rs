@@ -1,7 +1,5 @@
 use std::fs::DirEntry;
 
-use anyhow::anyhow;
-
 use super::dir::Dir;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -14,7 +12,7 @@ pub struct Version {
 
 impl Version {
     pub fn list() -> Result<Vec<Version>, anyhow::Error> {
-        let home = dirs::home_dir().ok_or_else(|| anyhow!("where is home"))?;
+        let home: std::path::PathBuf = Dir::home_dir()?;
         let current = Dir::new(&home).current().read_link()?;
 
         let dir: Result<Vec<DirEntry>, _> = Dir::new(&home).read_dir()?.collect();
@@ -29,7 +27,7 @@ impl Version {
                 if ver == "gotip" || !ver.starts_with("go") {
                     return None;
                 }
-                if !Dir::new(&home).version_dot_unpacked_success(&ver).exists() {
+                if !Dir::is_dot_unpacked_success_exists(&home, &ver) {
                     return None;
                 }
 

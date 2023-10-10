@@ -19,8 +19,7 @@ impl Run for Remove {
         if self.version.is_empty() {
             return Err(anyhow!("No version is specified"));
         }
-        let home = dirs::home_dir().ok_or_else(|| anyhow!("where is home"))?;
-
+        let home: std::path::PathBuf = Dir::home_dir()?;
         for ver in &self.version {
             let version = if ver.starts_with("go") {
                 ver.to_string()

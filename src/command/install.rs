@@ -1,10 +1,8 @@
-use anyhow::anyhow;
 use clap::Args;
-// use crate::command::switch_version;
 
 use crate::pkg::dir::Dir;
 
-use super::Run;
+use super::{get_latest_go_version, /*  switch_go_version,*/ Run};
 
 #[derive(Args, Debug)]
 #[command(disable_version_flag = true)]
@@ -27,38 +25,33 @@ impl Run for Install {
             get_latest_go_version()?
         };
         if version == "gotip" {
-            install_go_tip(self.cl.as_deref())?;
+            self.install_go_tip()?;
         } else {
-            install_go_version(&version)?;
+            self.install_go_version(&version)?;
         }
-        // switch_version(&version)
+        // switch_go_version(&version)
         Ok(())
     }
 }
 
-fn get_latest_go_version() -> Result<String, anyhow::Error> {
-    Ok("go1.21.1".to_owned())
-}
-
-fn install_go_version(version: &str) -> Result<(), anyhow::Error> {
-    let home = dirs::home_dir().ok_or_else(|| anyhow!("where is home"))?;
-    let target_dir = Dir::new(&home).version(&version);
-
-    if Dir::new(&home)
-        .version_dot_unpacked_success(&version)
-        .exists()
-    {
-        println!(
-            "{}: already installed in {:?}",
-            version,
-            target_dir.display()
-        );
-        return Ok(());
+impl Install {
+    fn install_go_tip(&self) -> Result<(), anyhow::Error> {
+        //    self.cl.as_deref()
+        Ok(())
     }
+    fn install_go_version(&self, version: &str) -> Result<(), anyhow::Error> {
+        let home = Dir::home_dir()?;
+        let target_dir = Dir::new(&home).version(&version);
 
-    Ok(())
-}
+        if Dir::is_dot_unpacked_success_exists(&home, &version) {
+            println!(
+                "{}: already installed in {:?}",
+                version,
+                target_dir.display()
+            );
+            return Ok(());
+        }
 
-fn install_go_tip(_cl: Option<&str>) -> Result<(), anyhow::Error> {
-    Ok(())
+        Ok(())
+    }
 }
