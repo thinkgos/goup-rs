@@ -42,6 +42,12 @@ impl Dir {
         self.path.push(p);
         self
     }
+    /// `${path}/.go/{version}/.unpacked-success`
+    pub fn version_dot_unpacked_success<P: AsRef<Path>>(mut self, p: P) -> Self {
+        self.path.push(p);
+        self.path.push(".unpacked-success");
+        self
+    }
 }
 
 impl AsRef<Path> for Dir {

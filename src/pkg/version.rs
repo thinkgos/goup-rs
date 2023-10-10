@@ -24,10 +24,15 @@ impl Version {
                 if !v.path().is_dir() {
                     return None;
                 }
+
                 let ver: String = v.file_name().to_string_lossy().to_string();
                 if ver == "gotip" || !ver.starts_with("go") {
                     return None;
                 }
+                if !Dir::new(&home).version_dot_unpacked_success(&ver).exists() {
+                    return None;
+                }
+
                 Some(Version {
                     version: ver.trim_start_matches("go").into(),
                     active: current == v.path(),
