@@ -10,7 +10,6 @@ use std::fs;
 use anyhow::anyhow;
 use clap::{ArgAction, Args};
 use clap::{Parser, Subcommand};
-// use derive_more::Display;
 
 use crate::pkg::dir::Dir;
 
@@ -47,6 +46,7 @@ pub struct Cli {
 #[non_exhaustive] // 表明未来还有其它元素添加
 pub enum Command {
     /// Install Go with a version
+    #[command(visible_alias = "update")]
     Install(Install),
     /// List all installed Go
     #[command(visible_alias = "ls")]
@@ -74,10 +74,6 @@ impl Run for Cli {
             Command::Upgrade(cmd) => cmd.run(),
         }
     }
-}
-
-fn get_latest_go_version() -> Result<String, anyhow::Error> {
-    Ok("go1.21.1".to_owned())
 }
 
 fn switch_go_version(version: &str) -> Result<(), anyhow::Error> {

@@ -1,8 +1,10 @@
+use anyhow::anyhow;
 use clap::Args;
+use reqwest::blocking;
 
-use crate::pkg::dir::Dir;
+use crate::pkg::{consts, dir::Dir};
 
-use super::{get_latest_go_version, /*  switch_go_version,*/ Run};
+use super::Run;
 
 #[derive(Args, Debug)]
 #[command(disable_version_flag = true)]
@@ -11,6 +13,9 @@ pub struct Install {
     version: Option<String>,
     /// an optional change list (CL), If the version is 'tip'
     cl: Option<String>,
+    /// host that is used to download Go.
+    #[arg(long, default_value_t = consts::GO_HOST.to_owned(), env = "GOUP_GO_HOST")]
+    host: String,
 }
 
 impl Run for Install {
@@ -22,7 +27,7 @@ impl Run for Install {
                 format!("go{}", s)
             }
         } else {
-            get_latest_go_version()?
+            self.get_latest_go_version()?
         };
         if version == "gotip" {
             self.install_go_tip()?;
@@ -51,7 +56,18 @@ impl Install {
             );
             return Ok(());
         }
+        let go_archive_url = consts::go_version_archive_url(version);
+        println!("{go_archive_url}");
 
         Ok(())
+    }
+    fn get_latest_go_version(&self) -> Result<String, anyhow::Error> {
+        let url = format!("{}/VERSION?m=text", self.host);
+        let body = blocking::get(&url)?.text()?;
+        let ver = body
+            .split("\n")
+            .nth(0)
+            .ok_or_else(|| anyhow!("Getting latest Go version failed"))?;
+        Ok(ver.to_owned())
     }
 }
