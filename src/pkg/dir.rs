@@ -1,5 +1,5 @@
 use std::{
-    ops::Deref,
+    ops::{Deref, DerefMut},
     path::{Path, PathBuf},
 };
 
@@ -78,6 +78,11 @@ impl Deref for Dir {
 
     fn deref(&self) -> &Self::Target {
         &self.path
+    }
+}
+impl DerefMut for Dir {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.path
     }
 }
 
