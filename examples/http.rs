@@ -1,9 +1,9 @@
-use anyhow::anyhow;
-use goup::pkg::consts;
-use reqwest::blocking;
+use std::path::Path;
 
 fn main() -> Result<(), anyhow::Error> {
-    // let body = get_latest_go_version()?;
-    // println!("{body}");
+    let p1 = Path::new("aa/b/c/d.tar.gz");
+
+    println!("{:?}", p1.file_stem());
+
     Ok(())
 }

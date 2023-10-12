@@ -1,15 +1,20 @@
 use std::{
     env, fs,
+    fs::File,
+    io::Read,
     path::{Path, PathBuf},
 };
 
 use anyhow::anyhow;
 use clap::Args;
+use flate2::read::GzDecoder;
 use reqwest::{blocking, StatusCode};
+use sha2::{Digest, Sha256};
+use tar::Archive;
 
 use crate::pkg::{consts, dir::Dir};
 
-use super::Run;
+use super::{switch_go_version, Run};
 
 #[derive(Args, Debug)]
 #[command(disable_version_flag = true)]
@@ -39,8 +44,7 @@ impl Run for Install {
         } else {
             self.install_go_version(&version)?;
         }
-        // switch_go_version(&version)
-        Ok(())
+        switch_go_version(&version)
     }
 }
 
@@ -93,12 +97,20 @@ impl Install {
             }
         }
         // 校验.sha256
-        let want_archive_sha256 = Self::get_archive_sha256(&archive_url)?;
-        Self::verify_sha256(&archive_file, want_archive_sha256.trim())?;
+        Self::verify_archive_sha256(
+            &archive_file,
+            Self::get_archive_sha256(&archive_url)?.trim(),
+        )?;
         // 解压
+        println!("Unpacking {} ...", archive_file.display());
         Self::unpack_archive(&target_version_dir, &archive_file)?;
+        Dir::create_dot_unpacked_success(&home, &version)?;
         // 设置解压成功
-
+        println!(
+            "Success: {} installed in {}",
+            version,
+            target_version_dir.display()
+        );
         Ok(())
     }
     fn get_latest_go_version(&self) -> Result<String, anyhow::Error> {
@@ -138,20 +150,90 @@ impl Install {
         };
         Ok(content_length)
     }
+    /// 获取压缩包sha256
     fn get_archive_sha256(archive_url: &str) -> Result<String, anyhow::Error> {
-        let body = blocking::get(format!("{}.sha256", archive_url))?.text()?;
-        Ok(body)
+        Ok(blocking::get(format!("{}.sha256", archive_url))?.text()?)
     }
-    fn download_archive(_archive_file: &PathBuf, _archive_url: &str) -> Result<(), anyhow::Error> {
+    /// 下载压缩包
+    fn download_archive(archive_file: &PathBuf, archive_url: &str) -> Result<(), anyhow::Error> {
+        let mut response = blocking::get(archive_url)?;
+        if !response.status().is_success() {
+            return Err(anyhow!("Downloading archive failure"));
+        }
+        let mut file = File::create(archive_file)?;
+        response.copy_to(&mut file)?;
         Ok(())
     }
-    fn verify_sha256(_archive_file: &PathBuf, want_sha256: &str) -> Result<(), anyhow::Error> {
+    /// 校验文件sha256
+    fn verify_archive_sha256(
+        archive_file: &PathBuf,
+        expect_sha256: &str,
+    ) -> Result<(), anyhow::Error> {
+        let mut context = Sha256::new();
+        let mut file = File::open(archive_file)?;
+        let mut buffer = [0; 4096]; // 定义一个缓冲区来处理字节流数据
+        loop {
+            let bytes_read = file.read(&mut buffer)?;
+            if bytes_read == 0 {
+                break;
+            }
+            context.update(&buffer[..bytes_read]);
+        }
+        let result = context.finalize();
+        if expect_sha256 != &format!("{:x}", result) {
+            return Err(anyhow!(
+                "{} corrupt? does not have expected SHA-256 of {}",
+                archive_file.display(),
+                expect_sha256,
+            ));
+        }
         Ok(())
     }
+    /// unpack_archive unpacks the provided archive zip or tar.gz file to targetDir,
+    /// removing the "go/" prefix from file entries.
     fn unpack_archive(
+        target_version_dir: &PathBuf,
+        archive_file: &PathBuf,
+    ) -> Result<(), anyhow::Error> {
+        let p = archive_file.to_string_lossy();
+        if p.ends_with(".zip") {
+            Self::unpack_zip(target_version_dir, archive_file)
+        } else if p.ends_with(".tar.gz") {
+            Self::unpack_tar_gz(target_version_dir, archive_file)
+        } else {
+            Err(anyhow!("unsupported archive file"))
+        }
+    }
+    fn unpack_zip(
         _target_version_dir: &PathBuf,
         _archive_file: &PathBuf,
     ) -> Result<(), anyhow::Error> {
+        Ok(())
+    }
+    fn unpack_tar_gz(
+        target_version_dir: &PathBuf,
+        archive_file: &PathBuf,
+    ) -> Result<(), anyhow::Error> {
+        let tar_gz_file = File::open(archive_file)?;
+        let tar = GzDecoder::new(tar_gz_file);
+        let mut archive = Archive::new(tar);
+
+        for entry in archive.entries()? {
+            let mut entry = entry?;
+            let path = entry.path()?;
+            let rel = Path::new("go");
+            if path.starts_with(rel) {
+                let mut dest_file = PathBuf::new();
+                dest_file.push(target_version_dir);
+                dest_file.push(path.strip_prefix(rel)?); // trim prefix path `go`
+
+                let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
+                if !parent.exists() {
+                    fs::create_dir_all(parent)?;
+                }
+                entry.unpack(dest_file)?;
+            }
+        }
         Ok(())
     }
 }

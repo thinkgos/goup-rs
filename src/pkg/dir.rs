@@ -1,4 +1,5 @@
 use std::{
+    fs::File,
     ops::{Deref, DerefMut},
     path::{Path, PathBuf},
 };
@@ -60,11 +61,20 @@ impl Dir {
         self.path.push(".unpacked-success");
         self
     }
+    // `${path}/.go/{version}/.unpacked-success` 是否存在
     pub fn is_dot_unpacked_success_exists<P: AsRef<Path>, P1: AsRef<Path>>(
         home: P,
         ver: P1,
     ) -> bool {
         Self::new(home).version_dot_unpacked_success(ver).exists()
+    }
+    /// 创建 `${path}/.go/{version}/.unpacked-success`
+    pub fn create_dot_unpacked_success<P: AsRef<Path>, P1: AsRef<Path>>(
+        home: P,
+        ver: P1,
+    ) -> Result<(), anyhow::Error> {
+        File::create(Self::new(home).version_dot_unpacked_success(ver))?;
+        Ok(())
     }
 }
 
