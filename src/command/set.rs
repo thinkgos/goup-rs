@@ -1,6 +1,7 @@
 use clap::Args;
-// use ratatui::prelude::CrosstermBackend;
-// use ratatui::terminal::Terminal;
+use dialoguer::{theme::ColorfulTheme, Select};
+
+use crate::pkg::version::Version;
 
 use super::{switch_go_version, Run};
 
@@ -16,9 +17,23 @@ impl Run for Set {
         if let Some(version) = &self.version {
             switch_go_version(version)
         } else {
-            // TODO: implement me
-            // let mut term = Terminal::new(CrosstermBackend::new(io::stdout()))?;
-            // _ = term
+            let vers = Version::list()?;
+            let mut items = Vec::new();
+            let mut pos = 0;
+            for (i, v) in vers.iter().enumerate() {
+                items.push(&v.version);
+                if v.active == true {
+                    pos = i;
+                }
+            }
+
+            let selection = Select::with_theme(&ColorfulTheme::default())
+                .with_prompt("Select a version")
+                .items(&items)
+                .default(pos)
+                .interact()?;
+
+            switch_go_version(items[selection])?;
             Ok(())
         }
     }

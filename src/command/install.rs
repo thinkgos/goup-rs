@@ -11,6 +11,7 @@ use flate2::read::GzDecoder;
 use reqwest::{blocking, StatusCode};
 use sha2::{Digest, Sha256};
 use tar::Archive;
+// use zip::ZipArchive;
 
 use crate::pkg::{consts, dir::Dir};
 
@@ -208,6 +209,20 @@ impl Install {
         _target_version_dir: &PathBuf,
         _archive_file: &PathBuf,
     ) -> Result<(), anyhow::Error> {
+        // let zip_file = File::open(archive_file)?;
+        // let mut archive = ZipArchive::new(zip_file)?;
+        // for i in 0..archive.len() {
+        //     let mut file = archive.by_index(i)?;
+        //     let out_path = format!("{}/{}", output_dir, file.name());
+        //     if file.name().ends_with('/') {
+        //         // Create directory if it's a directory entry
+        //         std::fs::create_dir_all(&out_path)?;
+        //     } else {
+        //         // Extract file contents
+        //         let mut out_file = File::create(&out_path)?;
+        //         io::copy(&mut file, &mut out_file)?;
+        //     }
+        // }
         Ok(())
     }
     fn unpack_tar_gz(
