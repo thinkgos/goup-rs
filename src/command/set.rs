@@ -21,20 +21,17 @@ impl Run for Set {
             let mut items = Vec::new();
             let mut pos = 0;
             for (i, v) in vers.iter().enumerate() {
-                items.push(&v.version);
+                items.push(v.version.as_ref());
                 if v.active == true {
                     pos = i;
                 }
             }
-
             let selection = Select::with_theme(&ColorfulTheme::default())
                 .with_prompt("Select a version")
                 .items(&items)
                 .default(pos)
                 .interact()?;
-
-            switch_go_version(items[selection])?;
-            Ok(())
+            switch_go_version(items[selection])
         }
     }
 }
