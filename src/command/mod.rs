@@ -5,13 +5,8 @@ mod search;
 mod set;
 mod upgrade;
 
-use std::fs;
-
-use anyhow::anyhow;
 use clap::{ArgAction, Args};
 use clap::{Parser, Subcommand};
-
-use crate::pkg::dir::Dir;
 
 use self::install::Install;
 use self::list::List;
@@ -74,33 +69,4 @@ impl Run for Cli {
             Command::Upgrade(cmd) => cmd.run(),
         }
     }
-}
-
-fn switch_go_version(version: &str) -> Result<(), anyhow::Error> {
-    let version = if version.starts_with("go") {
-        version.to_string()
-    } else {
-        format!("go{}", version)
-    };
-    let home: std::path::PathBuf = Dir::home_dir()?;
-    if !Dir::is_dot_unpacked_success_exists(&home, &version) {
-        return Err(anyhow!(
-            "Go version {version} is not installed. Install it with `goup install`."
-        ));
-    }
-    let version_dir = Dir::new(&home).version(&version);
-    let current = Dir::new(&home).current();
-    fs::remove_file(&current)?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs as unix_fs;
-        unix_fs::symlink(&version_dir, &current)?;
-    }
-    #[cfg(windows)]
-    {
-        use std::os::windows::fs as windows_fs;
-        windows_fs::symlink_file(&version_dir, &current)?;
-    }
-    println!("Default Go is set to '{version}'");
-    Ok(())
 }

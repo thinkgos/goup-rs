@@ -13,9 +13,9 @@ use sha2::{Digest, Sha256};
 use tar::Archive;
 // use zip::ZipArchive;
 
-use crate::pkg::{consts, dir::Dir};
+use crate::pkg::{consts, dir::Dir, version::Version};
 
-use super::{switch_go_version, Run};
+use super::Run;
 
 #[derive(Args, Debug)]
 #[command(disable_version_flag = true)]
@@ -38,14 +38,15 @@ impl Run for Install {
                 format!("go{}", s)
             }
         } else {
-            self.get_latest_go_version()?
+            Version::get_latest_go_version(&self.host)?
         };
+        println!("Installing {} ...", version);
         if version == "gotip" {
             self.install_go_tip()?;
         } else {
             self.install_go_version(&version)?;
         }
-        switch_go_version(&version)
+        Version::switch_go_version(&version)
     }
 }
 
@@ -79,7 +80,6 @@ impl Install {
         let mut archive_file = target_version_dir.clone();
         archive_file.push(archive_file_name.as_ref());
 
-        println!("bingo:\n\t{}\n\t{}", archive_url, archive_file.display());
         if !target_version_dir.exists() {
             fs::create_dir_all(&target_version_dir)?
         }
@@ -113,15 +113,6 @@ impl Install {
             target_version_dir.display()
         );
         Ok(())
-    }
-    fn get_latest_go_version(&self) -> Result<String, anyhow::Error> {
-        let url = format!("{}/VERSION?m=text", self.host);
-        let body = blocking::get(&url)?.text()?;
-        let ver = body
-            .split("\n")
-            .nth(0)
-            .ok_or_else(|| anyhow!("Getting latest Go version failed"))?;
-        Ok(ver.to_owned())
     }
     fn get_archive_content_length(version: &str, archive_url: &str) -> Result<u64, anyhow::Error> {
         let resp = blocking::Client::builder()

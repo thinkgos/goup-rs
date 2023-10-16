@@ -3,7 +3,7 @@ use dialoguer::{theme::ColorfulTheme, Select};
 
 use crate::pkg::version::Version;
 
-use super::{switch_go_version, Run};
+use super::Run;
 
 #[derive(Args, Debug)]
 #[command(disable_version_flag = true)]
@@ -15,9 +15,9 @@ pub struct Set {
 impl Run for Set {
     fn run(&self) -> Result<(), anyhow::Error> {
         if let Some(version) = &self.version {
-            switch_go_version(version)
+            Version::switch_go_version(version)
         } else {
-            let vers = Version::list()?;
+            let vers = Version::list_local_version()?;
             let mut items = Vec::new();
             let mut pos = 0;
             for (i, v) in vers.iter().enumerate() {
@@ -31,7 +31,7 @@ impl Run for Set {
                 .items(&items)
                 .default(pos)
                 .interact()?;
-            switch_go_version(items[selection])
+            Version::switch_go_version(items[selection])
         }
     }
 }
