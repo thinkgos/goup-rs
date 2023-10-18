@@ -57,10 +57,10 @@ impl Install {
     }
     fn install_go_version(&self, version: &str) -> Result<(), anyhow::Error> {
         let home = Dir::home_dir()?;
-        let target_version_dir = Dir::new(&home).version(&version);
+        let target_version_dir = Dir::new(&home).version(version);
 
         // 是否已解压并且存在
-        if Dir::is_dot_unpacked_success_exists(&home, &version) {
+        if Dir::is_dot_unpacked_success_exists(&home, version) {
             println!(
                 "{}: already installed in {:?}",
                 version,
@@ -105,7 +105,7 @@ impl Install {
         // 解压
         println!("Unpacking {} ...", archive_file.display());
         Self::unpack_archive(&target_version_dir, &archive_file)?;
-        Dir::create_dot_unpacked_success(&home, &version)?;
+        Dir::create_dot_unpacked_success(&home, version)?;
         // 设置解压成功
         println!(
             "Success: {} installed in {}",
@@ -172,7 +172,8 @@ impl Install {
             context.update(&buffer[..bytes_read]);
         }
         let result = context.finalize();
-        if expect_sha256 != &format!("{:x}", result) {
+        let got_sha256 = format!("{:x}", result);
+        if expect_sha256 != got_sha256 {
             return Err(anyhow!(
                 "{} corrupt? does not have expected SHA-256 of {}",
                 archive_file.display(),
@@ -184,7 +185,7 @@ impl Install {
     /// unpack_archive unpacks the provided archive zip or tar.gz file to targetDir,
     /// removing the "go/" prefix from file entries.
     fn unpack_archive(
-        target_version_dir: &PathBuf,
+        target_version_dir: &Path,
         archive_file: &PathBuf,
     ) -> Result<(), anyhow::Error> {
         let p = archive_file.to_string_lossy();
@@ -196,10 +197,7 @@ impl Install {
             Err(anyhow!("unsupported archive file"))
         }
     }
-    fn unpack_zip(
-        _target_version_dir: &PathBuf,
-        _archive_file: &PathBuf,
-    ) -> Result<(), anyhow::Error> {
+    fn unpack_zip(_target_version_dir: &Path, _archive_file: &Path) -> Result<(), anyhow::Error> {
         // let zip_file = File::open(archive_file)?;
         // let mut archive = ZipArchive::new(zip_file)?;
         // for i in 0..archive.len() {
@@ -217,7 +215,7 @@ impl Install {
         Ok(())
     }
     fn unpack_tar_gz(
-        target_version_dir: &PathBuf,
+        target_version_dir: &Path,
         archive_file: &PathBuf,
     ) -> Result<(), anyhow::Error> {
         let tar_gz_file = File::open(archive_file)?;

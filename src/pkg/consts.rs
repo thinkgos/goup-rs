@@ -36,14 +36,14 @@ pub fn go_version_archive_url(version: &str) -> String {
         _ => env::consts::ARCH,
     };
     let ext = if os == "windows" { "zip" } else { "tar.gz" };
-    return format!(
+    format!(
         "{}/{}.{}-{}.{}",
         go_download_base_url(),
         version,
         os,
         arch,
         ext
-    );
+    )
 }
 
 fn get_var_or_else(key: &str, op: impl FnOnce() -> String) -> String {

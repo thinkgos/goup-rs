@@ -22,7 +22,7 @@ impl Run for Set {
             let mut pos = 0;
             for (i, v) in vers.iter().enumerate() {
                 items.push(v.version.as_ref());
-                if v.active == true {
+                if v.active {
                     pos = i;
                 }
             }

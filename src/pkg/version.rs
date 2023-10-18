@@ -46,9 +46,9 @@ impl Version {
     }
     pub fn get_latest_go_version(host: &str) -> Result<String, anyhow::Error> {
         let url = format!("{}/VERSION?m=text", host);
-        let body = blocking::get(&url)?.text()?;
+        let body = blocking::get(url)?.text()?;
         let ver = body
-            .split("\n")
+            .split('\n')
             .nth(0)
             .ok_or_else(|| anyhow!("Getting latest Go version failed"))?;
         Ok(ver.to_owned())
@@ -72,12 +72,12 @@ impl Version {
         #[cfg(unix)]
         {
             use std::os::unix::fs as unix_fs;
-            unix_fs::symlink(&version_dir, &current)?;
+            unix_fs::symlink(version_dir, &current)?;
         }
         #[cfg(windows)]
         {
             use std::os::windows::fs as windows_fs;
-            windows_fs::symlink_file(&version_dir, &current)?;
+            windows_fs::symlink_file(version_dir, &current)?;
         }
         println!("Default Go is set to '{version}'");
         Ok(())
