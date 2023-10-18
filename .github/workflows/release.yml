@@ -137,11 +137,12 @@ jobs:
         with:
           name: goup-${{ matrix.target }}.msi
           path: target/wix/goup-${{ matrix.target }}.msi
+
   # Notarize goup binaries for MacOS and build notarized pkg installers
   notarize_and_pkgbuild:
     runs-on: macos-latest
     continue-on-error: true
-    needs: [github_build, merge_crowdin_pr]
+    needs: [github_build]
     strategy:
       fail-fast: false
       matrix:
