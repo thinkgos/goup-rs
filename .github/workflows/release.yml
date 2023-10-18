@@ -1,8 +1,10 @@
 name: Release
 on:
   push:
-    branches:
-      - master
+    # run only against tags
+    tags:
+      - "*"
+
 env:
   CARGO_INCREMENTAL: 0
   CARGO_NET_RETRY: 10
@@ -14,8 +16,6 @@ jobs:
   # Build sources for every OS
   github_build:
     name: Build release binaries
-    needs: release_please
-    if: ${{ needs.release_please.outputs.release_created == 'true' }}
     strategy:
       fail-fast: false
       matrix:
