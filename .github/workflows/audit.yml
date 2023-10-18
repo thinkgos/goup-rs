@@ -1,6 +1,15 @@
-name: Security audit - on push
+name: Security audit
 
 on:
+  pull_request:
+    paths:
+      # Run if workflow changes
+      - '.github/workflows/audit.yml'
+      # Run on changed dependencies
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+      # Run if the configuration file changes
+      - '**/audit.toml'
   push:
     paths:
       # Run if workflow changes
