@@ -21,7 +21,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run code format
+        run: cargo fmt -- --check
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
+      - name: Run check
+        run: cargo check --all
       - name: Run Test
         run: cargo test --all-features

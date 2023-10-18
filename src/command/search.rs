@@ -14,11 +14,9 @@ pub struct Search {
 
 impl Run for Search {
     fn run(&self) -> Result<(), anyhow::Error> {
-        self.list_remote_go_version()?
-            .iter()
-            .for_each(|v| {
-                println!("{}", v);
-            });
+        self.list_remote_go_version()?.iter().for_each(|v| {
+            println!("{}", v);
+        });
         Ok(())
     }
 }
