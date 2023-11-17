@@ -13,7 +13,7 @@ use sha2::{Digest, Sha256};
 use tar::Archive;
 // use zip::ZipArchive;
 
-use crate::pkg::{consts, dir::Dir, version::Version};
+use crate::{consts, dir::Dir, version::Version};
 
 use super::Run;
 

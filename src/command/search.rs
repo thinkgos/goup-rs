@@ -4,7 +4,7 @@ use clap::Args;
 use regex::Regex;
 
 use super::Run;
-use crate::pkg::consts;
+use crate::consts;
 
 #[derive(Args, Debug)]
 pub struct Search {

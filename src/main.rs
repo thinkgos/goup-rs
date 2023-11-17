@@ -1,7 +1,7 @@
 use clap::Parser;
 
-use goup::command::Cli;
-use goup::command::Run;
+use goup_rs::command::Cli;
+use goup_rs::command::Run;
 
 fn main() -> Result<(), anyhow::Error> {
     Cli::parse().run()

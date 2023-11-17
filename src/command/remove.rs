@@ -3,7 +3,7 @@ use std::fs;
 use anyhow::anyhow;
 use clap::Args;
 
-use crate::pkg::dir::Dir;
+use crate::dir::Dir;
 
 use super::Run;
 
