@@ -5,7 +5,7 @@ use crate::version::Version;
 
 use super::Run;
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 #[command(disable_version_flag = true)]
 pub struct Set {
     /// target go version

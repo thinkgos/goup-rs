@@ -2,7 +2,7 @@ use clap::Args;
 
 use super::Run;
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 pub struct Upgrade;
 
 impl Run for Upgrade {

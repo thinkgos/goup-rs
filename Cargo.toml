@@ -8,6 +8,7 @@ edition = "2021"
 
 [dependencies]
 clap = {version = "4", features = ["derive", "env"]}
+clap_complete = "4"
 anyhow = "1"
 which = "5"
 dirs = "5"

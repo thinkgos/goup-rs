@@ -6,7 +6,7 @@ use regex::Regex;
 use super::Run;
 use crate::consts;
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 pub struct Search {
     /// a regexp filter
     regex: Option<String>,

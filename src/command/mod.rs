@@ -1,3 +1,4 @@
+mod completion;
 mod install;
 mod list;
 mod remove;
@@ -5,9 +6,10 @@ mod search;
 mod set;
 mod upgrade;
 
-use clap::{ArgAction, Args};
+use clap::{ArgAction, Args, CommandFactory};
 use clap::{Parser, Subcommand};
 
+use self::completion::Completion;
 use self::install::Install;
 use self::list::List;
 use self::remove::Remove;
@@ -20,16 +22,17 @@ pub trait Run {
     fn run(&self) -> Result<(), anyhow::Error>;
 }
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 pub struct Global {
     /// Verbose
     #[arg(short, long, action = ArgAction::Count)]
     verbose: u8,
 }
 
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, PartialEq)]
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
+#[command(name = "completion-derive")]
 pub struct Cli {
     #[command(flatten)]
     pub global: Global,
@@ -37,7 +40,7 @@ pub struct Cli {
     pub command: Command,
 }
 
-#[derive(Subcommand, Debug)]
+#[derive(Subcommand, Debug, PartialEq)]
 #[non_exhaustive] // 表明未来还有其它元素添加
 pub enum Command {
     /// Install Go with a version
@@ -57,6 +60,8 @@ pub enum Command {
     Set(Set),
     /// Upgrade goup
     Upgrade(Upgrade),
+    /// Generate the autocompletion script for the specified shell
+    Completion(Completion),
 }
 
 impl Run for Cli {
@@ -68,6 +73,7 @@ impl Run for Cli {
             Command::Search(cmd) => cmd.run(),
             Command::Set(cmd) => cmd.run(),
             Command::Upgrade(cmd) => cmd.run(),
+            Command::Completion(c) => completion::print_completions(c.shell, &mut Cli::command()),
         }
     }
 }

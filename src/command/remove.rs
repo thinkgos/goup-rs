@@ -7,7 +7,7 @@ use crate::dir::Dir;
 
 use super::Run;
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 #[command(disable_version_flag = true)]
 pub struct Remove {
     /// target go version

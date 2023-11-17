@@ -17,7 +17,7 @@ use crate::{consts, dir::Dir, version::Version};
 
 use super::Run;
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 #[command(disable_version_flag = true)]
 pub struct Install {
     /// target go version

@@ -5,7 +5,7 @@ use which::which;
 use super::Run;
 use crate::version::Version;
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 pub struct List;
 
 impl Run for List {
