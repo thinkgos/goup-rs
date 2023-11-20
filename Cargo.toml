@@ -22,17 +22,25 @@ repository = "https://github.com/thinkgos/goup_rs"
 version_check = "0.9"
 
 [dependencies]
-clap = {version = "4", features = ["derive", "env"]}
-clap_complete = "4"
-anyhow = "1"
-which = "5"
-dirs = "5"
+clap = {version = "4.4", features = ["derive", "env"]}
+clap_complete = "4.4"
+anyhow = "1.0"
+which = "5.0"
+dirs = "5.0"
 prettytable-rs = "0.10"
 dialoguer = "0.11"
-regex = "1"
+regex = "1.10"
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "rustls-tls-native-roots"] }
 sha2 = "0.10"
-flate2 = "1"
+flate2 = "1.0"
 tar = "0.4"
 zip = "0.6"
 # git2 = "0.18"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1
