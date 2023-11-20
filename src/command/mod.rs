@@ -32,7 +32,6 @@ pub struct Global {
 #[derive(Parser, Debug, PartialEq)]
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
-#[command(name = "completion-derive")]
 pub struct Cli {
     #[command(flatten)]
     pub global: Global,
@@ -73,7 +72,7 @@ impl Run for Cli {
             Command::Search(cmd) => cmd.run(),
             Command::Set(cmd) => cmd.run(),
             Command::Upgrade(cmd) => cmd.run(),
-            Command::Completion(c) => completion::print_completions(c.shell, &mut Cli::command()),
+            Command::Completion(c) => completion::print_completions(c.shell, &mut Self::command()),
         }
     }
 }
