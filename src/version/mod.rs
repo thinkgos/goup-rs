@@ -63,7 +63,7 @@ impl Version {
         let home: std::path::PathBuf = Dir::home_dir()?;
         if !Dir::is_dot_unpacked_success_exists(&home, &version) {
             return Err(anyhow!(
-                "Go version {version} is not installed. Install it with `goup install`."
+                "Go version {version} is not installed. Install it with `govm install`."
             ));
         }
         let version_dir = Dir::new(&home).version(&version);

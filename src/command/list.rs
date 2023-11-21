@@ -13,7 +13,7 @@ impl Run for List {
         let vers = Version::list_local_version()?;
         if vers.is_empty() {
             println!(
-                "No Go is installed by goup.{}",
+                "No Go is installed by govm.{}",
                 if let Ok(go_bin) = which("go") {
                     format!(" Using system Go {}.", go_bin.to_string_lossy())
                 } else {

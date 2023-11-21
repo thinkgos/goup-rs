@@ -57,7 +57,7 @@ pub enum Command {
     /// If no version is provided, a prompt will show to select a installed Go version.
     #[command(visible_alias = "use")]
     Set(Set),
-    /// Upgrade goup
+    /// Upgrade govm
     Upgrade(Upgrade),
     /// Generate the autocompletion script for the specified shell
     Completion(Completion),
