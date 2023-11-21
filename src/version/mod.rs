@@ -16,9 +16,8 @@ pub struct Version {
 
 impl Version {
     pub fn list_local_version() -> Result<Vec<Version>, anyhow::Error> {
-        let home: std::path::PathBuf = Dir::home_dir()?;
+        let home = Dir::home_dir()?;
         let current = Dir::new(&home).current().read_link()?;
-
         let dir: Result<Vec<DirEntry>, _> = Dir::new(&home).read_dir()?.collect();
         let mut vers: Vec<_> = dir?
             .iter()

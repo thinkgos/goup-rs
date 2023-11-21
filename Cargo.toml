@@ -1,6 +1,6 @@
 [package]
 name = "govm"
-version = "0.1.0"
+version = "0.0.9"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2021"
 rust-version = "1.70.0"
@@ -37,6 +37,7 @@ sha2 = "0.10"
 flate2 = "1.0"
 tar = "0.4"
 zip = "0.6"
+self_update = {version = "0.39", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}
 # git2 = "0.18"
 
 [profile.dev.package."*"]
