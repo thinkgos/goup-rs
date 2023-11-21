@@ -53,7 +53,7 @@ impl Run for Install {
 impl Install {
     fn install_go_tip(&self) -> Result<(), anyhow::Error> {
         //    self.cl.as_deref()
-        Ok(())
+        Err(anyhow!("Feature not supported"))
     }
     fn install_go_version(&self, version: &str) -> Result<(), anyhow::Error> {
         let home = Dir::home_dir()?;

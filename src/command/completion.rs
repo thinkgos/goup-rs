@@ -1,7 +1,7 @@
 use std::io;
 
 use clap::{Args, Command};
-use clap_complete::{generate, Generator, Shell};
+use clap_complete::{Generator, Shell};
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Completion {
@@ -11,6 +11,6 @@ pub struct Completion {
 }
 
 pub fn print_completions<G: Generator>(gen: G, cmd: &mut Command) -> Result<(), anyhow::Error> {
-    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
+    clap_complete::generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
     Ok(())
 }
