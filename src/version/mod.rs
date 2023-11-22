@@ -76,7 +76,7 @@ impl Version {
         #[cfg(windows)]
         {
             use std::os::windows::fs as windows_fs;
-            windows_fs::symlink_file(version_dir, &current)?;
+            windows_fs::symlink_dir(version_dir, &current)?;
         }
         println!("Default Go is set to '{version}'");
         Ok(())
