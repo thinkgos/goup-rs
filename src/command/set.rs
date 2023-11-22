@@ -15,7 +15,7 @@ pub struct Set {
 impl Run for Set {
     fn run(&self) -> Result<(), anyhow::Error> {
         if let Some(version) = &self.version {
-            Version::switch_go_version(version)
+            Version::use_go_version(version)
         } else {
             let vers = Version::list_local_version()?;
             let mut items = Vec::new();
@@ -31,7 +31,7 @@ impl Run for Set {
                 .items(&items)
                 .default(pos)
                 .interact()?;
-            Version::switch_go_version(items[selection])
+            Version::use_go_version(items[selection])
         }
     }
 }

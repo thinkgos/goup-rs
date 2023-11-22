@@ -53,7 +53,7 @@ impl Version {
         Ok(ver.to_owned())
     }
 
-    pub fn switch_go_version(version: &str) -> Result<(), anyhow::Error> {
+    pub fn use_go_version(version: &str) -> Result<(), anyhow::Error> {
         let version = if version.starts_with("go") {
             version.to_string()
         } else {

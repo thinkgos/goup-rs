@@ -1,7 +1,7 @@
 use std::{
     env, fs,
     fs::File,
-    io::Read,
+    io::{self, Read},
     path::{Path, PathBuf},
 };
 
@@ -11,7 +11,7 @@ use flate2::read::GzDecoder;
 use reqwest::{blocking, StatusCode};
 use sha2::{Digest, Sha256};
 use tar::Archive;
-// use zip::ZipArchive;
+use zip::ZipArchive;
 
 use crate::{consts, dir::Dir, version::Version};
 
@@ -46,7 +46,7 @@ impl Run for Install {
         } else {
             self.install_go_version(&version)?;
         }
-        Version::switch_go_version(&version)
+        Version::use_go_version(&version)
     }
 }
 
@@ -184,53 +184,50 @@ impl Install {
     }
     /// unpack_archive unpacks the provided archive zip or tar.gz file to targetDir,
     /// removing the "go/" prefix from file entries.
-    fn unpack_archive(
-        target_version_dir: &Path,
-        archive_file: &PathBuf,
-    ) -> Result<(), anyhow::Error> {
+    fn unpack_archive(dest_dir: &Path, archive_file: &PathBuf) -> Result<(), anyhow::Error> {
         let p = archive_file.to_string_lossy();
         if p.ends_with(".zip") {
-            Self::unpack_zip(target_version_dir, archive_file)
+            Self::unpack_zip(dest_dir, archive_file)
         } else if p.ends_with(".tar.gz") {
-            Self::unpack_tar_gz(target_version_dir, archive_file)
+            Self::unpack_tgz(dest_dir, archive_file)
         } else {
             Err(anyhow!("unsupported archive file"))
         }
     }
-    fn unpack_zip(_target_version_dir: &Path, _archive_file: &Path) -> Result<(), anyhow::Error> {
-        // let zip_file = File::open(archive_file)?;
-        // let mut archive = ZipArchive::new(zip_file)?;
-        // for i in 0..archive.len() {
-        //     let mut file = archive.by_index(i)?;
-        //     let out_path = format!("{}/{}", output_dir, file.name());
-        //     if file.name().ends_with('/') {
-        //         // Create directory if it's a directory entry
-        //         std::fs::create_dir_all(&out_path)?;
-        //     } else {
-        //         // Extract file contents
-        //         let mut out_file = File::create(&out_path)?;
-        //         io::copy(&mut file, &mut out_file)?;
-        //     }
-        // }
+    /// unpack_zip unpack *.zip
+    fn unpack_zip(dest_dir: &Path, archive_file: &Path) -> Result<(), anyhow::Error> {
+        let mut archive = ZipArchive::new(File::open(archive_file)?)?;
+        let strip_prefix_with_go = Path::new("go");
+        for i in 0..archive.len() {
+            let mut file = archive.by_index(i)?;
+            let path = file.mangled_name();
+
+            // only unpack prefix with `go`
+            if path.starts_with(strip_prefix_with_go) {
+                let dest_file = dest_dir.join(path.strip_prefix(strip_prefix_with_go)?);
+                let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
+                if !parent.exists() {
+                    fs::create_dir_all(parent)?;
+                }
+
+                let mut output_file = File::create(dest_file)?;
+                io::copy(&mut file, &mut output_file)?;
+            }
+        }
         Ok(())
     }
-    fn unpack_tar_gz(
-        target_version_dir: &Path,
-        archive_file: &PathBuf,
-    ) -> Result<(), anyhow::Error> {
-        let tar_gz_file = File::open(archive_file)?;
-        let tar = GzDecoder::new(tar_gz_file);
-        let mut archive = Archive::new(tar);
 
+    /// unpack_tgz unpack *.tar.gz
+    fn unpack_tgz(dest_dir: &Path, archive_file: &PathBuf) -> Result<(), anyhow::Error> {
+        let mut archive = Archive::new(GzDecoder::new(File::open(archive_file)?));
+        let strip_prefix_with_go = Path::new("go");
         for entry in archive.entries()? {
             let mut entry = entry?;
             let path = entry.path()?;
-            let rel = Path::new("go");
-            if path.starts_with(rel) {
-                let mut dest_file = PathBuf::new();
-                dest_file.push(target_version_dir);
-                dest_file.push(path.strip_prefix(rel)?); // trim prefix path `go`
 
+            // only unpack prefix with `go`
+            if path.starts_with(strip_prefix_with_go) {
+                let dest_file = dest_dir.join(path.strip_prefix(strip_prefix_with_go)?);
                 let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
                 if !parent.exists() {
                     fs::create_dir_all(parent)?;
