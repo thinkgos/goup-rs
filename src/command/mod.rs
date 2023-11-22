@@ -6,8 +6,11 @@ mod search;
 mod set;
 mod upgrade;
 
+use clap::builder::{IntoResettable, Resettable, Str};
 use clap::{ArgAction, Args, CommandFactory};
 use clap::{Parser, Subcommand};
+use shadow_rs::shadow;
+use std::env::consts::{ARCH, OS};
 
 use self::completion::Completion;
 use self::install::Install;
@@ -16,6 +19,27 @@ use self::remove::Remove;
 use self::search::Search;
 use self::set::Set;
 use self::upgrade::Upgrade;
+
+shadow!(build);
+pub const VERSION: &str = shadow_rs::formatcp!(
+    r#"{}
+auth:            {}
+git_commit:      {}
+git_full_commit: {}
+build_time:      {}
+build_env:       {},{}
+build_os:        {}
+build_arch:      {}"#,
+    build::PKG_VERSION,
+    build::COMMIT_AUTHOR,
+    build::SHORT_COMMIT,
+    build::COMMIT_HASH,
+    build::BUILD_TIME_2822,
+    build::RUST_VERSION,
+    build::RUST_CHANNEL,
+    OS,
+    ARCH,
+);
 
 // run command.
 pub trait Run {
@@ -30,8 +54,9 @@ pub struct Global {
 }
 
 #[derive(Parser, Debug, PartialEq)]
-#[command(author, version, about, long_about = None)]
+#[command(author, about, long_about = None)]
 #[command(propagate_version = true)]
+#[command(version = VERSION)]
 pub struct Cli {
     #[command(flatten)]
     pub global: Global,
@@ -74,5 +99,13 @@ impl Run for Cli {
             Command::Upgrade(cmd) => cmd.run(),
             Command::Completion(c) => completion::print_completions(c.shell, &mut Self::command()),
         }
+    }
+}
+
+struct V {}
+
+impl IntoResettable<Str> for V {
+    fn into_resettable(self) -> Resettable<Str> {
+        Resettable::Value(build::CLAP_LONG_VERSION.into())
     }
 }
