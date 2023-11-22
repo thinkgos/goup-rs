@@ -85,7 +85,7 @@ jobs:
         continue-on-error: true
         # aarch64 is only supported in wix 4.0 development builds
         if: matrix.os == 'windows-latest' && matrix.target != 'aarch64-pc-windows-msvc'
-        run: cargo install --version 0.3.4 cargo-wix
+        run: cargo install cargo-wix
         env:
           # cargo-wix does not require static crt
           RUSTFLAGS: ""
@@ -105,9 +105,10 @@ jobs:
       - name: Build | Installer [Windows]
         continue-on-error: true
         if: matrix.os == 'windows-latest' && matrix.target != 'aarch64-pc-windows-msvc'
-        run: >
-          cargo wix -v --no-build --nocapture -I install/windows/main.wxs
-          --target ${{ matrix.target }}
+        run: |
+          cargo wix init
+          cargo wix -v --no-build --nocapture -I wix/main.wxs \
+          --target ${{ matrix.target }} \
           --output target/wix/govm-${{ matrix.target }}.msi
 
       - name: Post Build | Prepare artifacts [Windows]
