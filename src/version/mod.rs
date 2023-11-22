@@ -69,7 +69,7 @@ impl Version {
         }
         let source_dir = Dir::new(&home).version(&version);
         let current = Dir::new(&home).current();
-        fs::remove_dir_all(&current)?;
+        let _ = fs::remove_dir_all(&current);
         #[cfg(unix)]
         {
             use std::os::unix::fs as unix_fs;
@@ -77,8 +77,7 @@ impl Version {
         }
         #[cfg(windows)]
         {
-            use std::os::windows::fs as windows_fs;
-            windows_fs::symlink_dir(source_dir, &current)?;
+            junction::create(source_dir, &current)?;
         }
         println!("Default Go is set to '{version}'");
         Ok(())
