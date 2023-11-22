@@ -73,7 +73,8 @@ pub enum Command {
     /// List all installed Go
     #[command(visible_alias = "ls")]
     List(List),
-    /// Remove Go with a version
+    /// Remove Go with multiple version.
+    /// If no version is provided, a prompt will show to select multiple installed Go version.
     #[command(visible_alias = "rm")]
     Remove(Remove),
     /// Search Go versions to install

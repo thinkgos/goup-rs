@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use clap::Args;
 use dialoguer::{theme::ColorfulTheme, Select};
 
@@ -18,6 +19,12 @@ impl Run for Set {
             Version::use_go_version(version)
         } else {
             let vers = Version::list_local_version()?;
+            if vers.is_empty() {
+                return Err(anyhow!(
+                    "Not any go is installed, Install it with `govm install`."
+                ));
+            }
+
             let mut items = Vec::new();
             let mut pos = 0;
             for (i, v) in vers.iter().enumerate() {
