@@ -17,7 +17,9 @@ pub struct Version {
 impl Version {
     pub fn list_local_version() -> Result<Vec<Version>, anyhow::Error> {
         let home = Dir::home_dir()?;
-        let current = Dir::new(&home).current().read_link()?;
+        // may be current not exist
+        let current = Dir::new(&home).current().read_link();
+        let current = current.as_ref();
         let dir: Result<Vec<DirEntry>, _> = Dir::new(&home).read_dir()?.collect();
         let mut vers: Vec<_> = dir?
             .iter()
@@ -36,7 +38,7 @@ impl Version {
 
                 Some(Version {
                     version: ver.trim_start_matches("go").into(),
-                    active: current == v.path(),
+                    active: current.is_ok_and(|vv| vv == &v.path()),
                 })
             })
             .collect();
@@ -65,13 +67,15 @@ impl Version {
                 "Go version {version} is not installed. Install it with `govm install`."
             ));
         }
-        let version_dir = Dir::new(&home).version(&version);
+        let source_dir = Dir::new(&home).version(&version);
         let current = Dir::new(&home).current();
-        fs::remove_file(&current)?;
+        if current.exists() {
+            fs::remove_dir(&current)?;
+        }
         #[cfg(unix)]
         {
             use std::os::unix::fs as unix_fs;
-            unix_fs::symlink(version_dir, &current)?;
+            unix_fs::symlink(source_dir, &current)?;
         }
         #[cfg(windows)]
         {
