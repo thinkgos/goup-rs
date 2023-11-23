@@ -1,6 +1,6 @@
 [package]
 name = "govm-version"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2021"
 rust-version = "1.70.0"
