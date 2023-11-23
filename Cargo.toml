@@ -1,6 +1,6 @@
 [package]
 name = "govm"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2021"
 rust-version = "1.70.0"
@@ -20,6 +20,10 @@ readme = "README.md"
 homepage = "https://github.com/thinkgos/govm"
 repository = "https://github.com/thinkgos/govm"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "govm"
+path = "src/main.rs"
 
 [build-dependencies]
 version_check = "0.9"
