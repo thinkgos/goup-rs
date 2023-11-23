@@ -1,26 +1,29 @@
 use std::env;
 
+pub const GOVM_GO_HOST: &str = "GOVM_GO_HOST";
+pub const GOVM_GO_DOWNLOAD_BASE_URL: &str = "GOVM_GO_DOWNLOAD_BASE_URL";
+pub const GOVM_GO_SOURCE_GIT_URL: &str = "GOVM_GO_SOURCE_GIT_URL";
 pub const GO_HOST: &str = "https://go.dev";
 pub const GO_DOWNLOAD_BASE_URL: &str = "https://dl.google.com/go";
 pub const GO_SOURCE_GIT_URL: &str = "https://github.com/golang/go";
 pub const GO_SOURCE_UPSTREAM_GIT_URL: &str = "https://go.googlesource.com/go";
 
 pub fn go_host() -> String {
-    get_var_or_else("GOVM_GO_HOST", || GO_HOST.to_owned())
+    get_var_or_else(GOVM_GO_HOST, || GO_HOST.to_owned())
 }
 
 pub fn go_download_base_url() -> String {
-    get_var_or_else("GOVM_GO_DOWNLOAD_BASE_URL", || {
+    get_var_or_else(GOVM_GO_DOWNLOAD_BASE_URL, || {
         GO_DOWNLOAD_BASE_URL.to_owned()
     })
 }
 
 pub fn go_source_git_url() -> String {
-    get_var_or_else("GOVM_GO_SOURCE_GIT_URL", || GO_SOURCE_GIT_URL.to_owned())
+    get_var_or_else(GOVM_GO_SOURCE_GIT_URL, || GO_SOURCE_GIT_URL.to_owned())
 }
 
 pub fn go_source_upstream_git_url() -> String {
-    get_var_or_else("GOVM_GO_SOURCE_GIT_URL", || {
+    get_var_or_else(GOVM_GO_SOURCE_GIT_URL, || {
         GO_SOURCE_UPSTREAM_GIT_URL.to_owned()
     })
 }

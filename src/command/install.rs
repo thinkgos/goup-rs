@@ -14,7 +14,7 @@ pub struct Install {
     /// an optional change list (CL), If the version is 'tip'
     cl: Option<String>,
     /// host that is used to download Go.
-    #[arg(long, default_value_t = consts::GO_HOST.to_owned(), env = "GOVM_GO_HOST")]
+    #[arg(long, default_value_t = consts::GO_HOST.to_owned(), env = consts::GOVM_GO_HOST)]
     host: String,
 }
 
