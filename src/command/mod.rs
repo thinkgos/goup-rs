@@ -91,7 +91,7 @@ enum Command {
     /// Generate the autocompletion script for the specified shell
     Completion(Completion),
     #[cfg(unix)]
-    /// prints all necessary environment variables and values required to use goup
+    /// write all necessary environment variables and values.
     Init(Init),
 }
 

@@ -47,12 +47,13 @@ $ GOUP_GO_HOST=https://golang.google.cn goup install 1.21.4
 
 * `goup completion <SHELL>` Generate the autocompletion script for the specified shell.
 * `goup [help]` Print this message or the help of the given subcommand(s).
-* `goup install/update [VERSION]` downloads specified version of Go to`$HOME/.goup/<VERSION>` and symlinks it to `$HOME/.goup/current`.
+* `goup install/update [VERSION]` downloads specified version of Go to`$HOME/.goup/<VERSION>/go` and symlinks it to `$HOME/.goup/current`.
 * `goup use/set <VERSION>` switches to selected Go version.
-* `goup ls/list/show` list all installed Go version located at `$HOME/.goup/current`.
+* `goup ls/list/show` list all installed Go version located at `$HOME/.goup`.
 * `goup remove/rm [VERSION]...` removes the specified Go version.
 * `goup search [VERSION]` lists all available Go versions from `https://golang.org/dl`.
 * `goup upgrade` upgrades `goup`.
+* `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
 
 ## License
 
