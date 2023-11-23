@@ -24,7 +24,7 @@ impl Dir {
         Self { path }
     }
     /// Allocates a Dir with home_dir as `${home}/.go`
-    pub fn new_with_home_dir() -> Result<Self, anyhow::Error> {
+    pub fn from_home_dir() -> Result<Self, anyhow::Error> {
         let mut path = Self::home_dir()?;
         path.push(".go");
         Ok(Self { path })

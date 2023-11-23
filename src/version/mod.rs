@@ -82,7 +82,7 @@ impl Version {
     }
 
     pub fn set_go_version(version: &str) -> Result<(), anyhow::Error> {
-        let version = Self::normalize(&version);
+        let version = Self::normalize(version);
         let home = Dir::home_dir()?;
         if !Dir::is_dot_unpacked_success_file_exists(&home, &version) {
             return Err(anyhow!(
@@ -106,9 +106,8 @@ impl Version {
     }
 
     pub fn remove_go_version(version: &str) -> Result<(), anyhow::Error> {
-        let home = Dir::home_dir()?;
-        let version = Self::normalize(&version);
-        let version_dir = Dir::new(&home).version(&version);
+        let version = Self::normalize(version);
+        let version_dir = Dir::from_home_dir()?.version(version);
         if version_dir.exists() {
             fs::remove_dir_all(&version_dir)?;
         }
@@ -118,7 +117,7 @@ impl Version {
     pub fn remove_go_versions(vers: &[&str]) -> Result<(), anyhow::Error> {
         let home = Dir::home_dir()?;
         for ver in vers {
-            let version = Self::normalize(&ver);
+            let version = Self::normalize(ver);
             let version_dir = Dir::new(&home).version(&version);
             if version_dir.exists() {
                 fs::remove_dir_all(&version_dir)?;
