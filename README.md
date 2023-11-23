@@ -40,7 +40,7 @@ $ go env GOROOT
 /home/thinkgo/.goup/current
 $ go version
 go version go1.21.4 linux/amd64
-$ GOUP_GO_HOST=golang.google.cn goup install 
+$ GOUP_GO_HOST=https://golang.google.cn goup install 1.21.4
 ```
 
 ## How it works
@@ -49,7 +49,7 @@ $ GOUP_GO_HOST=golang.google.cn goup install
 * `goup [help]` Print this message or the help of the given subcommand(s).
 * `goup install/update [VERSION]` downloads specified version of Go to`$HOME/.goup/<VERSION>` and symlinks it to `$HOME/.goup/current`.
 * `goup use/set <VERSION>` switches to selected Go version.
-* `goup ls/list` list all installed Go version located at `$HOME/.goup/current`.
+* `goup ls/list/show` list all installed Go version located at `$HOME/.goup/current`.
 * `goup remove/rm [VERSION]...` removes the specified Go version.
 * `goup search [VERSION]` lists all available Go versions from `https://golang.org/dl`.
 * `goup upgrade` upgrades `goup`.
