@@ -9,7 +9,6 @@ description = "goup is an elegant Go version manager"
 keywords = [
     "goup",
     "gvm",
-    "goup",
     "golang",
     "installer",
     "version-manager",

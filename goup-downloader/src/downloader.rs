@@ -19,19 +19,18 @@ pub struct Downloader;
 
 impl Downloader {
     pub fn install_go_tip(_cl: Option<&str>) -> Result<(), anyhow::Error> {
-        //    self.cl.as_deref()
         Err(anyhow!("Feature not supported"))
     }
     pub fn install_go_version(version: &str) -> Result<(), anyhow::Error> {
         let home = Dir::home_dir()?;
-        let target_version_dir = Dir::new(&home).version(version);
+        let dest_version_dir = Dir::new(&home).version(version);
 
         // 是否已解压并且存在
         if Dir::is_dot_unpacked_success_file_exists(&home, version) {
             println!(
                 "{}: already installed in {:?}",
                 version,
-                target_version_dir.display()
+                dest_version_dir.display()
             );
             return Ok(());
         }
@@ -44,11 +43,11 @@ impl Downloader {
             .file_name()
             .ok_or_else(|| anyhow!("Getting archive filename failure."))?
             .to_string_lossy();
-        let mut archive_file = target_version_dir.clone();
+        let mut archive_file = dest_version_dir.clone();
         archive_file.push(archive_file_name.as_ref());
 
-        if !target_version_dir.exists() {
-            fs::create_dir_all(&target_version_dir)?
+        if !dest_version_dir.exists() {
+            fs::create_dir_all(&dest_version_dir)?
         }
         if !archive_file.exists() || archive_file.metadata()?.len() != archive_content_length {
             // 下载
@@ -71,13 +70,13 @@ impl Downloader {
         )?;
         // 解压
         println!("Unpacking {} ...", archive_file.display());
-        Self::unpack_archive(&target_version_dir, &archive_file)?;
+        Self::unpack_archive(&dest_version_dir, &archive_file)?;
         Dir::create_dot_unpacked_success_file(&home, version)?;
         // 设置解压成功
         println!(
             "Success: {} installed in {}",
             version,
-            target_version_dir.display()
+            dest_version_dir.display()
         );
         Ok(())
     }
@@ -168,22 +167,18 @@ impl Downloader {
     /// unpack_zip unpack *.zip
     fn unpack_zip(dest_dir: &Path, archive_file: &Path) -> Result<(), anyhow::Error> {
         let mut archive = ZipArchive::new(File::open(archive_file)?)?;
-        let strip_prefix_with_go = Path::new("go");
         for i in 0..archive.len() {
             let mut file = archive.by_index(i)?;
             let path = file.mangled_name();
 
-            // only unpack prefix with `go`
-            if path.starts_with(strip_prefix_with_go) {
-                let dest_file = dest_dir.join(path.strip_prefix(strip_prefix_with_go)?);
-                let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
-                if !parent.exists() {
-                    fs::create_dir_all(parent)?;
-                }
-
-                let mut output_file = File::create(dest_file)?;
-                io::copy(&mut file, &mut output_file)?;
+            let dest_file = dest_dir.join(path);
+            let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
+            if !parent.exists() {
+                fs::create_dir_all(parent)?;
             }
+
+            let mut output_file = File::create(dest_file)?;
+            io::copy(&mut file, &mut output_file)?;
         }
         Ok(())
     }
@@ -191,20 +186,16 @@ impl Downloader {
     /// unpack_tgz unpack *.tar.gz
     fn unpack_tgz(dest_dir: &Path, archive_file: &PathBuf) -> Result<(), anyhow::Error> {
         let mut archive = Archive::new(GzDecoder::new(File::open(archive_file)?));
-        let strip_prefix_with_go = Path::new("go");
         for entry in archive.entries()? {
             let mut entry = entry?;
             let path = entry.path()?;
 
-            // only unpack prefix with `go`
-            if path.starts_with(strip_prefix_with_go) {
-                let dest_file = dest_dir.join(path.strip_prefix(strip_prefix_with_go)?);
-                let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
-                if !parent.exists() {
-                    fs::create_dir_all(parent)?;
-                }
-                entry.unpack(dest_file)?;
+            let dest_file = dest_dir.join(path);
+            let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
+            if !parent.exists() {
+                fs::create_dir_all(parent)?;
             }
+            entry.unpack(dest_file)?;
         }
         Ok(())
     }

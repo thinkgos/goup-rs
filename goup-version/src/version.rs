@@ -1,5 +1,6 @@
 use std::fs;
 use std::fs::DirEntry;
+use std::ops::Deref;
 use std::process::Command;
 
 use anyhow::anyhow;
@@ -56,29 +57,28 @@ impl Version {
         let current = Dir::new(&home).current().read_link();
         let current = current.as_ref();
         let dir: Result<Vec<DirEntry>, _> = Dir::new(&home).read_dir()?.collect();
-        let mut vers: Vec<_> = dir?
+        let mut version_dirs: Vec<_> = dir?
             .iter()
             .filter_map(|v| {
                 if !v.path().is_dir() {
                     return None;
                 }
 
-                let ver: String = v.file_name().to_string_lossy().to_string();
+                let ver = v.file_name().to_string_lossy().to_string();
                 if ver == "gotip" || !ver.starts_with("go") {
                     return None;
                 }
                 if !Dir::is_dot_unpacked_success_file_exists(&home, &ver) {
                     return None;
                 }
-
                 Some(Version {
                     version: ver.trim_start_matches("go").into(),
-                    active: current.is_ok_and(|vv| vv == &v.path()),
+                    active: current.is_ok_and(|vv| vv == Dir::new(&home).version_go(ver).deref()),
                 })
             })
             .collect();
-        vers.sort();
-        Ok(vers)
+        version_dirs.sort();
+        Ok(version_dirs)
     }
 
     pub fn set_go_version(version: &str) -> Result<(), anyhow::Error> {
@@ -89,7 +89,7 @@ impl Version {
                 "Go version {version} is not installed. Install it with `goup install`."
             ));
         }
-        let source_dir = Dir::new(&home).version(&version);
+        let source_dir = Dir::new(&home).version_go(&version);
         let current = Dir::new(&home).current();
         let _ = fs::remove_dir_all(&current);
         #[cfg(unix)]

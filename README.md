@@ -22,22 +22,22 @@ If you want to install manually, there are the steps:
 
 * Download the latest `goup` from `https://github.com/thinkgos/goup/releases`
 * Drop the `goup` executable to your `PATH` and make it executable: `mv GOUP_BIN /usr/local/bin/goup && chmod +x /usr/local/bin/goup`
-* Add the Go bin directory to your shell startup script: `echo 'export PATH="$HOME/.go/current/bin:$PATH"' >> ~/.bashrc`
+* Add the Go bin directory to your shell startup script: `echo 'export PATH="$HOME/.goup/current/bin:$PATH"' >> ~/.bashrc`
 
 ## Quick Start
 
 ```shell
 $ goup install
 Installing go1.21.4 ...
-Unpacking /home/thinkgo/.go/go1.21.4/go1.21.4.linux-amd64.tar.gz ...
-Success: go1.21.1 installed in /home/thinkgo/.go/go1.21.4
+Unpacking /home/thinkgo/.goup/go1.21.4/go1.21.4.linux-amd64.tar.gz ...
+Success: go1.21.1 installed in /home/thinkgo/.goup/go1.21.4
 Default Go is set to 'go1.21.4'
 $ goup list
 | VERSION | ACTIVE |
 |---------|--------|
 | 1.21.4  |   *    |
 $ go env GOROOT
-/home/thinkgo/.go/current
+/home/thinkgo/.goup/current
 $ go version
 go version go1.21.4 linux/amd64
 $ GOUP_GO_HOST=golang.google.cn goup install 
@@ -47,9 +47,9 @@ $ GOUP_GO_HOST=golang.google.cn goup install
 
 * `goup completion <SHELL>` Generate the autocompletion script for the specified shell.
 * `goup [help]` Print this message or the help of the given subcommand(s).
-* `goup install/update [VERSION]` downloads specified version of Go to`$HOME/.go/VERSION` and symlinks it to `$HOME/.go/current`.
+* `goup install/update [VERSION]` downloads specified version of Go to`$HOME/.goup/<VERSION>` and symlinks it to `$HOME/.goup/current`.
 * `goup use/set <VERSION>` switches to selected Go version.
-* `goup ls/list` list all installed Go version located at `$HOME/.go/current`.
+* `goup ls/list` list all installed Go version located at `$HOME/.goup/current`.
 * `goup remove/rm [VERSION]...` removes the specified Go version.
 * `goup search [VERSION]` lists all available Go versions from `https://golang.org/dl`.
 * `goup upgrade` upgrades `goup`.
