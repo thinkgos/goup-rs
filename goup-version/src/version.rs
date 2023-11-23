@@ -19,6 +19,11 @@ pub struct Version {
 }
 
 impl Version {
+    pub fn init_env(s: &str) -> Result<(), anyhow::Error> {
+        let env_file = Dir::from_home_dir()?.env();
+        fs::write(env_file, s)?;
+        Ok(())
+    }
     pub fn list_upstream_versions(regex: Option<&str>) -> Result<Vec<String>, anyhow::Error> {
         let output = Command::new("git")
             .args([
@@ -53,6 +58,10 @@ impl Version {
 
     pub fn list_go_version() -> Result<Vec<Version>, anyhow::Error> {
         let home = Dir::home_dir()?;
+        // may be goup not exist
+        if !Dir::new(&home).exists() {
+            return Ok(Vec::new());
+        }
         // may be current not exist
         let current = Dir::new(&home).current().read_link();
         let current = current.as_ref();

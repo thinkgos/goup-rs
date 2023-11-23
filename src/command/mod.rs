@@ -1,4 +1,6 @@
 mod completion;
+#[cfg(unix)]
+mod init;
 mod install;
 mod list;
 mod remove;
@@ -12,6 +14,8 @@ use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
 
 use self::completion::Completion;
+#[cfg(unix)]
+use self::init::Init;
 use self::install::Install;
 use self::list::List;
 use self::remove::Remove;
@@ -86,6 +90,9 @@ enum Command {
     Upgrade(Upgrade),
     /// Generate the autocompletion script for the specified shell
     Completion(Completion),
+    #[cfg(unix)]
+    /// prints all necessary environment variables and values required to use goup
+    Init(Init),
 }
 
 impl Run for Cli {
@@ -97,6 +104,8 @@ impl Run for Cli {
             Command::Search(cmd) => cmd.run(),
             Command::Set(cmd) => cmd.run(),
             Command::Upgrade(cmd) => cmd.run(),
+            #[cfg(unix)]
+            Command::Init(cmd) => cmd.run(),
             Command::Completion(c) => completion::print_completions(c.shell, &mut Self::command()),
         }
     }

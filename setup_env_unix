@@ -1,0 +1,12 @@
+#!/bin/sh
+# goup shell setup
+# affix colons on either side of $PATH to simplify matching
+case ":${PATH}:" in
+    *:"$HOME/.goup/current/bin":*)
+        ;;
+    *)
+        # Prepending path in case a system-installed go needs to be overridden
+        export GOROOT=$HOME/.goup/current
+        export PATH=$PATH:$GOROOT/bin
+        ;;
+esac
