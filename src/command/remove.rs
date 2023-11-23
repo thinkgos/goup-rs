@@ -1,9 +1,7 @@
-use std::fs;
-
 use clap::Args;
 use dialoguer::{theme::ColorfulTheme, MultiSelect};
 
-use crate::{dir::Dir, version::Version};
+use crate::version::Version;
 
 use super::Run;
 
@@ -17,7 +15,7 @@ pub struct Remove {
 impl Run for Remove {
     fn run(&self) -> Result<(), anyhow::Error> {
         if self.version.is_empty() {
-            let vers = Version::list_local_version()?;
+            let vers = Version::list_go_version()?;
             if vers.is_empty() {
                 println!("No go is installed");
                 return Ok(());
@@ -31,14 +29,14 @@ impl Run for Remove {
                 println!("No item selected");
                 return Ok(());
             }
-            Self::remove_items(
+            Version::remove_go_versions(
                 &selection
                     .into_iter()
                     .map(|i| items[i])
                     .collect::<Vec<&str>>(),
             )
         } else {
-            Self::remove_items(
+            Version::remove_go_versions(
                 &self
                     .version
                     .iter()
@@ -46,25 +44,5 @@ impl Run for Remove {
                     .collect::<Vec<&str>>(),
             )
         }
-    }
-}
-
-impl Remove {
-    fn remove_items(vers: &[&str]) -> Result<(), anyhow::Error> {
-        let home: std::path::PathBuf = Dir::home_dir()?;
-        for ver in vers {
-            let version = if ver.starts_with("go") {
-                ver.to_string()
-            } else {
-                format!("go{}", ver)
-            };
-
-            println!("Removing {}", version);
-            let version_dir = Dir::new(&home).version(&version);
-            if version_dir.exists() {
-                fs::remove_dir_all(&version_dir)?;
-            }
-        }
-        Ok(())
     }
 }

@@ -1,10 +1,13 @@
 use std::fs;
 use std::fs::DirEntry;
+use std::process::Command;
 
 use anyhow::anyhow;
+use regex::Regex;
 use reqwest::blocking;
 
-use super::dir::Dir;
+use crate::consts;
+use crate::dir::Dir;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
@@ -15,7 +18,39 @@ pub struct Version {
 }
 
 impl Version {
-    pub fn list_local_version() -> Result<Vec<Version>, anyhow::Error> {
+    pub fn list_upstream_versions(regex: Option<&str>) -> Result<Vec<String>, anyhow::Error> {
+        let output = Command::new("git")
+            .args([
+                "ls-remote",
+                "--sort=version:refname",
+                "--tags",
+                &consts::go_source_git_url(),
+            ])
+            .output()?
+            .stdout;
+        let output = String::from_utf8_lossy(&output);
+
+        let re = regex.filter(|s| !s.is_empty()).map_or_else(
+            || "refs/tags/go(.+)".to_owned(),
+            |s| format!("refs/tags/go(.*{}.*)", s),
+        );
+        Ok(Regex::new(&re)?
+            .captures_iter(&output)
+            .map(|capture| capture[1].to_string())
+            .collect())
+    }
+
+    pub fn get_upstream_latest_go_version(host: &str) -> Result<String, anyhow::Error> {
+        let url = format!("{}/VERSION?m=text", host);
+        let body = blocking::get(url)?.text()?;
+        let ver = body
+            .split('\n')
+            .nth(0)
+            .ok_or_else(|| anyhow!("Getting latest Go version failed"))?;
+        Ok(ver.to_owned())
+    }
+
+    pub fn list_go_version() -> Result<Vec<Version>, anyhow::Error> {
         let home = Dir::home_dir()?;
         // may be current not exist
         let current = Dir::new(&home).current().read_link();
@@ -32,7 +67,7 @@ impl Version {
                 if ver == "gotip" || !ver.starts_with("go") {
                     return None;
                 }
-                if !Dir::is_dot_unpacked_success_exists(&home, &ver) {
+                if !Dir::is_dot_unpacked_success_file_exists(&home, &ver) {
                     return None;
                 }
 
@@ -45,24 +80,11 @@ impl Version {
         vers.sort();
         Ok(vers)
     }
-    pub fn get_latest_go_version(host: &str) -> Result<String, anyhow::Error> {
-        let url = format!("{}/VERSION?m=text", host);
-        let body = blocking::get(url)?.text()?;
-        let ver = body
-            .split('\n')
-            .nth(0)
-            .ok_or_else(|| anyhow!("Getting latest Go version failed"))?;
-        Ok(ver.to_owned())
-    }
 
-    pub fn use_go_version(version: &str) -> Result<(), anyhow::Error> {
-        let version = if version.starts_with("go") {
-            version.to_string()
-        } else {
-            format!("go{}", version)
-        };
-        let home: std::path::PathBuf = Dir::home_dir()?;
-        if !Dir::is_dot_unpacked_success_exists(&home, &version) {
+    pub fn set_go_version(version: &str) -> Result<(), anyhow::Error> {
+        let version = Self::normalize(&version);
+        let home = Dir::home_dir()?;
+        if !Dir::is_dot_unpacked_success_file_exists(&home, &version) {
             return Err(anyhow!(
                 "Go version {version} is not installed. Install it with `govm install`."
             ));
@@ -81,5 +103,37 @@ impl Version {
         }
         println!("Default Go is set to '{version}'");
         Ok(())
+    }
+
+    pub fn remove_go_version(version: &str) -> Result<(), anyhow::Error> {
+        let home = Dir::home_dir()?;
+        let version = Self::normalize(&version);
+        let version_dir = Dir::new(&home).version(&version);
+        if version_dir.exists() {
+            fs::remove_dir_all(&version_dir)?;
+        }
+        Ok(())
+    }
+
+    pub fn remove_go_versions(vers: &[&str]) -> Result<(), anyhow::Error> {
+        let home = Dir::home_dir()?;
+        for ver in vers {
+            let version = Self::normalize(&ver);
+            let version_dir = Dir::new(&home).version(&version);
+            if version_dir.exists() {
+                fs::remove_dir_all(&version_dir)?;
+            }
+        }
+        Ok(())
+    }
+    /// normalize the version string.
+    /// 1.21.1   -> go1.21.1
+    /// go1.21.1 -> go1.21,1
+    pub fn normalize(version: &str) -> String {
+        if version.starts_with("go") {
+            version.to_string()
+        } else {
+            format!("go{}", version)
+        }
     }
 }

@@ -10,7 +10,7 @@ pub struct List;
 
 impl Run for List {
     fn run(&self) -> Result<(), anyhow::Error> {
-        let vers = Version::list_local_version()?;
+        let vers = Version::list_go_version()?;
         if vers.is_empty() {
             println!(
                 "No Go is installed by govm.{}",

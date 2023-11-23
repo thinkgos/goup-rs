@@ -16,9 +16,9 @@ pub struct Set {
 impl Run for Set {
     fn run(&self) -> Result<(), anyhow::Error> {
         if let Some(version) = &self.version {
-            Version::use_go_version(version)
+            Version::set_go_version(version)
         } else {
-            let vers = Version::list_local_version()?;
+            let vers = Version::list_go_version()?;
             if vers.is_empty() {
                 return Err(anyhow!(
                     "Not any go is installed, Install it with `govm install`."
@@ -38,7 +38,7 @@ impl Run for Set {
                 .items(&items)
                 .default(pos)
                 .interact()?;
-            Version::use_go_version(items[selection])
+            Version::set_go_version(items[selection])
         }
     }
 }
