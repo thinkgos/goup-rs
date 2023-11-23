@@ -56,9 +56,9 @@ $ GOVM_GO_HOST=golang.google.cn govm install
 * `govm completion <SHELL>` Generate the autocompletion script for the specified shell.
 * `govm [help]` Print this message or the help of the given subcommand(s).
 * `govm install/update [VERSION]` downloads specified version of Go to`$HOME/.go/VERSION` and symlinks it to `$HOME/.go/current`.
-* `govm use/set [VERSION]` switches to selected Go version.
+* `govm use/set <VERSION>` switches to selected Go version.
 * `govm ls/list` list all installed Go version located at `$HOME/.go/current`.
-* `govm remove [VERSION]` removes the specified Go version.
+* `govm remove/rm [VERSION]...` removes the specified Go version.
 * `govm search [VERSION]` lists all available Go versions from `https://golang.org/dl`.
 * `govm upgrade` upgrades `govm`.
 
