@@ -1,0 +1,24 @@
+[package]
+name = "govm-consts"
+version = "0.1.5"
+authors = ["thinkgo <thinkgo@aliyun.com>"]
+edition = "2021"
+rust-version = "1.70.0"
+description = "govm-consts govm consts"
+keywords = [
+    "goup",
+    "gvm",
+    "govm",
+    "golang",
+    "installer",
+    "version-manager",
+    "tool",
+]
+license = "Apache-2.0"
+readme = "../README.md"
+homepage = "https://github.com/thinkgos/govm"
+repository = "https://github.com/thinkgos/govm"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]

@@ -3,7 +3,7 @@ use prettytable::{row, Table};
 use which::which;
 
 use super::Run;
-use crate::version::Version;
+use govm_version::Version;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct List;

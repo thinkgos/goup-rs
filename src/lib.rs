@@ -1,5 +1,4 @@
-pub mod command;
-pub mod consts;
-pub mod dir;
-pub mod downloader;
-pub mod version;
+mod command;
+
+pub use command::Cli;
+pub use command::Run;

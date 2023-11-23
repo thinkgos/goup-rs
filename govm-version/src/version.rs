@@ -3,11 +3,11 @@ use std::fs::DirEntry;
 use std::process::Command;
 
 use anyhow::anyhow;
+use govm_consts::consts;
 use regex::Regex;
 use reqwest::blocking;
 
-use crate::consts;
-use crate::dir::Dir;
+use super::Dir;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {

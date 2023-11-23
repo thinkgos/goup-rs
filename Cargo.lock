@@ -748,19 +748,46 @@ dependencies = [
  "clap",
  "clap_complete",
  "dialoguer",
- "dirs",
- "flate2",
- "junction",
+ "govm-consts",
+ "govm-downloader",
+ "govm-version",
  "prettytable-rs",
- "regex",
- "reqwest",
  "self_update",
- "sha2",
  "shadow-rs",
- "tar",
  "version_check",
  "which",
+]
+
+[[package]]
+name = "govm-consts"
+version = "0.1.5"
+
+[[package]]
+name = "govm-downloader"
+version = "0.1.5"
+dependencies = [
+ "anyhow",
+ "dirs",
+ "flate2",
+ "govm-consts",
+ "govm-version",
+ "regex",
+ "reqwest",
+ "sha2",
+ "tar",
  "zip",
+]
+
+[[package]]
+name = "govm-version"
+version = "0.1.5"
+dependencies = [
+ "anyhow",
+ "dirs",
+ "govm-consts",
+ "junction",
+ "regex",
+ "reqwest",
 ]
 
 [[package]]
@@ -2105,9 +2132,9 @@ dependencies = [
 
 [[package]]
 name = "webpki-roots"
-version = "0.25.2"
+version = "0.25.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14247bb57be4f377dfb94c72830b8ce8fc6beac03cf4bf7b9732eadd414123fc"
+checksum = "1778a42e8b3b90bff8d0f5032bf22250792889a5cdc752aa0020c84abe3aaf10"
 
 [[package]]
 name = "which"

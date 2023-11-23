@@ -1,7 +1,7 @@
 use clap::Args;
 
 use super::Run;
-use crate::version::Version;
+use govm_version::Version;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Search {

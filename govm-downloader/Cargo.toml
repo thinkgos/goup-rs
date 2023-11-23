@@ -1,0 +1,34 @@
+[package]
+name = "govm-downloader"
+version = "0.1.5"
+authors = ["thinkgo <thinkgo@aliyun.com>"]
+edition = "2021"
+rust-version = "1.70.0"
+description = "govm-downloader govm downloader"
+keywords = [
+    "goup",
+    "gvm",
+    "govm",
+    "golang",
+    "installer",
+    "version-manager",
+    "tool",
+]
+license = "Apache-2.0"
+readme = "../README.md"
+homepage = "https://github.com/thinkgos/govm"
+repository = "https://github.com/thinkgos/govm"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+govm-consts = {path = "../govm-consts"}
+govm-version = {path = "../govm-version"}
+anyhow = "1.0"
+dirs = "5.0"
+regex = "1.10"
+reqwest = { version = "0.11", default-features = false, features = ["blocking", "rustls-tls-native-roots"] }
+sha2 = "0.10"
+flate2 = "1.0"
+tar = "0.4"
+zip = "0.6"
+# git2 = "0.18"

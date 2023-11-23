@@ -6,7 +6,6 @@ mod search;
 mod set;
 mod upgrade;
 
-use clap::builder::{IntoResettable, Resettable, Str};
 use clap::{ArgAction, Args, CommandFactory};
 use clap::{Parser, Subcommand};
 use shadow_rs::shadow;
@@ -21,7 +20,7 @@ use self::set::Set;
 use self::upgrade::Upgrade;
 
 shadow!(build);
-pub const VERSION: &str = shadow_rs::formatcp!(
+const VERSION: &str = shadow_rs::formatcp!(
     r#"{}
 auth:            {}
 git_commit:      {}
@@ -47,7 +46,7 @@ pub trait Run {
 }
 
 #[derive(Args, Debug, PartialEq)]
-pub struct Global {
+struct Global {
     /// Verbose
     #[arg(short, long, action = ArgAction::Count)]
     verbose: u8,
@@ -59,14 +58,14 @@ pub struct Global {
 #[command(version = VERSION)]
 pub struct Cli {
     #[command(flatten)]
-    pub global: Global,
+    global: Global,
     #[command(subcommand)]
-    pub command: Command,
+    command: Command,
 }
 
 #[derive(Subcommand, Debug, PartialEq)]
 #[non_exhaustive] // 表明未来还有其它元素添加
-pub enum Command {
+enum Command {
     /// Install Go with a version
     #[command(visible_alias = "update")]
     Install(Install),
@@ -100,13 +99,5 @@ impl Run for Cli {
             Command::Upgrade(cmd) => cmd.run(),
             Command::Completion(c) => completion::print_completions(c.shell, &mut Self::command()),
         }
-    }
-}
-
-struct V {}
-
-impl IntoResettable<Str> for V {
-    fn into_resettable(self) -> Resettable<Str> {
-        Resettable::Value(build::CLAP_LONG_VERSION.into())
     }
 }
