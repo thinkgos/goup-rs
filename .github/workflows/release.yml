@@ -107,7 +107,7 @@ jobs:
         if: matrix.os == 'windows-latest' && matrix.target != 'aarch64-pc-windows-msvc'
         run: |
           cargo wix init -p goup
-          cargo wix -p goup -v --no-build --nocapture -I wix/main.wxs --target ${{ matrix.target }} --output target/wix/goup-${{ matrix.target }}.msi
+          cargo wix -p goup -v --no-build --nocapture --target ${{ matrix.target }} --output target/wix/goup-${{ matrix.target }}.msi
 
       - name: Post Build | Prepare artifacts [Windows]
         if: matrix.os == 'windows-latest'
