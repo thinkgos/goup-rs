@@ -1,14 +1,14 @@
 [package]
-name = "govm-downloader"
-version = "0.1.7"
+name = "goup-downloader"
+version = "0.2.0"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2021"
 rust-version = "1.70.0"
-description = "govm-downloader govm downloader"
+description = "goup-downloader goup downloader"
 keywords = [
     "goup",
     "gvm",
-    "govm",
+    "goup",
     "golang",
     "installer",
     "version-manager",
@@ -16,13 +16,13 @@ keywords = [
 ]
 license = "Apache-2.0"
 readme = "../README.md"
-homepage = "https://github.com/thinkgos/govm"
-repository = "https://github.com/thinkgos/govm"
+homepage = "https://github.com/thinkgos/goup"
+repository = "https://github.com/thinkgos/goup"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-govm-consts = {path = "../govm-consts"}
-govm-version = {path = "../govm-version"}
+goup-consts = {path = "../goup-consts"}
+goup-version = {path = "../goup-version"}
 anyhow = "1.0"
 dirs = "5.0"
 regex = "1.10"

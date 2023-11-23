@@ -1,7 +1,7 @@
 use clap::Args;
 use dialoguer::{theme::ColorfulTheme, MultiSelect};
 
-use govm_version::Version;
+use goup_version::Version;
 
 use super::Run;
 

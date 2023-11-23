@@ -1,7 +1,7 @@
 use clap::Parser;
 
-use govm::Cli;
-use govm::Run;
+use goup::Cli;
+use goup::Run;
 
 fn main() -> Result<(), anyhow::Error> {
     Cli::parse().run()

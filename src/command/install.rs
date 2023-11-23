@@ -1,8 +1,8 @@
 use clap::Args;
 
-use govm_consts::consts;
-use govm_downloader::Downloader;
-use govm_version::Version;
+use goup_consts::consts;
+use goup_downloader::Downloader;
+use goup_version::Version;
 
 use super::Run;
 
@@ -14,7 +14,7 @@ pub struct Install {
     /// an optional change list (CL), If the version is 'tip'
     cl: Option<String>,
     /// host that is used to download Go.
-    #[arg(long, default_value_t = consts::GO_HOST.to_owned(), env = consts::GOVM_GO_HOST)]
+    #[arg(long, default_value_t = consts::GO_HOST.to_owned(), env = consts::GOUP_GO_HOST)]
     host: String,
 }
 

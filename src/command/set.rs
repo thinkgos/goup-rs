@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use clap::Args;
 use dialoguer::{theme::ColorfulTheme, Select};
 
-use govm_version::Version;
+use goup_version::Version;
 
 use super::Run;
 
@@ -21,7 +21,7 @@ impl Run for Set {
             let vers = Version::list_go_version()?;
             if vers.is_empty() {
                 return Err(anyhow!(
-                    "Not any go is installed, Install it with `govm install`."
+                    "Not any go is installed, Install it with `goup install`."
                 ));
             }
 

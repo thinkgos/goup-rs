@@ -741,16 +741,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "govm"
-version = "0.1.7"
+name = "goup"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "clap",
  "clap_complete",
  "dialoguer",
- "govm-consts",
- "govm-downloader",
- "govm-version",
+ "goup-consts",
+ "goup-downloader",
+ "goup-version",
  "prettytable-rs",
  "self_update",
  "shadow-rs",
@@ -759,18 +759,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "govm-consts"
-version = "0.1.7"
+name = "goup-consts"
+version = "0.2.0"
 
 [[package]]
-name = "govm-downloader"
-version = "0.1.7"
+name = "goup-downloader"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "dirs",
  "flate2",
- "govm-consts",
- "govm-version",
+ "goup-consts",
+ "goup-version",
  "regex",
  "reqwest",
  "sha2",
@@ -779,12 +779,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "govm-version"
-version = "0.1.7"
+name = "goup-version"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "dirs",
- "govm-consts",
+ "goup-consts",
  "junction",
  "regex",
  "reqwest",

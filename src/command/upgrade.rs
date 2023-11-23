@@ -13,7 +13,7 @@ impl Run for Upgrade {
         let cmd = Cli::command();
         let status = Update::configure()
             .repo_owner("thinkgos")
-            .repo_name("govm")
+            .repo_name("goup")
             .bin_name(cmd.get_name())
             .show_download_progress(true)
             .no_confirm(true)

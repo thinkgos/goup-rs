@@ -3,7 +3,7 @@ use std::fs::DirEntry;
 use std::process::Command;
 
 use anyhow::anyhow;
-use govm_consts::consts;
+use goup_consts::consts;
 use regex::Regex;
 use reqwest::blocking;
 
@@ -86,7 +86,7 @@ impl Version {
         let home = Dir::home_dir()?;
         if !Dir::is_dot_unpacked_success_file_exists(&home, &version) {
             return Err(anyhow!(
-                "Go version {version} is not installed. Install it with `govm install`."
+                "Go version {version} is not installed. Install it with `goup install`."
             ));
         }
         let source_dir = Dir::new(&home).version(&version);

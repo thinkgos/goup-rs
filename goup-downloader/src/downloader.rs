@@ -12,8 +12,8 @@ use sha2::{Digest, Sha256};
 use tar::Archive;
 use zip::ZipArchive;
 
-use govm_consts::consts;
-use govm_version::Dir;
+use goup_consts::consts;
+use goup_version::Dir;
 
 pub struct Downloader;
 

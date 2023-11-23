@@ -70,7 +70,7 @@ enum Command {
     #[command(visible_alias = "update")]
     Install(Install),
     /// List all installed Go
-    #[command(visible_alias = "ls")]
+    #[command(visible_aliases = ["ls", "show"])]
     List(List),
     /// Remove Go with multiple version.
     /// If no version is provided, a prompt will show to select multiple installed Go version.
@@ -82,7 +82,7 @@ enum Command {
     /// If no version is provided, a prompt will show to select a installed Go version.
     #[command(visible_alias = "use")]
     Set(Set),
-    /// Upgrade govm
+    /// Upgrade goup
     Upgrade(Upgrade),
     /// Generate the autocompletion script for the specified shell
     Completion(Completion),

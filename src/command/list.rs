@@ -3,7 +3,7 @@ use prettytable::{row, Table};
 use which::which;
 
 use super::Run;
-use govm_version::Version;
+use goup_version::Version;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct List;
@@ -13,7 +13,7 @@ impl Run for List {
         let vers = Version::list_go_version()?;
         if vers.is_empty() {
             println!(
-                "No Go is installed by govm.{}",
+                "No Go is installed by goup.{}",
                 if let Ok(go_bin) = which("go") {
                     format!(" Using system Go {}.", go_bin.to_string_lossy())
                 } else {
