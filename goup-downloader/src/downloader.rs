@@ -1,7 +1,8 @@
 use std::{
     env, fs,
     fs::File,
-    io::{self, Read},
+    io,
+    io::Read,
     path::{Path, PathBuf},
 };
 
@@ -19,36 +20,37 @@ pub struct Downloader;
 
 impl Downloader {
     pub fn install_go_tip(_cl: Option<&str>) -> Result<(), anyhow::Error> {
+        // TODO: implement me?
         Err(anyhow!("Feature not supported"))
     }
     pub fn install_go_version(version: &str) -> Result<(), anyhow::Error> {
         let home = Dir::home_dir()?;
-        let dest_version_dir = Dir::new(&home).version(version);
-
-        // 是否已解压并且存在
+        let version_dest_dir = Dir::new(&home).version(version);
+        // 是否已解压成功并且存在
         if Dir::is_dot_unpacked_success_file_exists(&home, version) {
             println!(
                 "{}: already installed in {:?}",
                 version,
-                dest_version_dir.display()
+                version_dest_dir.display()
             );
             return Ok(());
         }
         // 压缩包url
         let archive_url = consts::go_version_archive_url(version);
         // 压缩包长度
-        let archive_content_length = Self::get_archive_content_length(version, &archive_url)?;
-        // 压缩包文件名
+        let archive_content_length =
+            Self::get_upstream_archive_content_length(version, &archive_url)?;
+        // 压缩包文件名称
         let archive_file_name = Path::new(&archive_url)
             .file_name()
             .ok_or_else(|| anyhow!("Getting archive filename failure."))?
             .to_string_lossy();
-        let mut archive_file = dest_version_dir.clone();
-        archive_file.push(archive_file_name.as_ref());
-
-        if !dest_version_dir.exists() {
-            fs::create_dir_all(&dest_version_dir)?
+        // 版本路径
+        if !version_dest_dir.exists() {
+            fs::create_dir_all(&version_dest_dir)?
         }
+        // 压缩包文件
+        let archive_file = version_dest_dir.join(archive_file_name.as_ref());
         if !archive_file.exists() || archive_file.metadata()?.len() != archive_content_length {
             // 下载
             Self::download_archive(&archive_file, &archive_url)?;
@@ -63,25 +65,26 @@ impl Downloader {
                 ));
             }
         }
-        // 校验.sha256
-        Self::verify_archive_sha256(
-            &archive_file,
-            Self::get_archive_sha256(&archive_url)?.trim(),
-        )?;
+        // 校验压缩包sha256
+        Self::verify_archive_file_sha256(&archive_file, &archive_url)?;
         // 解压
         println!("Unpacking {} ...", archive_file.display());
-        Self::unpack_archive(&dest_version_dir, &archive_file)?;
+        Self::unpack_archive(&version_dest_dir, &archive_file)?;
         Dir::create_dot_unpacked_success_file(&home, version)?;
         // 设置解压成功
         println!(
             "Success: {} installed in {}",
             version,
-            dest_version_dir.display()
+            version_dest_dir.display()
         );
         Ok(())
     }
 
-    fn get_archive_content_length(version: &str, archive_url: &str) -> Result<u64, anyhow::Error> {
+    /// get_upstream_archive_content_length 获取上游压缩包文件长度
+    fn get_upstream_archive_content_length(
+        version: &str,
+        archive_url: &str,
+    ) -> Result<u64, anyhow::Error> {
         let resp = blocking::Client::builder()
             .build()?
             .head(archive_url)
@@ -110,29 +113,25 @@ impl Downloader {
         Ok(content_length)
     }
 
-    /// 获取压缩包sha256
-    fn get_archive_sha256(archive_url: &str) -> Result<String, anyhow::Error> {
-        Ok(blocking::get(format!("{}.sha256", archive_url))?.text()?)
-    }
-
-    /// 下载压缩包
-    fn download_archive(archive_file: &PathBuf, archive_url: &str) -> Result<(), anyhow::Error> {
+    /// download_archive 下载压缩包
+    fn download_archive<P: AsRef<Path>>(dest: P, archive_url: &str) -> Result<(), anyhow::Error> {
         let mut response = blocking::get(archive_url)?;
         if !response.status().is_success() {
             return Err(anyhow!("Downloading archive failure"));
         }
-        let mut file = File::create(archive_file)?;
+        let mut file = File::create(dest)?;
         response.copy_to(&mut file)?;
         Ok(())
     }
 
-    /// 校验文件sha256
-    fn verify_archive_sha256(
-        archive_file: &PathBuf,
-        expect_sha256: &str,
-    ) -> Result<(), anyhow::Error> {
+    /// get_upstream_archive_file_sha256 获取上游压缩包的sha256值
+    fn get_upstream_archive_file_sha256(archive_url: &str) -> Result<String, anyhow::Error> {
+        Ok(blocking::get(format!("{}.sha256", archive_url))?.text()?)
+    }
+    /// compute_file_sha256 计算文件的sha256
+    fn compute_file_sha256<P: AsRef<Path>>(path: P) -> Result<String, anyhow::Error> {
         let mut context = Sha256::new();
-        let mut file = File::open(archive_file)?;
+        let mut file = File::open(path)?;
         let mut buffer = [0; 4096]; // 定义一个缓冲区来处理字节流数据
         loop {
             let bytes_read = file.read(&mut buffer)?;
@@ -141,17 +140,26 @@ impl Downloader {
             }
             context.update(&buffer[..bytes_read]);
         }
-        let result = context.finalize();
-        let got_sha256 = format!("{:x}", result);
+        Ok(format!("{:x}", context.finalize()))
+    }
+    /// verify_archive_file_sha256 校验本地文件和上游文件的sha256
+    fn verify_archive_file_sha256<P: AsRef<Path>>(
+        path: P,
+        archive_url: &str,
+    ) -> Result<(), anyhow::Error> {
+        let expect_sha256 = Self::get_upstream_archive_file_sha256(archive_url)?;
+        let expect_sha256 = expect_sha256.trim();
+        let got_sha256 = Self::compute_file_sha256(&path)?;
         if expect_sha256 != got_sha256 {
             return Err(anyhow!(
                 "{} corrupt? does not have expected SHA-256 of {}",
-                archive_file.display(),
+                path.as_ref().display(),
                 expect_sha256,
             ));
         }
         Ok(())
     }
+
     /// unpack_archive unpacks the provided archive zip or tar.gz file to targetDir,
     /// removing the "go/" prefix from file entries.
     fn unpack_archive(dest_dir: &Path, archive_file: &PathBuf) -> Result<(), anyhow::Error> {
