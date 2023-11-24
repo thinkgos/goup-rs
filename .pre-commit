@@ -8,7 +8,7 @@ if ! cargo fmt -- --check; then
     exit 1
 fi
 
-if ! cargo clippy --all-targets -- -D warnings; then
+if ! cargo clippy --all-targets --all-features -- -D warnings; then
     echo "There are some clippy issues."
     exit 1
 fi
@@ -18,7 +18,7 @@ if ! cargo check --all; then
     exit 1
 fi
 
-if ! cargo test; then
+if ! cargo test --all-features; then
     echo "There are some test issues."
     exit 1
 fi
