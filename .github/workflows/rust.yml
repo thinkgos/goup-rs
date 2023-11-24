@@ -10,8 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test:
-    name: Cargo Test
+  build:
     strategy:
       fail-fast: false
       matrix:
@@ -19,13 +18,16 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Set up Rust
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Use cache
+        uses: Swatinem/rust-cache@v2
       - name: Run code format
         run: cargo fmt -- --check
       - name: Run Clippy
-        run: cargo clippy --all-targets --all-features
+        run: cargo clippy --all-targets --all-features -- -D warnings
       - name: Run Check
         run: cargo check --all
       - name: Run Test
