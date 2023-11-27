@@ -109,7 +109,7 @@ impl Version {
         }
         #[cfg(windows)]
         {
-            junction::create(source_dir, &current)?;
+            junction::create(original, &link)?;
         }
         println!("Default Go is set to '{version}'");
         Ok(())
