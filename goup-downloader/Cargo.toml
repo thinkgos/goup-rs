@@ -1,6 +1,6 @@
 [package]
 name = "goup-downloader"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2021"
 rust-version = "1.70.0"
