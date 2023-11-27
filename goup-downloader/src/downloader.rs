@@ -91,11 +91,14 @@ impl Downloader {
         // 执行 ./src/make.rs/make.bat/make.bash 有$GOROOT/src问题
 
         //* $HOME/{owner}/.goup/gotip/src/[make.bash|make.rs|make.bat]
-        Self::execute_command(
-            gotip_go.join("src").join("make.bash"),
-            gotip_go.join("src"),
-            [],
-        )?;
+
+        let script = match env::consts::OS {
+            "windows" => "make.bat",
+            "plan9" => "make.rs",
+            _ => "make.bash",
+        };
+
+        Self::execute_command(gotip_go.join("src").join(script), gotip_go.join("src"), [])?;
         Ok(())
     }
     pub fn install_go_version(version: &str) -> Result<(), anyhow::Error> {
