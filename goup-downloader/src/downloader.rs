@@ -41,7 +41,7 @@ impl Downloader {
         }
         let status = command.wait()?;
         if !status.success() {
-            eprintln!("Command failed with exit code: {}", status);
+            return Err(anyhow!("Command failed with exit code: {}", status));
         }
         Ok(())
     }
