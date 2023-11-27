@@ -78,10 +78,7 @@ impl Version {
                 }
 
                 let ver = v.file_name().to_string_lossy().to_string();
-                if ver == "gotip" || !ver.starts_with("go") {
-                    return None;
-                }
-                if !Dir::is_dot_unpacked_success_file_exists(&home, &ver) {
+                if ver != "gotip" && !Dir::is_dot_unpacked_success_file_exists(&home, &ver) {
                     return None;
                 }
                 Some(Version {
@@ -97,18 +94,18 @@ impl Version {
     pub fn set_go_version(version: &str) -> Result<(), anyhow::Error> {
         let version = Self::normalize(version);
         let home = Dir::home_dir()?;
-        if !Dir::is_dot_unpacked_success_file_exists(&home, &version) {
+        let original = Dir::new(&home).version_go(&version);
+        if !original.exists() {
             return Err(anyhow!(
                 "Go version {version} is not installed. Install it with `goup install`."
             ));
         }
-        let source_dir = Dir::new(&home).version_go(&version);
-        let current = Dir::new(&home).current();
-        let _ = fs::remove_dir_all(&current);
+        let link = Dir::new(&home).current();
+        let _ = fs::remove_dir_all(&link);
         #[cfg(unix)]
         {
             use std::os::unix::fs as unix_fs;
-            unix_fs::symlink(source_dir, &current)?;
+            unix_fs::symlink(original, &link)?;
         }
         #[cfg(windows)]
         {

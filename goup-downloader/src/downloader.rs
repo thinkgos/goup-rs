@@ -1,9 +1,11 @@
 use std::{
-    env, fs,
+    env,
+    ffi::OsStr,
+    fs,
     fs::File,
-    io,
-    io::Read,
+    io::{self, BufRead, BufReader, Read},
     path::{Path, PathBuf},
+    process::{Command, Stdio},
 };
 
 use anyhow::anyhow;
@@ -19,9 +21,82 @@ use goup_version::Dir;
 pub struct Downloader;
 
 impl Downloader {
+    fn execute_command<P, I, S>(program: S, working_dir: P, args: I) -> Result<(), anyhow::Error>
+    where
+        P: AsRef<Path>,
+        I: IntoIterator<Item = S>,
+        S: AsRef<OsStr>,
+    {
+        let mut command = Command::new(program)
+            .current_dir(working_dir)
+            .args(args)
+            .stdout(Stdio::piped())
+            .spawn()?;
+        if let Some(stdout) = command.stdout.take() {
+            let reader = BufReader::new(stdout);
+
+            for line in reader.lines().flatten() {
+                println!("{}", line);
+            }
+        }
+        let status = command.wait()?;
+        if !status.success() {
+            eprintln!("Command failed with exit code: {}", status);
+        }
+        Ok(())
+    }
+
     pub fn install_go_tip(_cl: Option<&str>) -> Result<(), anyhow::Error> {
-        // TODO: implement me?
-        Err(anyhow!("Feature not supported"))
+        let gotip_go = Dir::from_home_dir()?.version_go("gotip");
+        let gotip_git = gotip_go.join(".git");
+        // gotip is not clone from source
+        if !gotip_git.exists() {
+            fs::create_dir_all(&gotip_go)?;
+            //* git clone --depth=1 {url}
+            Self::execute_command(
+                "git",
+                &gotip_go,
+                [
+                    "clone",
+                    "--depth=1",
+                    &consts::go_source_git_url(),
+                    &gotip_go.to_string_lossy(),
+                ],
+            )?;
+            //* git remote add upstream {url}
+            Self::execute_command(
+                "git",
+                &gotip_go,
+                [
+                    "remote",
+                    "add",
+                    "upstream",
+                    &consts::go_source_upstream_git_url(),
+                ],
+            )?;
+        }
+        println!("Updating the go development tree...");
+        //* git fetch origin master
+        Self::execute_command("git", &gotip_go, ["fetch", "origin", "master"])?;
+        //* git -c advice.detachedHead=false checkout FETCH_HEAD
+        Self::execute_command(
+            "git",
+            &gotip_go,
+            ["-c", "advice.detachedHead=false", "checkout", "FETCH_HEAD"],
+        )?;
+        //* git clean -i -d
+        Self::execute_command("git", &gotip_go, ["clean", "-i", "-d"])?;
+        //* git clean -q -f -d -X
+        Self::execute_command("git", &gotip_go, ["clean", "-q", "-f", "-d", "-X"])?;
+        // 执行 ./src/make.rs/make.bat/make.bash 有$GOROOT/src问题
+
+        //* $HOME/{owner}/.goup/gotip/src/[make.bash|make.rs|make.bat]
+        Self::execute_command(
+            gotip_go.join("src").join("make.bash"),
+            gotip_go.join("src"),
+            [],
+        )?;
+        Ok(())
     }
     pub fn install_go_version(version: &str) -> Result<(), anyhow::Error> {
         let home = Dir::home_dir()?;
