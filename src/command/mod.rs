@@ -26,7 +26,7 @@ use self::upgrade::Upgrade;
 shadow!(build);
 const VERSION: &str = shadow_rs::formatcp!(
     r#"{}
-auth:            {}
+author:            {}
 git_commit:      {}
 git_full_commit: {}
 build_time:      {}
