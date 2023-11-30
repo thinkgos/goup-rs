@@ -14,8 +14,8 @@ keywords = [
 ]
 license = "Apache-2.0"
 readme = "../README.md"
-homepage = "https://github.com/thinkgos/goup"
-repository = "https://github.com/thinkgos/goup"
+homepage = "https://github.com/thinkgos/goup-rs"
+repository = "https://github.com/thinkgos/goup-rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

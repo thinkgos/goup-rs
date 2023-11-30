@@ -13,14 +13,14 @@ There are a bunch of solutions to install Go or manage Go versions outside of a 
 ### One-liner
 
 ```shell
-cargo install goup --git https://github.com/thinkgos/goup
+cargo install goup --git https://github.com/thinkgos/goup-rs
 ```
 
 ### Manual
 
 If you want to install manually, there are the steps:
 
-* Download the latest `goup` from `https://github.com/thinkgos/goup/releases`
+* Download the latest `goup` from `https://github.com/thinkgos/goup-rs/releases`
 * Drop the `goup` executable to your `PATH` and make it executable: `mv GOUP_BIN /usr/local/bin/goup && chmod +x /usr/local/bin/goup`
 * Add the Go bin directory to your shell startup script: `echo 'export PATH="$HOME/.goup/current/bin:$PATH"' >> ~/.bashrc`
 
