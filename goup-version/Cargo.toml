@@ -1,6 +1,6 @@
 [package]
 name = "goup-version"
-version = "0.2.4"
+version = "0.2.5"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2021"
 rust-version = "1.70.0"
@@ -20,7 +20,7 @@ repository = "https://github.com/thinkgos/goup-rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-goup-consts = {path = "../goup-consts", version = "0.2.4"}
+goup-consts = {path = "../goup-consts", version = "0.2.5"}
 anyhow = "1.0"
 dirs = "5.0"
 regex = "1.10"

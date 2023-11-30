@@ -741,8 +741,28 @@ dependencies = [
 ]
 
 [[package]]
-name = "goup"
-version = "0.2.4"
+name = "goup-consts"
+version = "0.2.5"
+
+[[package]]
+name = "goup-downloader"
+version = "0.2.5"
+dependencies = [
+ "anyhow",
+ "dirs",
+ "flate2",
+ "goup-consts",
+ "goup-version",
+ "regex",
+ "reqwest",
+ "sha2",
+ "tar",
+ "zip",
+]
+
+[[package]]
+name = "goup-rs"
+version = "0.2.5"
 dependencies = [
  "anyhow",
  "clap",
@@ -759,28 +779,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "goup-consts"
-version = "0.2.4"
-
-[[package]]
-name = "goup-downloader"
-version = "0.2.4"
-dependencies = [
- "anyhow",
- "dirs",
- "flate2",
- "goup-consts",
- "goup-version",
- "regex",
- "reqwest",
- "sha2",
- "tar",
- "zip",
-]
-
-[[package]]
 name = "goup-version"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "anyhow",
  "dirs",
