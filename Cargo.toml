@@ -8,9 +8,7 @@ build = "build.rs"
 description = "goup is an elegant Go version manager"
 keywords = [
     "goup",
-    "gvm",
     "golang",
-    "installer",
     "version-manager",
     "tool",
     "rust"

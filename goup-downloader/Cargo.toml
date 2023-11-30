@@ -7,10 +7,8 @@ rust-version = "1.70.0"
 description = "goup-downloader goup downloader"
 keywords = [
     "goup",
-    "gvm",
     "goup",
     "golang",
-    "installer",
     "version-manager",
     "tool",
 ]
