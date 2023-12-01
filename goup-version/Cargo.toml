@@ -26,3 +26,6 @@ dirs = "5.0"
 regex = "1.10"
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "rustls-tls-native-roots"] }
 junction = "1.0"
+
+[dev-dependencies]
+tempfile = "3"

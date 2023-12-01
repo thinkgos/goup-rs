@@ -788,6 +788,7 @@ dependencies = [
  "junction",
  "regex",
  "reqwest",
+ "tempfile",
 ]
 
 [[package]]

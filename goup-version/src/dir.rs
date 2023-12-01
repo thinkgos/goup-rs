@@ -1,4 +1,5 @@
 use std::{
+    fs,
     fs::File,
     ops::{Deref, DerefMut},
     path::{Path, PathBuf},
@@ -56,34 +57,38 @@ impl Dir {
         self
     }
     /// `${path}/.goup/{version}/go`
-    pub fn version_go<P: AsRef<Path>>(mut self, p: P) -> Self {
-        self.path.push(p);
+    pub fn version_go<P: AsRef<Path>>(mut self, ver: P) -> Self {
+        self.path.push(ver);
         self.path.push("go");
         self
     }
-
+    /// `${path}/.goup/{version}/.unpacked-success`
+    fn version_dot_unpacked_success<P: AsRef<Path>>(mut self, ver: P) -> Self {
+        self.path.push(ver);
+        self.path.push(".unpacked-success");
+        self
+    }
     // `${path}/.goup/{version}/.unpacked-success` is exist.
     pub fn is_dot_unpacked_success_file_exists<P, P1>(home: P, ver: P1) -> bool
     where
         P: AsRef<Path>,
         P1: AsRef<Path>,
     {
-        Self::new(home).version_dot_unpacked_success(ver).exists()
+        Self::new(&home).version_dot_unpacked_success(&ver).exists()
     }
-    /// create `${path}/.goup/{version}/.unpacked-success` file
+    /// `${path}/.goup/{version}/.unpacked-success` create file
     pub fn create_dot_unpacked_success_file<P, P1>(home: P, ver: P1) -> Result<(), anyhow::Error>
     where
         P: AsRef<Path>,
         P1: AsRef<Path>,
     {
-        File::create(Self::new(home).version_dot_unpacked_success(ver))?;
+        let dot_unpacked_success_file = Self::new(&home).version_dot_unpacked_success(&ver);
+        let parent = dot_unpacked_success_file.parent();
+        if let Some(parent) = parent {
+            fs::create_dir_all(parent)?;
+        }
+        File::create(&dot_unpacked_success_file)?;
         Ok(())
-    }
-    /// `${path}/.goup/{version}/.unpacked-success`
-    fn version_dot_unpacked_success<P: AsRef<Path>>(mut self, p: P) -> Self {
-        self.path.push(p);
-        self.path.push(".unpacked-success");
-        self
     }
 }
 
@@ -113,20 +118,18 @@ mod tests {
     use std::ffi::OsStr;
 
     #[test]
+    fn test_home_dir() {
+        println!("Dir - home_dir: {:?}", Dir::home_dir());
+        println!("Dir - from_home_dir: {:?}", Dir::from_home_dir());
+    }
+
+    #[test]
     fn test_dir() {
         let home_dir = Path::new("/home/dev");
 
         assert_eq!(Dir::new(home_dir).as_ref(), Path::new("/home/dev/.goup"));
         assert_eq!(Dir::new(home_dir).file_name(), Some(OsStr::new(".goup")));
 
-        assert_eq!(
-            Dir::new(home_dir).bin().as_ref(),
-            Path::new("/home/dev/.goup/bin")
-        );
-        assert_eq!(
-            Dir::new(home_dir).current_bin().as_ref(),
-            Path::new("/home/dev/.goup/current/bin")
-        );
         assert_eq!(
             Dir::new(home_dir).env().as_ref(),
             Path::new("/home/dev/.goup/env")
@@ -136,6 +139,10 @@ mod tests {
             Path::new("/home/dev/.goup/current")
         );
         assert_eq!(
+            Dir::new(home_dir).current_bin().as_ref(),
+            Path::new("/home/dev/.goup/current/bin")
+        );
+        assert_eq!(
             Dir::new(home_dir).bin().as_ref(),
             Path::new("/home/dev/.goup/bin")
         );
@@ -143,5 +150,34 @@ mod tests {
             Dir::new(home_dir).version("go1.21.2").as_ref(),
             Path::new("/home/dev/.goup/go1.21.2")
         );
+        assert_eq!(
+            Dir::new(home_dir).version_go("go1.21.2").as_ref(),
+            Path::new("/home/dev/.goup/go1.21.2/go")
+        );
+        assert_eq!(
+            Dir::new(home_dir).version_go("go1.21.2").as_ref(),
+            Path::new("/home/dev/.goup/go1.21.2/go")
+        );
+        assert_eq!(
+            Dir::new(home_dir).version_go("go1.21.2").as_ref(),
+            Path::new("/home/dev/.goup/go1.21.2/go")
+        );
+    }
+
+    #[test]
+    fn test_dot_unpacked_success_file() -> Result<(), anyhow::Error> {
+        let tmp_home_dir = tempfile::tempdir()?;
+        println!("{}", tmp_home_dir.path().display());
+        assert!(!Dir::is_dot_unpacked_success_file_exists(
+            &tmp_home_dir,
+            "go1.21.2"
+        ));
+        Dir::create_dot_unpacked_success_file(&tmp_home_dir, "go1.21.2")?;
+        assert!(Dir::is_dot_unpacked_success_file_exists(
+            &tmp_home_dir,
+            "go1.21.2"
+        ));
+
+        Ok(())
     }
 }
