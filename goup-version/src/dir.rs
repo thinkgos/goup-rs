@@ -52,8 +52,8 @@ impl Dir {
         self
     }
     /// `${path}/.goup/{version}`
-    pub fn version<P: AsRef<Path>>(mut self, p: P) -> Self {
-        self.path.push(p);
+    pub fn version<P: AsRef<Path>>(mut self, ver: P) -> Self {
+        self.path.push(ver);
         self
     }
     /// `${path}/.goup/{version}/go`
@@ -122,7 +122,6 @@ mod tests {
         println!("Dir - home_dir: {:?}", Dir::home_dir());
         println!("Dir - from_home_dir: {:?}", Dir::from_home_dir());
     }
-
     #[test]
     fn test_dir() {
         let home_dir = Path::new("/home/dev");

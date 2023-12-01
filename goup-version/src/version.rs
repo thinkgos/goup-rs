@@ -138,11 +138,13 @@ impl Version {
     /// normalize the version string.
     /// 1.21.1   -> go1.21.1
     /// go1.21.1 -> go1.21,1
-    pub fn normalize(version: &str) -> String {
-        if version.starts_with("go") {
-            version.to_string()
+    /// tip      -> gotip
+    /// gotip    -> gotip
+    pub fn normalize(ver: &str) -> String {
+        if ver.starts_with("go") {
+            ver.to_string()
         } else {
-            format!("go{}", version)
+            format!("go{}", ver)
         }
     }
 }
