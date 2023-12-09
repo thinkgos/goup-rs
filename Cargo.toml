@@ -25,7 +25,7 @@ path = "src/main.rs"
 
 [build-dependencies]
 version_check = "0.9"
-shadow-rs = "0.24"
+shadow-rs = "0.25"
 
 [dependencies]
 goup-consts = {path = "./goup-consts", version = "0.2.5"}
@@ -39,7 +39,7 @@ which = "5.0"
 prettytable-rs = "0.10"
 dialoguer = "0.11"
 self_update = {version = "0.39", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}
-shadow-rs = "0.24"
+shadow-rs = "0.25"
 
 [profile.dev.package."*"]
 opt-level = 3
