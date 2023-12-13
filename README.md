@@ -16,6 +16,12 @@ There are a bunch of solutions to install Go or manage Go versions outside of a 
 cargo install goup --git https://github.com/thinkgos/goup-rs
 ```
 
+or
+
+```shell
+cargo install goup-rs
+```
+
 ### Manual
 
 If you want to install manually, there are the steps:

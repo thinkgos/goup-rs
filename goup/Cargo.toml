@@ -1,0 +1,37 @@
+[package]
+name = "goup-rs"
+version.workspace =true
+authors.workspace =true
+edition.workspace =true
+rust-version.workspace =true
+description.workspace =true
+keywords.workspace =true
+license.workspace =true
+readme.workspace =true
+homepage.workspace =true
+repository.workspace =true
+
+build = "build.rs"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "goup"
+path = "src/main.rs"
+
+[build-dependencies]
+version_check = "0.9"
+shadow-rs = "0.25"
+
+[dependencies]
+goup-consts = {path = "../goup-consts"}
+goup-version = {path = "../goup-version"}
+goup-downloader = {path = "../goup-downloader"}
+
+clap = {version = "4.4", features = ["derive", "env"]}
+clap_complete = "4.4"
+anyhow = "1.0"
+which = "5.0"
+prettytable-rs = "0.10"
+dialoguer = "0.11"
+self_update = {version = "0.39", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}
+shadow-rs = "0.25"

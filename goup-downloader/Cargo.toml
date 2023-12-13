@@ -1,26 +1,20 @@
 [package]
 name = "goup-downloader"
-version = "0.2.5"
-authors = ["thinkgo <thinkgo@aliyun.com>"]
-edition = "2021"
-rust-version = "1.70.0"
-description = "goup-downloader goup downloader"
-keywords = [
-    "goup",
-    "goup",
-    "golang",
-    "version-manager",
-    "tool",
-]
-license = "Apache-2.0"
-readme = "../README.md"
-homepage = "https://github.com/thinkgos/goup-rs"
-repository = "https://github.com/thinkgos/goup-rs"
+version.workspace =true
+authors.workspace =true
+edition.workspace =true
+rust-version.workspace =true
+description.workspace =true
+keywords.workspace =true
+license.workspace =true
+readme.workspace =true
+homepage.workspace =true
+repository.workspace =true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-goup-consts = {path = "../goup-consts", version = "0.2.5"}
-goup-version = {path = "../goup-version", version = "0.2.5"}
+goup-consts = {path = "../goup-consts"}
+goup-version = {path = "../goup-version"}
 anyhow = "1.0"
 dirs = "5.0"
 regex = "1.10"
