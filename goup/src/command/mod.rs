@@ -60,6 +60,7 @@ struct Global {
 #[command(author, about, long_about = None)]
 #[command(propagate_version = true)]
 #[command(version = VERSION)]
+#[command(name = "goup")]
 pub struct Cli {
     #[command(flatten)]
     global: Global,
