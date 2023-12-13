@@ -3,7 +3,7 @@ use goup_version::Version;
 
 use super::Run;
 
-const SETUP_ENV_UNIX: &str = include_str!("../../../setup_env_unix");
+const SETUP_ENV_UNIX: &str = include_str!("../../setup_env_unix");
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Init;
