@@ -13,7 +13,7 @@ There are a bunch of solutions to install Go or manage Go versions outside of a 
 ### One-liner
 
 ```shell
-cargo install goup --git https://github.com/thinkgos/goup-rs
+cargo install goup-rs --git https://github.com/thinkgos/goup-rs
 ```
 
 or
