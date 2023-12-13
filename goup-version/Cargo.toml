@@ -14,7 +14,7 @@ repository.workspace =true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-goup-consts = {path = "../goup-consts", version = "0.2.7"}
+goup-consts = {path = "../goup-consts", version = "0.2.8"}
 anyhow = "1.0"
 dirs = "5.0"
 regex = "1.10"
