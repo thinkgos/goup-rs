@@ -1,7 +1,7 @@
 mod tgz;
 mod zip;
 
-use std::path::Path;
+use std::{path::Path, str::FromStr};
 
 use anyhow::anyhow;
 
@@ -9,28 +9,42 @@ use tgz::Tgz;
 use zip::Zip;
 
 pub trait Unpacker {
+    /// unpack the provided archive file to dest_dir.
     fn unpack<P1, P2>(dest_dir: P1, archive_file: P2) -> Result<(), anyhow::Error>
     where
         P1: AsRef<Path>,
         P2: AsRef<Path>;
 }
 
-/// Unpack unpacks the provided archive zip or tar.gz file to targetDir.
-pub(crate) struct Unpack;
+/// Unpack the provided archive file.
+pub(crate) enum Unpack {
+    Zip,
+    Tgz,
+}
 
-impl Unpacker for Unpack {
-    fn unpack<P1, P2>(dest_dir: P1, archive_file: P2) -> Result<(), anyhow::Error>
+impl FromStr for Unpack {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.ends_with(".zip") {
+            Ok(Self::Zip)
+        } else if s.ends_with(".tar.gz") {
+            Ok(Self::Tgz)
+        } else {
+            Err(anyhow!("unsupported archive file"))
+        }
+    }
+}
+
+impl Unpack {
+    pub(crate) fn unpack<P1, P2>(&self, dest_dir: P1, archive_file: P2) -> Result<(), anyhow::Error>
     where
         P1: AsRef<Path>,
         P2: AsRef<Path>,
     {
-        let p = archive_file.as_ref().to_string_lossy();
-        if p.ends_with(".zip") {
-            Zip::unpack(dest_dir, archive_file)
-        } else if p.ends_with(".tar.gz") {
-            Tgz::unpack(dest_dir, archive_file)
-        } else {
-            Err(anyhow!("unsupported archive file"))
+        match self {
+            Unpack::Zip => Zip::unpack(dest_dir, archive_file),
+            Unpack::Tgz => Tgz::unpack(dest_dir, archive_file),
         }
     }
 }

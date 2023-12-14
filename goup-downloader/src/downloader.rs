@@ -15,7 +15,7 @@ use sha2::{Digest, Sha256};
 use goup_consts::consts;
 use goup_version::Dir;
 
-use crate::archived::{Unpack, Unpacker};
+use crate::archived::Unpack;
 
 pub struct Downloader;
 
@@ -146,9 +146,12 @@ impl Downloader {
         Self::verify_archive_file_sha256(&archive_file, &archive_url)?;
         // 解压
         println!("Unpacking {} ...", archive_file.display());
-        Unpack::unpack(&version_dest_dir, &archive_file)?;
-        Dir::create_dot_unpacked_success_file(&home, version)?;
+        archive_file
+            .to_string_lossy()
+            .parse::<Unpack>()?
+            .unpack(&version_dest_dir, &archive_file)?;
         // 设置解压成功
+        Dir::create_dot_unpacked_success_file(&home, version)?;
         println!(
             "Success: {} installed in {}",
             version,
