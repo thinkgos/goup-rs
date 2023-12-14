@@ -3,20 +3,19 @@ use std::{
     ffi::OsStr,
     fs,
     fs::File,
-    io::{self, BufRead, BufReader, Read},
-    path::{Path, PathBuf},
+    io::{BufRead, BufReader, Read},
+    path::Path,
     process::{Command, Stdio},
 };
 
 use anyhow::anyhow;
-use flate2::read::GzDecoder;
 use reqwest::{blocking, StatusCode};
 use sha2::{Digest, Sha256};
-use tar::Archive;
-use zip::ZipArchive;
 
 use goup_consts::consts;
 use goup_version::Dir;
+
+use crate::archived::{Unpack, Unpacker};
 
 pub struct Downloader;
 
@@ -147,7 +146,7 @@ impl Downloader {
         Self::verify_archive_file_sha256(&archive_file, &archive_url)?;
         // 解压
         println!("Unpacking {} ...", archive_file.display());
-        Self::unpack_archive(&version_dest_dir, &archive_file)?;
+        Unpack::unpack(&version_dest_dir, &archive_file)?;
         Dir::create_dot_unpacked_success_file(&home, version)?;
         // 设置解压成功
         println!(
@@ -234,54 +233,6 @@ impl Downloader {
                 path.as_ref().display(),
                 expect_sha256,
             ));
-        }
-        Ok(())
-    }
-
-    /// unpack_archive unpacks the provided archive zip or tar.gz file to targetDir,
-    /// removing the "go/" prefix from file entries.
-    fn unpack_archive(dest_dir: &Path, archive_file: &PathBuf) -> Result<(), anyhow::Error> {
-        let p = archive_file.to_string_lossy();
-        if p.ends_with(".zip") {
-            Self::unpack_zip(dest_dir, archive_file)
-        } else if p.ends_with(".tar.gz") {
-            Self::unpack_tgz(dest_dir, archive_file)
-        } else {
-            Err(anyhow!("unsupported archive file"))
-        }
-    }
-    /// unpack_zip unpack *.zip
-    fn unpack_zip(dest_dir: &Path, archive_file: &Path) -> Result<(), anyhow::Error> {
-        let mut archive = ZipArchive::new(File::open(archive_file)?)?;
-        for i in 0..archive.len() {
-            let mut file = archive.by_index(i)?;
-            let path = file.mangled_name();
-
-            let dest_file = dest_dir.join(path);
-            let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
-            if !parent.exists() {
-                fs::create_dir_all(parent)?;
-            }
-
-            let mut output_file = File::create(dest_file)?;
-            io::copy(&mut file, &mut output_file)?;
-        }
-        Ok(())
-    }
-
-    /// unpack_tgz unpack *.tar.gz
-    fn unpack_tgz(dest_dir: &Path, archive_file: &PathBuf) -> Result<(), anyhow::Error> {
-        let mut archive = Archive::new(GzDecoder::new(File::open(archive_file)?));
-        for entry in archive.entries()? {
-            let mut entry = entry?;
-            let path = entry.path()?;
-
-            let dest_file = dest_dir.join(path);
-            let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
-            if !parent.exists() {
-                fs::create_dir_all(parent)?;
-            }
-            entry.unpack(dest_file)?;
         }
         Ok(())
     }
