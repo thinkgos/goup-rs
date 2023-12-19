@@ -27,8 +27,10 @@ jobs:
       - name: Run code format
         run: cargo fmt -- --check
       - name: Run Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-targets --all-features --tests --benches -- -D warnings
       - name: Run Check
         run: cargo check --all
       - name: Run Test
         run: cargo test --all-features
+      - name: Run docs
+        run: cargo doc --all-features --no-deps
