@@ -2,6 +2,10 @@
 
 `goup` is an elegant Go version manager.
 
+[![Tests](https://github.com/thinkgos/goup-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/thinkgos/goup-rs/actions/workflows/ci.yml)
+[![Licence](https://img.shields.io/github/license/thinkgos/goup-rs)](https://raw.githubusercontent.com/thinkgos/goup-rs/main/LICENSE)
+[![Tag](https://img.shields.io/github/v/tag/thinkgos/goup-rs)](https://github.com/thinkgos/goup-rs/tags)
+
 There are a bunch of solutions to install Go or manage Go versions outside of a package manager:
 [golang/dl](https://github.com/golang/dl), [getgo](https://github.com/golang/tools/tree/master/cmd/getgo), [gvm](https://github.com/moovweb/gvm), [goenv](https://github.com/syndbg/goenv), to name a few.
 
