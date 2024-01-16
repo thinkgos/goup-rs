@@ -16,6 +16,9 @@ pub struct Install {
     /// host that is used to download Go.
     #[arg(long, default_value_t = consts::GO_HOST.to_owned(), env = consts::GOUP_GO_HOST)]
     host: String,
+    /// only just install the version, but do not switch.
+    #[arg(long, default_value_t = false)]
+    dry: bool,
 }
 
 impl Run for Install {
@@ -31,6 +34,9 @@ impl Run for Install {
         } else {
             Downloader::install_go_version(&version)?;
         }
-        Version::set_go_version(&version)
+        if !self.dry {
+            Version::set_go_version(&version)?;
+        }
+        Ok(())
     }
 }
