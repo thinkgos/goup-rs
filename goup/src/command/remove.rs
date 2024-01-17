@@ -8,7 +8,7 @@ use super::Run;
 #[derive(Args, Debug, PartialEq)]
 #[command(disable_version_flag = true)]
 pub struct Remove {
-    /// target go version
+    /// target go version list.
     version: Vec<String>,
 }
 
