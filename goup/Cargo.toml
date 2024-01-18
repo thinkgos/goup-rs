@@ -30,7 +30,7 @@ goup-downloader = {path = "../goup-downloader", version = "0.3"}
 clap = {version = "4.4", features = ["derive", "env"]}
 clap_complete = "4.4"
 anyhow = "1.0"
-which = "5.0"
+which = "6.0"
 prettytable-rs = "0.10"
 dialoguer = "0.11"
 self_update = {version = "0.39", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}
