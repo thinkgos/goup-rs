@@ -4,12 +4,13 @@ use std::ops::Deref;
 use std::process::Command;
 
 use anyhow::anyhow;
-use goup_consts::consts;
+
 use regex::Regex;
 use reqwest::blocking;
 
+use super::consts;
 use super::Dir;
-use crate::ToolchainFilter;
+use super::ToolchainFilter;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {

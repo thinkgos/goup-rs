@@ -1,3 +1,4 @@
+pub mod consts;
 mod dir;
 mod version;
 

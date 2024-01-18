@@ -730,20 +730,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "goup-consts"
-version = "0.3.0"
-dependencies = [
- "temp-env",
-]
-
-[[package]]
 name = "goup-downloader"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "dirs",
  "flate2",
- "goup-consts",
  "goup-version",
  "regex",
  "reqwest",
@@ -754,13 +746,12 @@ dependencies = [
 
 [[package]]
 name = "goup-rs"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "clap",
  "clap_complete",
  "dialoguer",
- "goup-consts",
  "goup-downloader",
  "goup-version",
  "prettytable-rs",
@@ -772,14 +763,14 @@ dependencies = [
 
 [[package]]
 name = "goup-version"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "dirs",
- "goup-consts",
  "junction",
  "regex",
  "reqwest",
+ "temp-env",
  "tempfile",
 ]
 

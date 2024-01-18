@@ -12,7 +12,7 @@ use anyhow::anyhow;
 use reqwest::{blocking, StatusCode};
 use sha2::{Digest, Sha256};
 
-use goup_consts::consts;
+use goup_version::consts;
 use goup_version::Dir;
 
 use crate::archived::Unpack;
