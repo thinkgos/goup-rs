@@ -23,9 +23,9 @@ version_check = "0.9"
 shadow-rs = "0.26"
 
 [dependencies]
-goup-consts = {path = "../goup-consts", version = "0.2"}
-goup-version = {path = "../goup-version", version = "0.2"}
-goup-downloader = {path = "../goup-downloader", version = "0.2"}
+goup-consts = {path = "../goup-consts", version = "0.3"}
+goup-version = {path = "../goup-version", version = "0.3"}
+goup-downloader = {path = "../goup-downloader", version = "0.3"}
 
 clap = {version = "4.4", features = ["derive", "env"]}
 clap_complete = "4.4"

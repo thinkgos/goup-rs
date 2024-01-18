@@ -731,14 +731,14 @@ dependencies = [
 
 [[package]]
 name = "goup-consts"
-version = "0.2.9"
+version = "0.3.0"
 dependencies = [
  "temp-env",
 ]
 
 [[package]]
 name = "goup-downloader"
-version = "0.2.9"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "dirs",
@@ -754,7 +754,7 @@ dependencies = [
 
 [[package]]
 name = "goup-rs"
-version = "0.2.9"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -772,7 +772,7 @@ dependencies = [
 
 [[package]]
 name = "goup-version"
-version = "0.2.9"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "dirs",
