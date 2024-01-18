@@ -89,7 +89,7 @@ impl Downloader {
         Self::execute_command("git", &gotip_go, ["clean", "-q", "-f", "-d", "-X"])?;
         // 执行 ./src/make.rs/make.bat/make.bash 有$GOROOT/src问题
 
-        //* $HOME/{owner}/.goup/gotip/src/[make.bash|make.rs|make.bat]
+        //* $HOME/{owner}/.goup/gotip/src/<make.bash|make.rs|make.bat>
 
         let script = match env::consts::OS {
             "windows" => "make.bat",

@@ -5,13 +5,14 @@ use goup_version::Version;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Search {
-    /// a regexp filter
-    regex: Option<String>,
+    /// a filter, such as 'stable', "unstable", 'beta' or any regex string.
+    filter: Option<String>,
 }
 
 impl Run for Search {
     fn run(&self) -> Result<(), anyhow::Error> {
-        Version::list_upstream_versions(self.regex.as_deref())?
+        let filter = self.filter.as_ref().and_then(|s| s.parse().ok());
+        Version::list_upstream_go_versions(filter)?
             .iter()
             .for_each(|v| {
                 println!("{}", v);
