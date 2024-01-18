@@ -9,6 +9,7 @@ use regex::Regex;
 use reqwest::blocking;
 
 use super::Dir;
+use crate::ToolchainFilter;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
@@ -28,7 +29,16 @@ impl Version {
         fs::write(env_file, s)?;
         Ok(())
     }
+    #[deprecated(
+        since = "0.3.0",
+        note = "please use `list_upstream_go_versions` instead"
+    )]
     pub fn list_upstream_versions(regex: Option<&str>) -> Result<Vec<String>, anyhow::Error> {
+        Self::list_upstream_go_versions(regex.map(|s| ToolchainFilter::Filter(s.to_owned())))
+    }
+    pub fn list_upstream_go_versions(
+        filter: Option<ToolchainFilter>,
+    ) -> Result<Vec<String>, anyhow::Error> {
         let output = Command::new("git")
             .args([
                 "ls-remote",
@@ -40,9 +50,23 @@ impl Version {
             .stdout;
         let output = String::from_utf8_lossy(&output);
 
-        let re = regex.filter(|s| !s.is_empty()).map_or_else(
+        let re = filter.map_or_else(
             || "refs/tags/go(.+)".to_owned(),
-            |s| format!("refs/tags/go(.*{}.*)", s),
+            |f| match f {
+                ToolchainFilter::Stable => {
+                    r#"refs/tags/go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?\b)"#
+                        .to_string()
+                }
+                ToolchainFilter::Unstable => {
+                    r#"refs/tags/go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:rc(?:0|[1-9]\d*)))"#
+                        .to_string()
+                }
+                ToolchainFilter::Beta => {
+                    r#"refs/tags/go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:beta(?:0|[1-9]\d*)))"#
+                        .to_string()
+                }
+                ToolchainFilter::Filter(s) => format!("refs/tags/go(.*{}.*)", s),
+            },
         );
         Ok(Regex::new(&re)?
             .captures_iter(&output)
