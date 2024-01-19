@@ -60,12 +60,12 @@ Default Go is set to 'go1.21.6'
 $ goup list
 | VERSION | ACTIVE |
 |---------|--------|
-| 1.21.4  |   *    |
+| 1.21.6  |   *    |
 $ go env GOROOT
 /home/thinkgo/.goup/current
 $ go version
-go version go1.21.4 linux/amd64
-$ GOUP_GO_HOST=https://golang.google.cn goup install 1.21.4
+go version go1.21.6 linux/amd64
+$ GOUP_GO_HOST=https://golang.google.cn goup install 1.21.6
 ```
 
 ## Usage
