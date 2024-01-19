@@ -121,7 +121,7 @@ Success: go1.21.6 installed in /home/thinkgo/.goup/go1.21.4
 
 ### Switches to selected Go version
 
-`goup use/set [VERSION]`, switches to selected Go version. switches to selected Go version.
+`goup use/set [VERSION]`, switches to selected Go version.
 
 ```bash
 $ goup use 
