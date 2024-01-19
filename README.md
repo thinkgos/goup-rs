@@ -145,7 +145,7 @@ $ goup rm
 ✔ Select multiple version · 1.21.5
 ```
 
-### upgrades `goup`
+### Upgrades `goup`
 
 ```bash
 Checking target-arch... x86_64-unknown-linux-gnu
@@ -154,7 +154,7 @@ Checking latest released version... v0.3.0
 Update status: `v0.3.0`!
 ```
 
-### more information
+### More information
 
 `goup -h` get more information
 
