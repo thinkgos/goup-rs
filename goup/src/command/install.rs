@@ -20,7 +20,7 @@ pub struct Install {
     /// host that is used to download Go.
     #[arg(long, default_value_t = consts::GO_HOST.to_owned(), env = consts::GOUP_GO_HOST)]
     host: String,
-    /// only just install the version, but do not switch.
+    /// only install the version, but do not switch.
     #[arg(long, default_value_t = false)]
     dry: bool,
 }
