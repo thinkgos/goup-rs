@@ -22,7 +22,7 @@
 
 ## Installation
 
-### One-liner
+### Cargo
 
 Alternatively, you can also install it using `cargo`.
 
