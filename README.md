@@ -3,6 +3,9 @@
 `goup` is an elegant Go version manager write in rust.
 
 [![Rust](https://github.com/thinkgos/goup-rs/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/thinkgos/goup-rs/actions/workflows/rust.yml)
+![Crates.io MSRV](https://img.shields.io/crates/msrv/goup-rs)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/goup-rs)
+![Crates.io Crates](https://img.shields.io/crates/v/goup-rs?style=flat-square)
 [![Licence](https://img.shields.io/github/license/thinkgos/goup-rs)](https://raw.githubusercontent.com/thinkgos/goup-rs/main/LICENSE)
 [![Tag](https://img.shields.io/github/v/tag/thinkgos/goup-rs)](https://github.com/thinkgos/goup-rs/tags)
 
