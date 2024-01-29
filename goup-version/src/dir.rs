@@ -14,7 +14,7 @@ pub struct Dir {
 }
 
 impl Dir {
-    ///  Returns the path to the user's home directory.
+    /// Returns the path to the user's home directory.
     pub fn home_dir() -> Result<PathBuf, anyhow::Error> {
         dirs::home_dir().ok_or_else(|| anyhow!("where is home"))
     }

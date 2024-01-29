@@ -1,4 +1,5 @@
 mod completion;
+mod env;
 #[cfg(unix)]
 mod init;
 mod install;
@@ -14,6 +15,7 @@ use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
 
 use self::completion::Completion;
+use self::env::Env;
 #[cfg(unix)]
 use self::init::Init;
 use self::install::Install;
@@ -94,6 +96,8 @@ enum Command {
     #[cfg(unix)]
     /// write all necessary environment variables and values.
     Init(Init),
+    /// Show the specified goup environment and values.
+    Env(Env),
 }
 
 impl Run for Cli {
@@ -107,6 +111,7 @@ impl Run for Cli {
             Command::Upgrade(cmd) => cmd.run(),
             #[cfg(unix)]
             Command::Init(cmd) => cmd.run(),
+            Command::Env(cmd) => cmd.run(),
             Command::Completion(c) => completion::print_completions(c.shell, &mut Self::command()),
         }
     }

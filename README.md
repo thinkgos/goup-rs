@@ -159,6 +159,23 @@ Checking latest released version... v0.3.0
 Update status: `v0.3.0`!
 ```
 
+### Environment
+
+```bash
+$ goup env
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+| Key                       | Value                          | Explain                                                                         |
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+| GOUP_GO_HOST              | https://go.dev                 | Get upstream latest go version, use by 'install'                                |
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+| GOUP_GO_DOWNLOAD_BASE_URL | https://dl.google.com/go       | Download go archive file base url, use by 'install'                             |
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+| GOUP_GO_SOURCE_GIT_URL    | https://github.com/golang/go   | Upstream source git url and get upstream go versions, use by 'install'/'search' |
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+| GOUP_GO_SOURCE_GIT_URL    | https://go.googlesource.com/go | Upstream source git url, use by 'install' the gotip                             |
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+```
+
 ### More information
 
 `goup -h` get more information
@@ -171,7 +188,7 @@ Update status: `v0.3.0`!
 - `goup use/set [VERSION]` switches to selected Go version.
 - `goup ls/list/show` list all installed Go version located at `$HOME/.goup`.
 - `goup remove/rm [VERSION]...` remove the specified Go version list.
-- `goup search [FILTER]` lists all available Go versions from `https://golang.org/dl`.
+- `goup search [FILTER]` lists all available Go versions.
 - `goup upgrade` upgrades `goup`.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
 
