@@ -12,7 +12,7 @@ impl Run for List {
     fn run(&self) -> Result<(), anyhow::Error> {
         let vers = Version::list_go_version()?;
         if vers.is_empty() {
-            println!(
+            log::info!(
                 "No Go is installed by goup.{}",
                 if let Ok(go_bin) = which("go") {
                     format!(" Using system Go {}.", go_bin.to_string_lossy())

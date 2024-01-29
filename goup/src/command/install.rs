@@ -32,7 +32,7 @@ impl Run for Install {
             Toolchain::Stable => {
                 let version = Version::get_upstream_latest_go_version(&self.host)?;
                 let version = Version::normalize(&version);
-                println!("Installing {} ...", version);
+                log::info!("Installing {} ...", version);
                 Downloader::install_go_version(&version)?;
                 version
             }
@@ -42,7 +42,7 @@ impl Run for Install {
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest unstable version"))?;
                 let version = Version::normalize(version);
-                println!("Installing {} ...", version);
+                log::info!("Installing {} ...", version);
                 Downloader::install_go_version(&version)?;
                 version
             }
@@ -52,17 +52,17 @@ impl Run for Install {
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest beta version"))?;
                 let version = Version::normalize(version);
-                println!("Installing {} ...", version);
+                log::info!("Installing {} ...", version);
                 Downloader::install_go_version(&version)?;
                 version
             }
             Toolchain::Version(version) => {
-                println!("Installing {} ...", version);
+                log::info!("Installing {} ...", version);
                 Downloader::install_go_version(&version)?;
                 version
             }
             Toolchain::Nightly => {
-                println!("Installing gotip ...");
+                log::info!("Installing gotip ...");
                 Downloader::install_go_tip(self.cl.as_deref())?;
                 "gotip".to_owned()
             }

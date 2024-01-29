@@ -11,6 +11,7 @@ mod upgrade;
 
 use clap::{ArgAction, Args, CommandFactory};
 use clap::{Parser, Subcommand};
+use log::LevelFilter;
 use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
 
@@ -53,9 +54,22 @@ pub trait Run {
 
 #[derive(Args, Debug, PartialEq)]
 struct Global {
-    /// Verbose
+    /// Verbose log
     #[arg(short, long, action = ArgAction::Count)]
     verbose: u8,
+    /// Whether or not to write the target in the log format.
+    #[arg(short, long)]
+    enable_target: bool,
+}
+
+impl Global {
+    fn log_filter_level(&self) -> LevelFilter {
+        match self.verbose {
+            0 => LevelFilter::Info,
+            1 => LevelFilter::Debug,
+            _ => LevelFilter::Trace,
+        }
+    }
 }
 
 #[derive(Parser, Debug, PartialEq)]
@@ -102,6 +116,10 @@ enum Command {
 
 impl Run for Cli {
     fn run(&self) -> Result<(), anyhow::Error> {
+        env_logger::builder()
+            .format_target(self.global.enable_target)
+            .filter_level(self.global.log_filter_level())
+            .init();
         match &self.command {
             Command::Install(cmd) => cmd.run(),
             Command::List(cmd) => cmd.run(),

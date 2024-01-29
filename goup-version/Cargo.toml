@@ -18,6 +18,7 @@ anyhow = "1.0"
 dirs = "5.0"
 regex = "1.10"
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "rustls-tls-native-roots"] }
+log = "0.4"
 
 [target.'cfg(windows)'.dependencies]
 junction = "1.0"

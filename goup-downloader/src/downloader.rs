@@ -74,7 +74,7 @@ impl Downloader {
                 ],
             )?;
         }
-        println!("Updating the go development tree...");
+        log::info!("Updating the go development tree...");
         //* git fetch origin master
         Self::execute_command("git", &gotip_go, ["fetch", "origin", "master"])?;
         //* git -c advice.detachedHead=false checkout FETCH_HEAD
@@ -105,7 +105,7 @@ impl Downloader {
         let version_dest_dir = Dir::new(&home).version(version);
         // 是否已解压成功并且存在
         if Dir::is_dot_unpacked_success_file_exists(&home, version) {
-            println!(
+            log::info!(
                 "{}: already installed in {:?}",
                 version,
                 version_dest_dir.display()
@@ -145,14 +145,14 @@ impl Downloader {
         // 校验压缩包sha256
         Self::verify_archive_file_sha256(&archive_file, &archive_url)?;
         // 解压
-        println!("Unpacking {} ...", archive_file.display());
+        log::info!("Unpacking {} ...", archive_file.display());
         archive_file
             .to_string_lossy()
             .parse::<Unpack>()?
             .unpack(&version_dest_dir, &archive_file)?;
         // 设置解压成功
         Dir::create_dot_unpacked_success_file(&home, version)?;
-        println!(
+        log::info!(
             "Success: {} installed in {}",
             version,
             version_dest_dir.display()

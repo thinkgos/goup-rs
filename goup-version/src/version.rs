@@ -136,15 +136,20 @@ impl Version {
         {
             junction::create(original, &link)?;
         }
-        println!("Default Go is set to '{version}'");
+        log::info!("Default Go is set to '{version}'");
         Ok(())
     }
 
     pub fn remove_go_version(version: &str) -> Result<(), anyhow::Error> {
         let version = Self::normalize(version);
-        let version_dir = Dir::from_home_dir()?.version(version);
-        if version_dir.exists() {
-            fs::remove_dir_all(&version_dir)?;
+        let cur = Self::current_go_version()?;
+        if Some(&version) == cur.as_ref() {
+            log::warn!("{} is current active version, do not remove it", version);
+        } else {
+            let version_dir = Dir::from_home_dir()?.version(version);
+            if version_dir.exists() {
+                fs::remove_dir_all(&version_dir)?;
+            }
         }
         Ok(())
     }
@@ -156,10 +161,7 @@ impl Version {
             for ver in vers {
                 let version = Self::normalize(ver);
                 if Some(&version) == cur.as_ref() {
-                    println!(
-                        "warning: {} is current active version, do not remove it",
-                        ver
-                    );
+                    log::warn!("{} is current active version, do not remove it", ver);
                     continue;
                 }
                 let version_dir = Dir::new(&home).version(&version);

@@ -17,7 +17,7 @@ impl Run for Remove {
         if self.version.is_empty() {
             let vers = Version::list_go_version()?;
             if vers.is_empty() {
-                println!("No go is installed");
+                log::info!("No go is installed");
                 return Ok(());
             }
             let items: Vec<&str> = vers.iter().map(|v| v.version.as_ref()).collect();
@@ -26,7 +26,7 @@ impl Run for Remove {
                 .items(&items)
                 .interact()?;
             if selection.is_empty() {
-                println!("No item selected");
+                log::info!("No item selected");
                 return Ok(());
             }
 

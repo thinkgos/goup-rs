@@ -20,7 +20,7 @@ impl Run for Upgrade {
             .current_version(cargo_crate_version!())
             .build()?
             .update()?;
-        println!("Update status: `v{}`!", status.version());
+        log::info!("Update status: `v{}`!", status.version());
         Ok(())
     }
 }
