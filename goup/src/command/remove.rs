@@ -29,20 +29,19 @@ impl Run for Remove {
                 println!("No item selected");
                 return Ok(());
             }
-            Version::remove_go_versions(
-                &selection
-                    .into_iter()
-                    .map(|i| items[i])
-                    .collect::<Vec<&str>>(),
-            )
+
+            let vers = selection
+                .into_iter()
+                .map(|i| items[i])
+                .collect::<Vec<&str>>();
+            Version::remove_go_versions(&vers)
         } else {
-            Version::remove_go_versions(
-                &self
-                    .version
-                    .iter()
-                    .map(AsRef::as_ref)
-                    .collect::<Vec<&str>>(),
-            )
+            let vers = self
+                .version
+                .iter()
+                .map(AsRef::as_ref)
+                .collect::<Vec<&str>>();
+            Version::remove_go_versions(&vers)
         }
     }
 }
