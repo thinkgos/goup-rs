@@ -150,15 +150,38 @@ impl Version {
     }
 
     pub fn remove_go_versions(vers: &[&str]) -> Result<(), anyhow::Error> {
-        let home = Dir::home_dir()?;
-        for ver in vers {
-            let version = Self::normalize(ver);
-            let version_dir = Dir::new(&home).version(&version);
-            if version_dir.exists() {
-                fs::remove_dir_all(&version_dir)?;
+        if !vers.is_empty() {
+            let home = Dir::home_dir()?;
+            let cur = Self::current_go_version()?;
+            for ver in vers {
+                let version = Self::normalize(ver);
+                if Some(&version) == cur.as_ref() {
+                    println!(
+                        "warning: {} is current active version, do not remove it",
+                        ver
+                    );
+                    continue;
+                }
+                let version_dir = Dir::new(&home).version(&version);
+                if version_dir.exists() {
+                    fs::remove_dir_all(&version_dir)?;
+                }
             }
         }
         Ok(())
+    }
+
+    pub fn current_go_version() -> Result<Option<String>, anyhow::Error> {
+        // may be current not exist
+        let current = Dir::from_home_dir()?
+            .current()
+            .read_link()
+            .ok()
+            .and_then(|p| {
+                p.parent()
+                    .and_then(|v| v.file_name().map(|vv| vv.to_string_lossy().to_string()))
+            });
+        Ok(current)
     }
     /// normalize the version string.
     /// 1.21.1   -> go1.21.1
