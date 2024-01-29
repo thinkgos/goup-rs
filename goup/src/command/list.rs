@@ -27,7 +27,7 @@ impl Run for List {
             for v in vers {
                 table.add_row(row![v.version, bc -> if v.active { "*" } else { "" }]);
             }
-            table.printstd()
+            table.printstd();
         }
         Ok(())
     }
