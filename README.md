@@ -151,6 +151,7 @@ $ goup rm
 ### Upgrades `goup`
 
 ```bash
+$ goup upgrade
 Checking target-arch... x86_64-unknown-linux-gnu
 Checking current version... v0.3.0
 Checking latest released version... v0.3.0
