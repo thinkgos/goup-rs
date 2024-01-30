@@ -110,7 +110,7 @@ enum Command {
     #[cfg(unix)]
     /// write all necessary environment variables and values.
     Init(Init),
-    /// Show the specified goup environment and values.
+    /// Show the specified goup environment variables and values.
     Env(Env),
 }
 

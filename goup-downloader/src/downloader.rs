@@ -152,11 +152,7 @@ impl Downloader {
             .unpack(&version_dest_dir, &archive_file)?;
         // 设置解压成功
         Dir::create_dot_unpacked_success_file(&home, version)?;
-        log::info!(
-            "Success: {} installed in {}",
-            version,
-            version_dest_dir.display()
-        );
+        log::info!("{} installed in {}", version, version_dest_dir.display());
         Ok(())
     }
 

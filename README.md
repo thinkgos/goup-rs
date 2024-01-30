@@ -57,10 +57,10 @@ I do not have Windows. So you know, welcome PR.
 
 ```shell
 $ goup install
-Installing go1.21.6 ...
-Unpacking /home/thinkgo/.goup/go1.21.6/go1.21.6.linux-amd64.tar.gz ...
-Success: go1.21.6 installed in /home/thinkgo/.goup/go1.21.6
-Default Go is set to 'go1.21.6'
+[2024-01-30T00:38:48Z INFO ] Installing go1.21.6 ...
+[2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.6/go1.21.6.linux-amd64.tar.gz ...
+[2024-01-30T00:38:48Z INFO ] go1.21.6 installed in /home/thinkgo/.goup/go1.21.6
+[2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.6'
 $ goup list
 | VERSION | ACTIVE |
 |---------|--------|
@@ -113,14 +113,14 @@ $ goup list
 
 ```bash
 $ goup install
-Installing go1.21.6 ...
-Unpacking /home/thinkgo/.goup/go1.21.6/go1.21.6.linux-amd64.tar.gz ...
-Success: go1.21.6 installed in /home/thinkgo/.goup/go1.21.6
-Default Go is set to 'go1.21.6'
+[2024-01-30T00:38:48Z INFO ] Installing go1.21.6 ...
+[2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.6/go1.21.6.linux-amd64.tar.gz ...
+[2024-01-30T00:38:48Z INFO ] go1.21.6 installed in /home/thinkgo/.goup/go1.21.6
+[2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.6'
 $ goup install 1.21.4 --dry
-Installing go1.21.4 ...
-Unpacking /home/thinkgo/.goup/go1.21.4/go1.21.4.linux-amd64.tar.gz ...
-Success: go1.21.6 installed in /home/thinkgo/.goup/go1.21.4
+[2024-01-30T00:38:48Z INFO ] Installing go1.21.4 ...
+[2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.4/go1.21.4.linux-amd64.tar.gz ...
+[2024-01-30T00:38:48Z INFO ] go1.21.6 installed in /home/thinkgo/.goup/go1.21.4
 ```
 
 ### Switches to selected Go version
@@ -133,7 +133,7 @@ $ goup use
   1.21.5
 ❯ 1.21.6
   tip
-Default Go is set to 'go1.21.6'
+[2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.6'
 ```
 
 ### Remove the specified Go version list
@@ -156,7 +156,7 @@ $ goup upgrade
 Checking target-arch... x86_64-unknown-linux-gnu
 Checking current version... v0.3.0
 Checking latest released version... v0.3.0
-Update status: `v0.3.0`!
+[2024-01-30T00:38:48Z INFO ] Update status: `v0.3.0`!
 ```
 
 ### Environment
@@ -191,6 +191,7 @@ $ goup env
 - `goup search [FILTER]` lists all available Go versions.
 - `goup upgrade` upgrades `goup`.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
+- `goup env` Show the specified goup environment variables and values.
 
 ## License
 

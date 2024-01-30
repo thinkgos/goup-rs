@@ -144,7 +144,7 @@ impl Version {
         let version = Self::normalize(version);
         let cur = Self::current_go_version()?;
         if Some(&version) == cur.as_ref() {
-            log::warn!("{} is current active version, do not remove it", version);
+            log::warn!("{} is current active version,  ignore deletion!", version);
         } else {
             let version_dir = Dir::from_home_dir()?.version(version);
             if version_dir.exists() {
@@ -161,7 +161,7 @@ impl Version {
             for ver in vers {
                 let version = Self::normalize(ver);
                 if Some(&version) == cur.as_ref() {
-                    log::warn!("{} is current active version, do not remove it", ver);
+                    log::warn!("{} is current active version, ignore deletion!", ver);
                     continue;
                 }
                 let version_dir = Dir::new(&home).version(&version);
