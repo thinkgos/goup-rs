@@ -7,7 +7,7 @@ body:
     attributes:
       label: "Please complete the following tasks"
       options:
-        - label: "I have searched the [open](https://github.com/thinkgos/goup-rs/issues) issues"
+        - label: "I have searched the [open](https://github.com/thinkgos/goup-rs/issues) and [closed](https://github.com/thinkgos/goup-rs/issues?q=is%3Aissue+is%3Aclosed) issues"
           required: true
   - type: input
     attributes:
@@ -18,7 +18,7 @@ body:
   - type: input
     attributes:
       label: goup-rs version
-      description: run `goup --version`, you will get it.
+      description: output of `goup --version`.
     validations:
       required: true
   - type: textarea
