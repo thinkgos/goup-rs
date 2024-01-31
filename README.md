@@ -195,6 +195,10 @@ $ goup env
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
 - `goup env` Show the specified goup environment variables and values.
 
+## FAQ
+
+- TODO...
+
 ## License
 
 [Apache 2.0](LICENSE)
