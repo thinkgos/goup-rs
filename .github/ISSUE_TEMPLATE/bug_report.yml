@@ -1,0 +1,45 @@
+name: Bug report
+description: Things aren't working as expected
+labels: 
+  - 'bug'
+body:
+  - type: checkboxes
+    attributes:
+      label: "Please complete the following tasks"
+      options:
+        - label: "I have searched the [open](https://github.com/thinkgos/goup-rs/issues) issues"
+          required: true
+  - type: input
+    attributes:
+      label: rust version
+      description: output of `rustc -V`
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: goup-rs version
+      description: run `goup --version`, you will get it.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce the bug with the action.
+      description: more logs.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Actual Behaviour
+      description: When I do like *this*, *that* is happening and I think it shouldn't.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behaviour
+      description: I think *this* should happen instead.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here.
