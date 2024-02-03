@@ -10,6 +10,7 @@ pub struct Upgrade;
 
 impl Run for Upgrade {
     fn run(&self) -> Result<(), anyhow::Error> {
+        log::warn!("Deprecated in future version, use `goup self update` instead");
         let cmd = Cli::command();
         let status = Update::configure()
             .repo_owner("thinkgos")

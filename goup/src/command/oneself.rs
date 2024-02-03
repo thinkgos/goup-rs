@@ -1,6 +1,8 @@
 use clap::Args;
 use clap::CommandFactory;
 use clap::Subcommand;
+use dialoguer::theme::ColorfulTheme;
+use dialoguer::Confirm;
 use self_update::{backends::github::Update, cargo_crate_version};
 
 use super::Cli;
@@ -38,7 +40,15 @@ impl Run for Oneself {
                 log::info!("Update status: `v{}`!", status.version());
             }
             Command::Uninstall => {
-                log::warn!("Not implement!");
+                let confirmation = Confirm::with_theme(&ColorfulTheme::default())
+                    .with_prompt("Do you want to uninstall goup?")
+                    .interact()?;
+                if confirmation {
+                    // TODO...
+                    log::warn!("Not implement real uninstall!");
+                } else {
+                    log::info!("Cancelled");
+                }
             }
         }
         Ok(())
