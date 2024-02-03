@@ -4,6 +4,7 @@ mod env;
 mod init;
 mod install;
 mod list;
+mod oneself;
 mod remove;
 mod search;
 mod set;
@@ -21,6 +22,7 @@ use self::env::Env;
 use self::init::Init;
 use self::install::Install;
 use self::list::List;
+use self::oneself::Oneself;
 use self::remove::Remove;
 use self::search::Search;
 use self::set::Set;
@@ -103,7 +105,7 @@ enum Command {
     /// If no version is provided, a prompt will show to select a installed Go version.
     #[command(visible_alias = "use")]
     Set(Set),
-    /// Upgrade goup
+    /// Upgrade goup, deprecated in future version, use `goup self update` instead
     Upgrade(Upgrade),
     /// Generate the autocompletion script for the specified shell
     Completion(Completion),
@@ -112,6 +114,9 @@ enum Command {
     Init(Init),
     /// Show the specified goup environment variables and values.
     Env(Env),
+    /// Modify the goup installation.
+    #[command(name = "self")]
+    Oneself(Oneself),
 }
 
 impl Run for Cli {
@@ -127,6 +132,7 @@ impl Run for Cli {
             Command::Search(cmd) => cmd.run(),
             Command::Set(cmd) => cmd.run(),
             Command::Upgrade(cmd) => cmd.run(),
+            Command::Oneself(cmd) => cmd.run(),
             #[cfg(unix)]
             Command::Init(cmd) => cmd.run(),
             Command::Env(cmd) => cmd.run(),

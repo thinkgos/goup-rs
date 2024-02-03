@@ -151,10 +151,10 @@ $ goup rm
 ✔ Select multiple version · 1.21.5
 ```
 
-### Upgrades `goup`
+### Modify the goup installation
 
 ```bash
-$ goup upgrade
+$ goup self update
 Checking target-arch... x86_64-unknown-linux-gnu
 Checking current version... v0.3.0
 Checking latest released version... v0.3.0
@@ -191,7 +191,8 @@ $ goup env
 - `goup ls/list/show` list all installed Go version located at `$HOME/.goup`.
 - `goup remove/rm [VERSION]...` remove the specified Go version list.
 - `goup search [FILTER]` lists all available Go versions.
-- `goup upgrade` upgrades `goup`.
+- `goup upgrade` upgrades `goup`, deprecated in future version, use `goup self update` instead
+- `goup self <COMMAND>` Modify the goup installation.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
 - `goup env` Show the specified goup environment variables and values.
 
