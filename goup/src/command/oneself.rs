@@ -1,3 +1,8 @@
+use std::env;
+use std::fs;
+use std::path::Path;
+
+use anyhow::anyhow;
 use clap::Args;
 use clap::CommandFactory;
 use clap::Subcommand;
@@ -45,7 +50,7 @@ impl Run for Oneself {
                     .interact()?;
                 if confirmation {
                     // TODO...
-                    log::warn!("Not implement real uninstall!");
+                    log::warn!("Not implement real uninstall!",);
                 } else {
                     log::info!("Cancelled");
                 }
@@ -53,4 +58,18 @@ impl Run for Oneself {
         }
         Ok(())
     }
+}
+
+#[allow(dead_code)]
+pub fn remove_goup_exe() -> Result<(), anyhow::Error> {
+    let exe = env::args().next().ok_or(anyhow!("Get exe path Failed"))?;
+    let exe = Path::new(&exe);
+    if exe.is_symlink() {
+        let link_file = exe.read_link()?;
+        fs::remove_file(link_file)?;
+        fs::remove_dir_all(exe)?;
+    } else {
+        fs::remove_file(exe)?;
+    }
+    Ok(())
 }

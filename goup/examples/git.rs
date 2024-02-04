@@ -1,6 +1,8 @@
 // use git2::{Direction, Remote};
 
-fn main() {}
+fn main() -> Result<(), anyhow::Error> {
+    Ok(())
+}
 
 // fn main() -> Result<(), git2::Error> {
 //     let mut remote = Remote::create_detached("https://github.com/golang/go")?;

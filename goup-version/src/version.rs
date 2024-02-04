@@ -215,6 +215,14 @@ impl Version {
         Ok(())
     }
 
+    pub fn remove_goup_home() -> Result<(), anyhow::Error> {
+        let goup_home_dir = Dir::from_home_dir()?;
+        if goup_home_dir.exists() {
+            fs::remove_dir_all(&goup_home_dir)?;
+        }
+        Ok(())
+    }
+
     /// normalize the version string.
     /// 1.21.1   -> go1.21.1
     /// go1.21.1 -> go1.21,1
