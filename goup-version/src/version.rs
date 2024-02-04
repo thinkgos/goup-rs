@@ -186,7 +186,7 @@ impl Version {
         Ok(current)
     }
 
-    pub fn list_dl(contain_sha256: bool) -> Result<Vec<String>, anyhow::Error> {
+    pub fn list_dl(contain_sha256: Option<bool>) -> Result<Vec<String>, anyhow::Error> {
         let home = Dir::home_dir()?;
         // may be .goup or .goup/dl not exist
         if !Dir::new(&home).exists() || !Dir::new(&home).dl().exists() {
@@ -201,7 +201,8 @@ impl Version {
                 }
                 let filename = v.file_name();
                 let filename = filename.to_string_lossy();
-                (contain_sha256 || !filename.ends_with(".sha256")).then(|| filename.to_string())
+                (contain_sha256.unwrap_or_default() || !filename.ends_with(".sha256"))
+                    .then(|| filename.to_string())
             })
             .collect();
         archive_files.sort();

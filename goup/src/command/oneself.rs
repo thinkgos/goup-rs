@@ -15,7 +15,7 @@ use super::Run;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Oneself {
-    // outputs the completion content for given shell
+    // the goup installation command.
     #[command(subcommand)]
     command: Command,
 }

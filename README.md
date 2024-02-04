@@ -151,6 +151,17 @@ $ goup rm
 ✔ Select multiple version · 1.21.5
 ```
 
+### Manage download archive files
+
+```bash
+$ goup dl show --contain-sha256
+go1.21.6.linux-amd64.tar.gz
+go1.21.6.linux-amd64.tar.gz.sha256
+
+$ goup dl clean
+✔ Do you want to clean archive file? · yes
+```
+
 ### Modify the goup installation
 
 ```bash
@@ -191,6 +202,7 @@ $ goup env
 - `goup ls/list/show` list all installed Go version located at `$HOME/.goup`.
 - `goup remove/rm [VERSION]...` remove the specified Go version list.
 - `goup search [FILTER]` lists all available Go versions.
+- `goup downloads [COMMAND]` Manage download archive files.
 - `goup upgrade` upgrades `goup`, deprecated in future version, use `goup self update` instead
 - `goup self <COMMAND>` Modify the goup installation.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
