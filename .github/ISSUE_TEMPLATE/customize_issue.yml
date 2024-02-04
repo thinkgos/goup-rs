@@ -1,0 +1,23 @@
+name: Feature request
+description: Raise the bar on expectations
+labels: 
+  - 'enhancement'
+body:
+  - type: checkboxes
+    attributes:
+      label: Please complete the following tasks
+      options:
+        - label: "I have searched the [open](https://github.com/thinkgos/goup-rs/issues) and [closed](https://github.com/thinkgos/goup-rs/issues?q=is%3Aissue+is%3Aclosed) issues"
+          required: true
+  - type: input
+    attributes:
+      label: goup version
+      description: output of `goup --version`.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe your use issue
+      description: Describe the problem you want to solve.
+    validations:
+      required: true
