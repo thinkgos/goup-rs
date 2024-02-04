@@ -112,25 +112,37 @@ impl Downloader {
             );
             return Ok(());
         }
-        // 压缩包url
-        let archive_url = consts::go_version_archive_url(version);
-        // 压缩包长度
-        let archive_content_length =
-            Self::get_upstream_archive_content_length(version, &archive_url)?;
+        // download directory
+        let dl_dest_dir = Dir::new(&home).dl();
         // 压缩包文件名称
-        let archive_file_name = Path::new(&archive_url)
-            .file_name()
-            .ok_or_else(|| anyhow!("Getting archive filename failure."))?
-            .to_string_lossy();
-        // 版本路径
-        if !version_dest_dir.exists() {
-            fs::create_dir_all(&version_dest_dir)?
+        let archive_filename = consts::go_version_archive(version);
+        // 压缩包sha256文件名称
+        let archive_sha256_filename = consts::archive_sha256(&archive_filename);
+        // 压缩包url
+        let (archive_url, archive_sha256_url) = consts::archive_url(&archive_filename);
+        if !dl_dest_dir.exists() {
+            log::debug!("Create download directory");
+            fs::create_dir_all(&dl_dest_dir)?
         }
+
         // 压缩包文件
-        let archive_file = version_dest_dir.join(archive_file_name.as_ref());
-        if !archive_file.exists() || archive_file.metadata()?.len() != archive_content_length {
-            // 下载
+        let archive_file = dl_dest_dir.join(archive_filename);
+        let archive_sha256_file = dl_dest_dir.join(archive_sha256_filename);
+        if !archive_file.exists()
+            || !archive_sha256_file.exists()
+            || Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file).is_err()
+        {
+            log::debug!(
+                "Download archive file from {} to {}",
+                archive_url,
+                archive_file.display(),
+            );
+            // 下载压缩包
             Self::download_archive(&archive_file, &archive_url)?;
+            log::debug!("Check archive file content length");
+            // 压缩包长度
+            let archive_content_length =
+                Self::get_upstream_archive_content_length(version, &archive_url)?;
             // 检查大小
             let got_archive_content_length = archive_file.metadata()?.len();
             if got_archive_content_length != archive_content_length {
@@ -141,11 +153,27 @@ impl Downloader {
                     archive_content_length,
                 ));
             }
+            // 下载压缩包sha256
+            log::debug!(
+                "Download archive sha256 file from {} to {}",
+                archive_sha256_url,
+                archive_sha256_file.display()
+            );
+            Self::download_archive_sha256(&archive_sha256_file, &archive_sha256_url)?;
+            // 校验压缩包sha256
+            Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file)?;
         }
-        // 校验压缩包sha256
-        Self::verify_archive_file_sha256(&archive_file, &archive_url)?;
+
         // 解压
-        log::info!("Unpacking {} ...", archive_file.display());
+        log::info!(
+            "Unpacking {} to {} ...",
+            archive_file.display(),
+            version_dest_dir.display()
+        );
+        if !version_dest_dir.exists() {
+            log::debug!("Create version directory: {}", version_dest_dir.display());
+            fs::create_dir_all(&version_dest_dir)?
+        }
         archive_file
             .to_string_lossy()
             .parse::<Unpack>()?
@@ -199,11 +227,20 @@ impl Downloader {
         response.copy_to(&mut file)?;
         Ok(())
     }
-
-    /// get_upstream_archive_file_sha256 获取上游压缩包的sha256值
-    fn get_upstream_archive_file_sha256(archive_url: &str) -> Result<String, anyhow::Error> {
-        Ok(blocking::get(format!("{}.sha256", archive_url))?.text()?)
+    /// download_archive_sha256 下载压缩包sha256
+    fn download_archive_sha256<P: AsRef<Path>>(
+        dest: P,
+        archive_sha256_url: &str,
+    ) -> Result<(), anyhow::Error> {
+        let mut response = blocking::get(archive_sha256_url)?;
+        if !response.status().is_success() {
+            return Err(anyhow!("Downloading archive failure"));
+        }
+        let mut file = File::create(dest)?;
+        response.copy_to(&mut file)?;
+        Ok(())
     }
+
     /// compute_file_sha256 计算文件的sha256
     fn compute_file_sha256<P: AsRef<Path>>(path: P) -> Result<String, anyhow::Error> {
         let mut context = Sha256::new();
@@ -218,18 +255,19 @@ impl Downloader {
         }
         Ok(format!("{:x}", context.finalize()))
     }
-    /// verify_archive_file_sha256 校验本地文件和上游文件的sha256
-    fn verify_archive_file_sha256<P: AsRef<Path>>(
-        path: P,
-        archive_url: &str,
+
+    /// verify_archive_file_sha256 校验文件压缩包的sha256
+    fn verify_archive_file_sha256<P1: AsRef<Path>, P2: AsRef<Path>>(
+        archive_file: P1,
+        archive_sha256_file: P2,
     ) -> Result<(), anyhow::Error> {
-        let expect_sha256 = Self::get_upstream_archive_file_sha256(archive_url)?;
+        let expect_sha256 = fs::read_to_string(archive_sha256_file)?;
         let expect_sha256 = expect_sha256.trim();
-        let got_sha256 = Self::compute_file_sha256(&path)?;
+        let got_sha256 = Self::compute_file_sha256(&archive_file)?;
         if expect_sha256 != got_sha256 {
             return Err(anyhow!(
                 "{} corrupt? does not have expected SHA-256 of {}",
-                path.as_ref().display(),
+                archive_file.as_ref().display(),
                 expect_sha256,
             ));
         }

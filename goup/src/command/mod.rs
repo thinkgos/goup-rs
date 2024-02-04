@@ -1,4 +1,5 @@
 mod completion;
+mod downloads;
 mod env;
 #[cfg(unix)]
 mod init;
@@ -17,6 +18,7 @@ use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
 
 use self::completion::Completion;
+use self::downloads::Downloads;
 use self::env::Env;
 #[cfg(unix)]
 use self::init::Init;
@@ -117,6 +119,9 @@ enum Command {
     /// Modify the goup installation.
     #[command(name = "self")]
     Oneself(Oneself),
+    /// Manage download archive files.
+    #[command(visible_alias = "dl")]
+    Downloads(Downloads),
 }
 
 impl Run for Cli {
@@ -136,6 +141,7 @@ impl Run for Cli {
             #[cfg(unix)]
             Command::Init(cmd) => cmd.run(),
             Command::Env(cmd) => cmd.run(),
+            Command::Downloads(cmd) => cmd.run(),
             Command::Completion(c) => completion::print_completions(c.shell, &mut Self::command()),
         }
     }
