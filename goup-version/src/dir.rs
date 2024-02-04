@@ -56,6 +56,17 @@ impl Dir {
         self.path.push(ver);
         self
     }
+    /// `${path}/.goup/dl`
+    pub fn dl(mut self) -> Self {
+        self.path.push("dl");
+        self
+    }
+    /// `${path}/.goup/dl/{filename}`
+    pub fn dl_file<P: AsRef<Path>>(mut self, p: P) -> Self {
+        self.path.push("dl");
+        self.path.push(p);
+        self
+    }
     /// `${path}/.goup/{version}/go`
     pub fn version_go<P: AsRef<Path>>(mut self, ver: P) -> Self {
         self.path.push(ver);

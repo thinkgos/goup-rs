@@ -87,7 +87,7 @@ impl Version {
 
     pub fn list_go_version() -> Result<Vec<Version>, anyhow::Error> {
         let home = Dir::home_dir()?;
-        // may be goup not exist
+        // may be .goup not exist
         if !Dir::new(&home).exists() {
             return Ok(Vec::new());
         }
@@ -185,6 +185,36 @@ impl Version {
             });
         Ok(current)
     }
+
+    pub fn list_dl(contain_sha256: bool) -> Result<Vec<String>, anyhow::Error> {
+        let home = Dir::home_dir()?;
+        // may be .goup or .goup/dl not exist
+        if !Dir::new(&home).exists() || !Dir::new(&home).dl().exists() {
+            return Ok(Vec::new());
+        }
+        let dir: Result<Vec<DirEntry>, _> = Dir::new(&home).dl().read_dir()?.collect();
+        let mut archive_files: Vec<_> = dir?
+            .iter()
+            .filter_map(|v| {
+                if v.path().is_dir() {
+                    return None;
+                }
+                let filename = v.file_name();
+                let filename = filename.to_string_lossy();
+                (contain_sha256 || !filename.ends_with(".sha256")).then(|| filename.to_string())
+            })
+            .collect();
+        archive_files.sort();
+        Ok(archive_files)
+    }
+    pub fn remove_dl() -> Result<(), anyhow::Error> {
+        let dl_dir = Dir::from_home_dir()?.dl();
+        if dl_dir.exists() {
+            fs::remove_dir_all(&dl_dir)?;
+        }
+        Ok(())
+    }
+
     /// normalize the version string.
     /// 1.21.1   -> go1.21.1
     /// go1.21.1 -> go1.21,1
