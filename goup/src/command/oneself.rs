@@ -8,6 +8,7 @@ use clap::CommandFactory;
 use clap::Subcommand;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
+use goup_version::Version;
 use self_update::{backends::github::Update, cargo_crate_version};
 
 use super::Cli;
@@ -49,10 +50,11 @@ impl Run for Oneself {
                     .with_prompt("Do you want to uninstall goup?")
                     .interact()?;
                 if confirmation {
-                    // TODO...
-                    log::warn!("Not implement real uninstall!",);
+                    remove_goup_exe()?;
+                    Version::remove_goup_home()?;
+                    log::info!("Uninstall successful!");
                 } else {
-                    log::info!("Cancelled");
+                    log::info!("Cancelled!");
                 }
             }
         }
@@ -60,8 +62,7 @@ impl Run for Oneself {
     }
 }
 
-#[allow(dead_code)]
-pub fn remove_goup_exe() -> Result<(), anyhow::Error> {
+fn remove_goup_exe() -> Result<(), anyhow::Error> {
     let exe = env::args().next().ok_or(anyhow!("Get exe path Failed"))?;
     let exe = Path::new(&exe);
     if exe.is_symlink() {

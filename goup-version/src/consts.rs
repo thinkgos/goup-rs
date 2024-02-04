@@ -61,6 +61,10 @@ pub fn archive_url(archive_filename: &str) -> (String, String) {
 }
 
 // go_version_archive_url returns the zip or tar.gz URL of the given Go version.
+#[deprecated(
+    since = "0.6.0",
+    note = "please use `list_upstream_go_versions` instead"
+)]
 pub fn go_version_archive_url(version: &str) -> String {
     format!("{}/{}", go_download_base_url(), go_version_archive(version))
 }
@@ -75,6 +79,8 @@ fn get_var_or_else(key: &str, op: impl FnOnce() -> String) -> String {
 
 #[cfg(test)]
 mod tests {
+    use crate::consts::{archive_sha256, archive_url, go_version_archive};
+
     use super::{
         go_download_base_url, go_host, go_source_git_url, go_source_upstream_git_url,
         go_version_archive_url,
@@ -119,7 +125,12 @@ mod tests {
     }
 
     #[test]
-    fn test_archive_url() {
-        assert!(go_version_archive_url("1.21.5").starts_with("https://dl.google.com/go/1.21.5"))
+    fn test_archive() {
+        let archive_filename = go_version_archive("1.21.5");
+        assert!(archive_sha256(&archive_filename).ends_with(".sha256"));
+
+        let (archive_url, archive_sha256_url) = archive_url(&archive_filename);
+        assert!(archive_url.starts_with("https://dl.google.com/go/1.21.5"));
+        assert!(archive_sha256_url.starts_with("https://dl.google.com/go/1.21.5"))
     }
 }
