@@ -81,10 +81,7 @@ fn get_var_or_else(key: &str, op: impl FnOnce() -> String) -> String {
 mod tests {
     use crate::consts::{archive_sha256, archive_url, go_version_archive};
 
-    use super::{
-        go_download_base_url, go_host, go_source_git_url, go_source_upstream_git_url,
-        go_version_archive_url,
-    };
+    use super::{go_download_base_url, go_host, go_source_git_url, go_source_upstream_git_url};
     use super::{GOUP_GO_DOWNLOAD_BASE_URL, GOUP_GO_HOST, GOUP_GO_SOURCE_GIT_URL};
     use super::{GO_DOWNLOAD_BASE_URL, GO_HOST, GO_SOURCE_GIT_URL, GO_SOURCE_UPSTREAM_GIT_URL};
 
