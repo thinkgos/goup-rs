@@ -16,7 +16,7 @@ use super::Run;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Oneself {
-    // the goup installation command.
+    /// the goup installation command.
     #[command(subcommand)]
     command: Command,
 }

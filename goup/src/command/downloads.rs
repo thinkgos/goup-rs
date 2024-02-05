@@ -8,7 +8,7 @@ use super::Run;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Downloads {
-    // outputs the completion content for given shell
+    /// the download command.
     #[command(subcommand)]
     command: Command,
 }
