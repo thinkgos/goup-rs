@@ -18,29 +18,38 @@ enum Command {
     /// Show download archive file
     Show(Show),
     /// Clean download archive file
-    Clean,
+    Clean(Clean),
 }
 
 #[derive(Args, Clone, Debug, PartialEq)]
 struct Show {
+    /// Contain archive sha256 file
     #[arg(short, long, default_value_t = false)]
     contain_sha256: bool,
+}
+
+#[derive(Args, Clone, Debug, PartialEq)]
+struct Clean {
+    /// Skip interact prompt.
+    #[arg(short, long, default_value_t = false)]
+    no_confirm: bool,
 }
 
 impl Run for Downloads {
     fn run(&self) -> Result<(), anyhow::Error> {
         match self.command {
-            Command::Show(ref show) => {
-                Version::list_dl(Some(show.contain_sha256))?
+            Command::Show(ref arg) => {
+                Version::list_dl(Some(arg.contain_sha256))?
                     .iter()
                     .for_each(|v| {
                         println!("{}", v);
                     });
             }
-            Command::Clean => {
-                let confirmation = Confirm::with_theme(&ColorfulTheme::default())
-                    .with_prompt("Do you want to clean archive file?")
-                    .interact()?;
+            Command::Clean(ref arg) => {
+                let confirmation = arg.no_confirm
+                    || Confirm::with_theme(&ColorfulTheme::default())
+                        .with_prompt("Do you want to clean archive file?")
+                        .interact()?;
                 if confirmation {
                     Version::remove_dl()?;
                 } else {

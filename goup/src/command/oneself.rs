@@ -26,7 +26,14 @@ enum Command {
     /// Download and install updates to goup
     Update,
     // Uninstall goup
-    Uninstall,
+    Uninstall(Uninstall),
+}
+
+#[derive(Args, Clone, Debug, PartialEq)]
+struct Uninstall {
+    /// Skip interact prompt.
+    #[arg(short, long, default_value_t = false)]
+    no_confirm: bool,
 }
 
 impl Run for Oneself {
@@ -45,10 +52,11 @@ impl Run for Oneself {
                     .update()?;
                 log::info!("Update status: `v{}`!", status.version());
             }
-            Command::Uninstall => {
-                let confirmation = Confirm::with_theme(&ColorfulTheme::default())
-                    .with_prompt("Do you want to uninstall goup?")
-                    .interact()?;
+            Command::Uninstall(ref arg) => {
+                let confirmation = arg.no_confirm
+                    || Confirm::with_theme(&ColorfulTheme::default())
+                        .with_prompt("Do you want to uninstall goup?")
+                        .interact()?;
                 if confirmation {
                     remove_goup_exe()?;
                     Version::remove_goup_home()?;
