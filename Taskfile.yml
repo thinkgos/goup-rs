@@ -1,0 +1,21 @@
+version: "3"
+
+tasks:
+  fmt:check:
+    cmds:
+      - cargo fmt -- --check
+  clippy:
+    cmds:
+      - cargo clippy --all-targets --all-features -- -D warnings
+  check:
+    cmds:
+      - cargo check --all
+  test:
+    cmds:
+      - cargo test --all-features
+  lint:
+    cmds:
+      - task: fmt:check
+      - task: clippy
+      - task: check
+      - task: test
