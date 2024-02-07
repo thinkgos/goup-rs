@@ -1,7 +1,7 @@
-name: Customize issue
+name: Question
 description: Raise the bar on expectations
 labels: 
-  - 'help wanted'
+  - 'question'
 body:
   - type: checkboxes
     attributes:
@@ -17,7 +17,7 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Describe your use issue
-      description: Describe the problem you want to solve.
+      label: Describe your question
+      description: Describe the question you want to ask.
     validations:
       required: true

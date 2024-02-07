@@ -2,6 +2,7 @@ name: Bug report
 description: Things aren't working as expected
 labels: 
   - 'bug'
+  - 'help wanted'
 body:
   - type: checkboxes
     attributes:
