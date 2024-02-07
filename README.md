@@ -52,7 +52,15 @@ If you want to install manually, there are the steps:
 
 ### Manual(for Windows)
 
-I do not have Windows. So you know, welcome PR.
+#### MSI-installers
+
+Install the latest version for your system with the MSI-installers from the [Release Page](https://github.com/thinkgos/goup-rs/releases) section
+
+#### Binary Compressed
+
+- Download the binary compressed file for Windows version from [Release Page](https://github.com/thinkgos/goup-rs/releases), and then unzipping it.
+- Move the `goup.exe` to `$YOUR_PATH`.
+- Add the `$YOUR_PATH` to windows environment.
 
 ## Quick Start
 
