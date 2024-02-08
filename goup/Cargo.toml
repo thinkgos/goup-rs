@@ -26,7 +26,7 @@ shadow-rs = "0.26"
 goup-version = {path = "../goup-version", version = "0.6"}
 goup-downloader = {path = "../goup-downloader", version = "0.6"}
 
-clap = {version = "4.4", features = ["derive", "env"]}
+clap = {version = "4.5", features = ["derive", "env"]}
 clap_complete = "4.4"
 anyhow = "1.0"
 which = "6.0"
