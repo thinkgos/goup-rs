@@ -1,4 +1,4 @@
-const MIN_VERSION: &str = "1.70";
+const MIN_VERSION: &str = "1.74";
 
 fn main() -> Result<(), shadow_rs::ShadowError> {
     match version_check::is_min_version(MIN_VERSION) {
