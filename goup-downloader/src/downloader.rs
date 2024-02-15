@@ -34,7 +34,7 @@ impl Downloader {
         if let Some(stdout) = command.stdout.take() {
             let reader = BufReader::new(stdout);
 
-            for line in reader.lines().flatten() {
+            for line in reader.lines().map_while(Result::ok) {
                 println!("{}", line);
             }
         }
