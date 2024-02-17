@@ -157,6 +157,14 @@ mod tests {
             Path::new("/home/dev/.goup/bin")
         );
         assert_eq!(
+            Dir::new(home_dir).dl().as_ref(),
+            Path::new("/home/dev/.goup/dl")
+        );
+        assert_eq!(
+            Dir::new(home_dir).dl_file("file").as_ref(),
+            Path::new("/home/dev/.goup/dl/file")
+        );
+        assert_eq!(
             Dir::new(home_dir).version("go1.21.2").as_ref(),
             Path::new("/home/dev/.goup/go1.21.2")
         );
@@ -187,7 +195,6 @@ mod tests {
             &tmp_home_dir,
             "go1.21.2"
         ));
-
         Ok(())
     }
 }
