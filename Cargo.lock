@@ -757,11 +757,9 @@ name = "goup-downloader"
 version = "0.6.1"
 dependencies = [
  "anyhow",
- "dirs",
  "flate2",
  "goup-version",
  "log",
- "regex",
  "reqwest",
  "sha2",
  "tar",

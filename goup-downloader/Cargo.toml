@@ -14,13 +14,13 @@ repository.workspace =true
 
 [dependencies]
 goup-version = {path = "../goup-version", version = "0.6"}
-anyhow = "1.0"
-dirs = "5.0"
-regex = "1.10"
-reqwest = { version = "0.11", default-features = false, features = ["blocking", "rustls-tls-native-roots"] }
+
+anyhow.workspace = true
+log.workspace = true
+reqwest.workspace = true
 sha2 = "0.10"
 flate2 = "1.0"
 tar = "0.4"
 zip = "0.6"
-log = "0.4"
+
 # git2 = "0.18"

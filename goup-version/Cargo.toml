@@ -14,11 +14,11 @@ repository.workspace =true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0"
+anyhow.workspace = true
+log.workspace = true
+regex.workspace = true
+reqwest.workspace = true
 dirs = "5.0"
-regex = "1.10"
-reqwest = { version = "0.11", default-features = false, features = ["blocking", "rustls-tls-native-roots"] }
-log = "0.4"
 
 [target.'cfg(windows)'.dependencies]
 junction = "1.0"
