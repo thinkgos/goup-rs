@@ -31,6 +31,10 @@ log = "0.4"
 regex = "1.10"
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "rustls-tls-native-roots"] }
 
+# dev
+tempfile = "3"
+temp-env = "0.3"
+
 [workspace.lints.rust]
 unsafe_code = "forbid"
 # unused = "allow" # for experimental dev
