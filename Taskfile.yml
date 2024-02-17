@@ -24,4 +24,9 @@ tasks:
     requires:
       vars:
         - Package
-      
+  publish:
+    vars:
+      PACKAGES: goup-version goup-downloader goup-rs
+    cmds:
+      - for: { var: PACKAGES, as: Package }
+        cmd: cargo publish --registry crates-io -p {{.Package}}
