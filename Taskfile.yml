@@ -19,3 +19,9 @@ tasks:
       - task: clippy
       - task: check
       - task: test
+  coverage:
+    cmd: cargo tarpaulin -p {{.Package}} --out lcov
+    requires:
+      vars:
+        - Package
+      
