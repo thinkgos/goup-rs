@@ -7,6 +7,7 @@ use std::str::FromStr;
 pub use dir::Dir;
 pub use version::Version;
 
+/// support toolchain
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Toolchain {
     Stable,
@@ -30,6 +31,7 @@ impl FromStr for Toolchain {
     }
 }
 
+/// a toolchain filter.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum ToolchainFilter {
     Stable,

@@ -24,7 +24,7 @@ impl Dir {
         path.push(".goup");
         Self { path }
     }
-    /// Allocates a Dir with home_dir as `${home}/.goup`
+    /// Allocates a Dir with home_dir as `${HOME}/.goup`
     pub fn from_home_dir() -> Result<Self, anyhow::Error> {
         let mut path = Self::home_dir()?;
         path.push(".goup");

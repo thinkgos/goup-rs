@@ -4,7 +4,6 @@ use std::ops::Deref;
 use std::process::Command;
 
 use anyhow::anyhow;
-
 use regex::Regex;
 use reqwest::blocking;
 
@@ -21,6 +20,7 @@ pub struct Version {
 }
 
 impl Version {
+    /// initializes the environment file.
     pub fn init_env(s: &str) -> Result<(), anyhow::Error> {
         let goup_dir = Dir::from_home_dir()?;
         if !goup_dir.exists() {
@@ -30,6 +30,7 @@ impl Version {
         fs::write(env_file, s)?;
         Ok(())
     }
+    /// list upstream version
     #[deprecated(
         since = "0.3.0",
         note = "please use `list_upstream_go_versions` instead"
@@ -37,6 +38,7 @@ impl Version {
     pub fn list_upstream_versions(regex: Option<&str>) -> Result<Vec<String>, anyhow::Error> {
         Self::list_upstream_go_versions(regex.map(|s| ToolchainFilter::Filter(s.to_owned())))
     }
+    /// list upstream go version
     pub fn list_upstream_go_versions(
         filter: Option<ToolchainFilter>,
     ) -> Result<Vec<String>, anyhow::Error> {
@@ -75,6 +77,7 @@ impl Version {
             .collect())
     }
 
+    /// get upstream latest go version.
     pub fn get_upstream_latest_go_version(host: &str) -> Result<String, anyhow::Error> {
         let url = format!("{}/VERSION?m=text", host);
         let body = blocking::get(url)?.text()?;
@@ -84,7 +87,7 @@ impl Version {
             .ok_or_else(|| anyhow!("Getting latest Go version failed"))?;
         Ok(ver.to_owned())
     }
-
+    /// list locally installed go version.
     pub fn list_go_version() -> Result<Vec<Version>, anyhow::Error> {
         let home = Dir::home_dir()?;
         // may be .goup not exist
@@ -116,6 +119,7 @@ impl Version {
         Ok(version_dirs)
     }
 
+    /// set active go version
     pub fn set_go_version(version: &str) -> Result<(), anyhow::Error> {
         let version = Self::normalize(version);
         let home = Dir::home_dir()?;
@@ -139,7 +143,7 @@ impl Version {
         log::info!("Default Go is set to '{version}'");
         Ok(())
     }
-
+    /// remove the go version, if it is current active go version, will ignore deletion.
     pub fn remove_go_version(version: &str) -> Result<(), anyhow::Error> {
         let version = Self::normalize(version);
         let cur = Self::current_go_version()?;
@@ -154,6 +158,7 @@ impl Version {
         Ok(())
     }
 
+    /// remove multiple go version, if it is current active go version, will ignore deletion.
     pub fn remove_go_versions(vers: &[&str]) -> Result<(), anyhow::Error> {
         if !vers.is_empty() {
             let home = Dir::home_dir()?;
@@ -173,6 +178,7 @@ impl Version {
         Ok(())
     }
 
+    /// current active go version
     pub fn current_go_version() -> Result<Option<String>, anyhow::Error> {
         // may be current not exist
         let current = Dir::from_home_dir()?
@@ -186,12 +192,14 @@ impl Version {
         Ok(current)
     }
 
+    /// list `${HOME}/.goup/dl` directory items(only file, ignore directory).
     pub fn list_dl(contain_sha256: Option<bool>) -> Result<Vec<String>, anyhow::Error> {
         let home = Dir::home_dir()?;
         // may be .goup or .goup/dl not exist
         if !Dir::new(&home).exists() || !Dir::new(&home).dl().exists() {
             return Ok(Vec::new());
         }
+        let contain_sha256 = contain_sha256.unwrap_or_default();
         let dir: Result<Vec<DirEntry>, _> = Dir::new(&home).dl().read_dir()?.collect();
         let mut archive_files: Vec<_> = dir?
             .iter()
@@ -201,13 +209,14 @@ impl Version {
                 }
                 let filename = v.file_name();
                 let filename = filename.to_string_lossy();
-                (contain_sha256.unwrap_or_default() || !filename.ends_with(".sha256"))
-                    .then(|| filename.to_string())
+                (contain_sha256 || !filename.ends_with(".sha256")).then(|| filename.to_string())
             })
             .collect();
         archive_files.sort();
         Ok(archive_files)
     }
+
+    /// remove `${HOME}/.goup/dl` directory.
     pub fn remove_dl() -> Result<(), anyhow::Error> {
         let dl_dir = Dir::from_home_dir()?.dl();
         if dl_dir.exists() {
@@ -216,6 +225,7 @@ impl Version {
         Ok(())
     }
 
+    /// remove `${HOME}/.goup` directory.
     pub fn remove_goup_home() -> Result<(), anyhow::Error> {
         let goup_home_dir = Dir::from_home_dir()?;
         if goup_home_dir.exists() {
@@ -226,7 +236,7 @@ impl Version {
 
     /// normalize the version string.
     /// 1.21.1   -> go1.21.1
-    /// go1.21.1 -> go1.21,1
+    /// go1.21.1 -> go1.21.1
     /// tip      -> gotip
     /// gotip    -> gotip
     pub fn normalize(ver: &str) -> String {
