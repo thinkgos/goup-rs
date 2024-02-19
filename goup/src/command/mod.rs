@@ -32,16 +32,25 @@ use self::upgrade::Upgrade;
 
 shadow!(build);
 const VERSION: &str = shadow_rs::formatcp!(
-    r#"{}
+    r#"{} 
+{}
+
 author:          {}
+email:           {}
+repository:      {}
+branch:          {}
 git_commit:      {}
 git_full_commit: {}
 build_time:      {}
 build_env:       {},{}
 build_os:        {}
 build_arch:      {}"#,
-    build::PKG_VERSION,
+    env!("CARGO_PKG_VERSION"),
+    env!("CARGO_PKG_DESCRIPTION"),
     build::COMMIT_AUTHOR,
+    build::COMMIT_EMAIL,
+    env!("CARGO_PKG_REPOSITORY"),
+    build::BRANCH,
     build::SHORT_COMMIT,
     build::COMMIT_HASH,
     build::BUILD_TIME_2822,
