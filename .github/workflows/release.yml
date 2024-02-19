@@ -140,7 +140,7 @@ jobs:
           path: target/wix/goup-${{ matrix.target }}.msi
 
       - name: Generate a changelog [Changelog]
-        uses: orhun/git-cliff-action@v2
+        uses: orhun/git-cliff-action@v3
         if: matrix.os == 'ubuntu-latest' && matrix.target == 'x86_64-unknown-linux-gnu'
         with:
           config: cliff.toml
