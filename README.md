@@ -6,7 +6,7 @@
 ![Crates.io MSRV](https://img.shields.io/crates/msrv/goup-rs)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/goup-rs)
 ![Crates.io Crates](https://img.shields.io/crates/v/goup-rs?style=flat-square)
-[![Licence](https://img.shields.io/github/license/thinkgos/goup-rs)](https://raw.githubusercontent.com/thinkgos/goup-rs/main/LICENSE)
+[![License](https://img.shields.io/github/license/thinkgos/goup-rs)](https://raw.githubusercontent.com/thinkgos/goup-rs/main/LICENSE)
 [![Tag](https://img.shields.io/github/v/tag/thinkgos/goup-rs)](https://github.com/thinkgos/goup-rs/tags)
 
 `goup` is an attempt to fulfill the above features and is heavily inspired by [Rustup](https://rustup.rs/), [golang/dl](https://github.com/golang/dl), [goup](https://github.com/owenthereal/goup), [goenv](https://github.com/syndbg/goenv), [gvm](https://github.com/moovweb/gvm) and [getgo](https://github.com/golang/tools/tree/master/cmd/getgo).
@@ -19,8 +19,9 @@
 - Multi-platform compatible (Linux, macOS & Windows).
 - Install/Remove Go versions with `goup install/remove`. Such as `tip` version.
 - List locally installed versions.
-- Switch between multiple versions.
+- Switch between multiple installed versions.
 - Search available version of Go.
+- Manage locally archived files(such as `*.tar.gz`, `*.tar.gz.sha256`).
 - Upgrade `goup` itself.
 - Friendly prompt.
 - Should be pretty fast.
@@ -194,6 +195,14 @@ $ goup env
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
 | GOUP_GO_SOURCE_GIT_URL    | https://go.googlesource.com/go | Upstream source git url, use by 'install' the gotip                             |
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+```
+
+### Autocompletion
+
+`goup completion <SHELL>` Generate the autocompletion script for the specified shell. `<SHELL>` possible values: `bash`, `elvish`, `fish`, `powershell`, `zsh`.
+
+```bash
+goup completion zsh > _goup
 ```
 
 ### More information
