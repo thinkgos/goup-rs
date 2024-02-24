@@ -30,14 +30,6 @@ impl Version {
         fs::write(env_file, s)?;
         Ok(())
     }
-    /// list upstream version
-    #[deprecated(
-        since = "0.3.0",
-        note = "please use `list_upstream_go_versions` instead"
-    )]
-    pub fn list_upstream_versions(regex: Option<&str>) -> Result<Vec<String>, anyhow::Error> {
-        Self::list_upstream_go_versions(regex.map(|s| ToolchainFilter::Filter(s.to_owned())))
-    }
     /// list upstream go version
     pub fn list_upstream_go_versions(
         filter: Option<ToolchainFilter>,

@@ -9,7 +9,6 @@ mod oneself;
 mod remove;
 mod search;
 mod set;
-mod upgrade;
 
 use clap::{ArgAction, Args, CommandFactory};
 use clap::{Parser, Subcommand};
@@ -28,7 +27,6 @@ use self::oneself::Oneself;
 use self::remove::Remove;
 use self::search::Search;
 use self::set::Set;
-use self::upgrade::Upgrade;
 
 shadow!(build);
 const VERSION: &str = shadow_rs::formatcp!(
@@ -117,8 +115,6 @@ enum Command {
     /// If no version is provided, a prompt will show to select a installed Go version.
     #[command(visible_alias = "use")]
     Set(Set),
-    /// Upgrade goup, deprecated in future version, use `goup self update` instead
-    Upgrade(Upgrade),
     /// Generate the autocompletion script for the specified shell
     Completion(Completion),
     #[cfg(unix)]
@@ -146,7 +142,6 @@ impl Run for Cli {
             Command::Remove(cmd) => cmd.run(),
             Command::Search(cmd) => cmd.run(),
             Command::Set(cmd) => cmd.run(),
-            Command::Upgrade(cmd) => cmd.run(),
             Command::Oneself(cmd) => cmd.run(),
             #[cfg(unix)]
             Command::Init(cmd) => cmd.run(),

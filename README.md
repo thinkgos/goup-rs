@@ -219,7 +219,6 @@ goup completion zsh > _goup
 - `goup remove/rm [VERSION]...` remove the specified Go version list.
 - `goup search [FILTER]` lists all available Go versions.
 - `goup downloads [COMMAND]` Manage download archive files.
-- `goup upgrade` upgrades `goup`, deprecated in future version, use `goup self update` instead
 - `goup self <COMMAND>` Modify the goup installation.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
 - `goup env` Show the specified goup environment variables and values.

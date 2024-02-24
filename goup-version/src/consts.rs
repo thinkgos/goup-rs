@@ -60,15 +60,6 @@ pub fn archive_url(archive_filename: &str) -> (String, String) {
     )
 }
 
-// go_version_archive_url returns the zip or tar.gz URL of the given Go version.
-#[deprecated(
-    since = "0.6.0",
-    note = "please use `list_upstream_go_versions` instead"
-)]
-pub fn go_version_archive_url(version: &str) -> String {
-    format!("{}/{}", go_download_base_url(), go_version_archive(version))
-}
-
 #[inline]
 fn get_var_or_else(key: &str, op: impl FnOnce() -> String) -> String {
     env::var(key)
