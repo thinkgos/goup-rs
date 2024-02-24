@@ -26,8 +26,7 @@ impl Dir {
     }
     /// Allocates a `GOUP_HOME` Dir as `${HOME}/.goup`
     pub fn goup_home() -> Result<Self, anyhow::Error> {
-        let path = Self::home_dir()?;
-        Ok(Self::new(path))
+        Ok(Self::new(Self::home_dir()?))
     }
     // Creates an owned [`Dir`] with `path` adjoined to `self`.
     pub fn join_path<P: AsRef<Path>>(&self, path: P) -> Self {
