@@ -87,16 +87,14 @@ impl Downloader {
         Self::execute_command("git", &gotip_go, ["clean", "-i", "-d"])?;
         //* git clean -q -f -d -X
         Self::execute_command("git", &gotip_go, ["clean", "-q", "-f", "-d", "-X"])?;
-        // 执行 ./src/make.rs/make.bat/make.bash 有$GOROOT/src问题
-
-        //* $HOME/{owner}/.goup/gotip/src/<make.bash|make.rs|make.bat>
 
         let script = match env::consts::OS {
             "windows" => "make.bat",
             "plan9" => "make.rs",
             _ => "make.bash",
         };
-
+        //* 执行 ./src/<make.bashmake.rs|make.bat> 有$GOROOT/src问题
+        //* $HOME/{owner}/.goup/gotip/src/<make.bash|make.rs|make.bat>
         Self::execute_command(gotip_go.join("src").join(script), gotip_go.join("src"), [])?;
         Ok(())
     }
@@ -257,10 +255,14 @@ impl Downloader {
     }
 
     /// verify_archive_file_sha256 校验文件压缩包的sha256
-    fn verify_archive_file_sha256<P1: AsRef<Path>, P2: AsRef<Path>>(
+    fn verify_archive_file_sha256<P1, P2>(
         archive_file: P1,
         archive_sha256_file: P2,
-    ) -> Result<(), anyhow::Error> {
+    ) -> Result<(), anyhow::Error>
+    where
+        P1: AsRef<Path>,
+        P2: AsRef<Path>,
+    {
         let expect_sha256 = fs::read_to_string(archive_sha256_file)?;
         let expect_sha256 = expect_sha256.trim();
         let got_sha256 = Self::compute_file_sha256(&archive_file)?;

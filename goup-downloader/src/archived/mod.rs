@@ -8,6 +8,8 @@ use anyhow::anyhow;
 use tgz::Tgz;
 use zip::Zip;
 
+/// unpack format,
+/// such as zip,tar.gz.
 pub trait Unpacker {
     /// unpack the provided archive file to dest_dir.
     fn unpack<P1, P2>(dest_dir: P1, archive_file: P2) -> Result<(), anyhow::Error>
