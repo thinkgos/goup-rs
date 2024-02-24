@@ -24,76 +24,74 @@ impl Dir {
         path.push(".goup");
         Self { path }
     }
-    /// Allocates a Dir with home_dir as `${HOME}/.goup`
-    pub fn from_home_dir() -> Result<Self, anyhow::Error> {
-        let mut path = Self::home_dir()?;
-        path.push(".goup");
-        Ok(Self { path })
+    /// Allocates a `GOUP_HOME` Dir as `${HOME}/.goup`
+    pub fn goup_home() -> Result<Self, anyhow::Error> {
+        let path = Self::home_dir()?;
+        Ok(Self::new(path))
     }
-    /// `${path}/.goup/env`
-    pub fn env(mut self) -> Self {
-        self.path.push("env");
-        self
+    // Creates an owned [`Dir`] with `path` adjoined to `self`.
+    pub fn join_path<P: AsRef<Path>>(&self, path: P) -> Self {
+        Self {
+            path: self.path.join(path),
+        }
     }
-    /// `${path}/.goup/current`
-    pub fn current(mut self) -> Self {
-        self.path.push("current");
-        self
+    /// Extends `self` with `env`
+    pub fn env(&self) -> Self {
+        self.join_path("env")
     }
-    /// `${path}/.goup/current/bin`
-    pub fn current_bin(mut self) -> Self {
-        self.path.push("current");
-        self.path.push("bin");
-        self
+    // Extends `self` with `current`.
+    pub fn current(&self) -> Self {
+        self.join_path("current")
     }
-    /// `${path}/.goup/bin`
-    pub fn bin(mut self) -> Self {
-        self.path.push("bin");
-        self
+    /// Extends `self` with `/current/bin`
+    pub fn current_bin(&self) -> Self {
+        let mut d = self.join_path("current");
+        d.push("bin");
+        d
     }
-    /// `${path}/.goup/{version}`
-    pub fn version<P: AsRef<Path>>(mut self, ver: P) -> Self {
-        self.path.push(ver);
-        self
+    /// Extends `self` with `/bin`
+    pub fn bin(&self) -> Self {
+        self.join_path("bin")
     }
-    /// `${path}/.goup/dl`
-    pub fn dl(mut self) -> Self {
-        self.path.push("dl");
-        self
+    /// Extends `self` with `{version}`
+    pub fn version<P: AsRef<Path>>(&self, ver: P) -> Self {
+        self.join_path(ver)
     }
-    /// `${path}/.goup/dl/{filename}`
-    pub fn dl_file<P: AsRef<Path>>(mut self, p: P) -> Self {
-        self.path.push("dl");
-        self.path.push(p);
-        self
+    /// Extends `self` with `dl`
+    pub fn dl(&self) -> Self {
+        self.join_path("dl")
     }
-    /// `${path}/.goup/{version}/go`
-    pub fn version_go<P: AsRef<Path>>(mut self, ver: P) -> Self {
-        self.path.push(ver);
-        self.path.push("go");
-        self
+    /// Extends `self` with `dl/{filename}`
+    pub fn dl_file<P: AsRef<Path>>(&self, p: P) -> Self {
+        let mut d = self.join_path("dl");
+        d.push(p);
+        d
     }
-    /// `${path}/.goup/{version}/.unpacked-success`
-    fn version_dot_unpacked_success<P: AsRef<Path>>(mut self, ver: P) -> Self {
-        self.path.push(ver);
-        self.path.push(".unpacked-success");
-        self
+    /// Extends `self` with `{version}/go`
+    pub fn version_go<P: AsRef<Path>>(&self, ver: P) -> Self {
+        let mut d = self.join_path(ver);
+        d.push("go");
+        d
+    }
+    /// Extends `self` with `{version}/.unpacked-success`
+    fn version_dot_unpacked_success<P: AsRef<Path>>(&self, ver: P) -> Self {
+        let mut d = self.join_path(ver);
+        d.push(".unpacked-success");
+        d
     }
     // `${path}/.goup/{version}/.unpacked-success` is exist.
-    pub fn is_dot_unpacked_success_file_exists<P, P1>(home: P, ver: P1) -> bool
+    pub fn is_dot_unpacked_success_file_exists<P>(&self, ver: P) -> bool
     where
         P: AsRef<Path>,
-        P1: AsRef<Path>,
     {
-        Self::new(&home).version_dot_unpacked_success(&ver).exists()
+        self.version_dot_unpacked_success(&ver).exists()
     }
-    /// `${path}/.goup/{version}/.unpacked-success` create file
-    pub fn create_dot_unpacked_success_file<P, P1>(home: P, ver: P1) -> Result<(), anyhow::Error>
+    /// create `${path}/.goup/{version}/.unpacked-success` file
+    pub fn create_dot_unpacked_success_file<P>(&self, ver: P) -> Result<(), anyhow::Error>
     where
         P: AsRef<Path>,
-        P1: AsRef<Path>,
     {
-        let dot_unpacked_success_file = Self::new(&home).version_dot_unpacked_success(&ver);
+        let dot_unpacked_success_file = self.version_dot_unpacked_success(&ver);
         let parent = dot_unpacked_success_file.parent();
         if let Some(parent) = parent {
             fs::create_dir_all(parent)?;
@@ -131,7 +129,7 @@ mod tests {
     #[test]
     fn test_home_dir() {
         println!("Dir - home_dir: {:?}", Dir::home_dir());
-        println!("Dir - from_home_dir: {:?}", Dir::from_home_dir());
+        println!("Dir - from_home_dir: {:?}", Dir::goup_home());
     }
     #[test]
     fn test_dir() {
@@ -185,16 +183,11 @@ mod tests {
     #[test]
     fn test_dot_unpacked_success_file() -> Result<(), anyhow::Error> {
         let tmp_home_dir = tempfile::tempdir()?;
-        println!("{}", tmp_home_dir.path().display());
-        assert!(!Dir::is_dot_unpacked_success_file_exists(
-            &tmp_home_dir,
-            "go1.21.2"
-        ));
-        Dir::create_dot_unpacked_success_file(&tmp_home_dir, "go1.21.2")?;
-        assert!(Dir::is_dot_unpacked_success_file_exists(
-            &tmp_home_dir,
-            "go1.21.2"
-        ));
+        let tmp_goup_home = Dir::new(tmp_home_dir);
+        println!("{}", tmp_goup_home.display());
+        assert!(!tmp_goup_home.is_dot_unpacked_success_file_exists("go1.21.2"));
+        tmp_goup_home.create_dot_unpacked_success_file("go1.21.2")?;
+        assert!(tmp_goup_home.is_dot_unpacked_success_file_exists("go1.21.2"));
         Ok(())
     }
 }

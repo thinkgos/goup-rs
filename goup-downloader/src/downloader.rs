@@ -46,8 +46,8 @@ impl Downloader {
     }
 
     pub fn install_go_tip(_cl: Option<&str>) -> Result<(), anyhow::Error> {
-        let gotip_go = Dir::from_home_dir()?.version_go("gotip");
-        let gotip_git = gotip_go.join(".git");
+        let gotip_go = Dir::goup_home()?.version_go("gotip");
+        let gotip_git = gotip_go.join_path(".git");
         // gotip is not clone from source
         if !gotip_git.exists() {
             fs::create_dir_all(&gotip_go)?;
@@ -95,14 +95,18 @@ impl Downloader {
         };
         //* 执行 ./src/<make.bashmake.rs|make.bat> 有$GOROOT/src问题
         //* $HOME/{owner}/.goup/gotip/src/<make.bash|make.rs|make.bat>
-        Self::execute_command(gotip_go.join("src").join(script), gotip_go.join("src"), [])?;
+        Self::execute_command(
+            gotip_go.join("src").join(script),
+            gotip_go.join_path("src"),
+            [],
+        )?;
         Ok(())
     }
     pub fn install_go_version(version: &str) -> Result<(), anyhow::Error> {
-        let home = Dir::home_dir()?;
-        let version_dest_dir = Dir::new(&home).version(version);
+        let goup_home = Dir::goup_home()?;
+        let version_dest_dir = goup_home.version(version);
         // 是否已解压成功并且存在
-        if Dir::is_dot_unpacked_success_file_exists(&home, version) {
+        if goup_home.is_dot_unpacked_success_file_exists(version) {
             log::info!(
                 "{}: already installed in {:?}",
                 version,
@@ -111,7 +115,7 @@ impl Downloader {
             return Ok(());
         }
         // download directory
-        let dl_dest_dir = Dir::new(&home).dl();
+        let dl_dest_dir = goup_home.dl();
         // 压缩包文件名称
         let archive_filename = consts::go_version_archive(version);
         // 压缩包sha256文件名称
@@ -124,8 +128,8 @@ impl Downloader {
         }
 
         // 压缩包文件
-        let archive_file = dl_dest_dir.join(archive_filename);
-        let archive_sha256_file = dl_dest_dir.join(archive_sha256_filename);
+        let archive_file = dl_dest_dir.join_path(archive_filename);
+        let archive_sha256_file = dl_dest_dir.join_path(archive_sha256_filename);
         if !archive_file.exists()
             || !archive_sha256_file.exists()
             || Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file).is_err()
@@ -177,7 +181,7 @@ impl Downloader {
             .parse::<Unpack>()?
             .unpack(&version_dest_dir, &archive_file)?;
         // 设置解压成功
-        Dir::create_dot_unpacked_success_file(&home, version)?;
+        goup_home.create_dot_unpacked_success_file(version)?;
         log::info!("{} installed in {}", version, version_dest_dir.display());
         Ok(())
     }
