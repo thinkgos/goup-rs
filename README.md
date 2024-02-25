@@ -230,7 +230,7 @@ Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -v <sub
 
 ## FAQ
 
-- Compiling and Installing from source code failure?
+- Compiling and Installing from source code failure?  
   The minimum version of Go required depends on the target version of Go, more information see [source installation instructions](https://go.dev/doc/install/source)
 
 ## License
