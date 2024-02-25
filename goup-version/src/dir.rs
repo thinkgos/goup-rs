@@ -38,7 +38,7 @@ impl Dir {
     pub fn env(&self) -> Self {
         self.join_path("env")
     }
-    // Extends `self` with `current`.
+    /// Extends `self` with `current`.
     pub fn current(&self) -> Self {
         self.join_path("current")
     }
@@ -78,7 +78,7 @@ impl Dir {
         d.push(".unpacked-success");
         d
     }
-    // `${path}/.goup/{version}/.unpacked-success` is exist.
+    /// `${path}/.goup/{version}/.unpacked-success` is exist.
     pub fn is_dot_unpacked_success_file_exists<P>(&self, ver: P) -> bool
     where
         P: AsRef<Path>,

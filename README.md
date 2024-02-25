@@ -84,7 +84,7 @@ $ GOUP_GO_HOST=https://golang.google.cn goup install 1.21.6
 
 ## Usage
 
-### Lists all available Go versions from `https://golang.org/dl`
+### Lists all available Go versions
 
 `goup search [FILTER]`, `[FILTER]` can be follow value 'stable', "unstable", 'beta' or any regex string.
 
@@ -222,6 +222,10 @@ goup completion zsh > _goup
 - `goup self <COMMAND>` Modify the goup installation.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
 - `goup env` Show the specified goup environment variables and values.
+
+## How to Debug
+
+Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -v <subcommand>` to use `Debug` or `Trace` level.
 
 ## FAQ
 
