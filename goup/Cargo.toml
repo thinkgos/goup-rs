@@ -33,6 +33,6 @@ clap_complete = "4.5"
 which = "6.0"
 prettytable-rs = "0.10"
 dialoguer = "0.11"
-self_update = {version = "0.39", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}
+self_update = {version = "0.40", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}
 shadow-rs = "0.27"
 env_logger = "0.11"
