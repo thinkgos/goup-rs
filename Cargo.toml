@@ -29,7 +29,7 @@ repository = "https://github.com/thinkgos/goup-rs"
 anyhow = "1.0"
 log = "0.4"
 regex = "1.10"
-reqwest = { version = "0.11", default-features = false, features = ["blocking", "rustls-tls-native-roots"] }
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls-native-roots"] }
 
 # dev
 tempfile = "3"
