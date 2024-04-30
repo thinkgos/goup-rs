@@ -21,7 +21,7 @@ reqwest.workspace = true
 dirs = "5.0"
 
 [target.'cfg(windows)'.dependencies]
-junction = "1.0"
+junction = "1.1"
 
 [dev-dependencies]
 tempfile.workspace = true
