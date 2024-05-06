@@ -21,6 +21,6 @@ reqwest.workspace = true
 sha2 = "0.10"
 flate2 = "1.0"
 tar = "0.4"
-zip = "1.1"
+zip = "1.2"
 
 # git2 = "0.18"
