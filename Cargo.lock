@@ -835,6 +835,7 @@ dependencies = [
  "log",
  "prettytable-rs",
  "self_update",
+ "semver",
  "shadow-rs",
  "version_check",
  "which",
@@ -850,6 +851,8 @@ dependencies = [
  "log",
  "regex",
  "reqwest",
+ "serde",
+ "serde_json",
  "temp-env",
  "tempfile",
 ]

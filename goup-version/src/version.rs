@@ -4,12 +4,32 @@ use std::ops::Deref;
 use std::process::Command;
 
 use anyhow::anyhow;
+use anyhow::Ok;
 use regex::Regex;
 use reqwest::blocking;
+use serde::{Deserialize, Serialize};
 
 use super::consts;
 use super::Dir;
 use super::ToolchainFilter;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GoFile {
+    pub arch: String,
+    pub filename: String,
+    pub kind: String,
+    pub os: String,
+    pub sha256: String,
+    pub size: isize,
+    pub version: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct GoRelease {
+    pub version: String,
+    pub stable: bool,
+    // pub files: Vec<GoFile>,
+}
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
@@ -30,8 +50,19 @@ impl Version {
         fs::write(env_file, s)?;
         Ok(())
     }
-    /// list upstream go version
+    /// list upstream go version, use http.
+    #[deprecated(
+        since = "0.8.0",
+        note = "use `list_upstream_go_versions_from_git` or `list_upstream_go_versions_from_http`  instead"
+    )]
     pub fn list_upstream_go_versions(
+        filter: Option<ToolchainFilter>,
+    ) -> Result<Vec<String>, anyhow::Error> {
+        Self::list_upstream_go_versions_from_git(filter)
+    }
+
+    /// list upstream go version, use git.
+    pub fn list_upstream_go_versions_from_git(
         filter: Option<ToolchainFilter>,
     ) -> Result<Vec<String>, anyhow::Error> {
         let output = Command::new("git")
@@ -66,6 +97,45 @@ impl Version {
         Ok(Regex::new(&re)?
             .captures_iter(&output)
             .map(|capture| capture[1].to_string())
+            .collect())
+    }
+    /// list upstream go version, use http.
+    pub fn list_upstream_go_versions_from_http(
+        host: &str,
+        filter: Option<ToolchainFilter>,
+    ) -> Result<Vec<String>, anyhow::Error> {
+        let url = format!("{}/dl/?mode=json&include=all", host);
+        let go_releases: Vec<GoRelease> = blocking::get(url)?.json()?;
+
+        let re = filter.map_or_else(
+            || "go(.+)".to_owned(),
+            |f| match f {
+                ToolchainFilter::Stable => {
+                    r#"go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?\b)"#
+                        .to_string()
+                }
+                ToolchainFilter::Unstable => {
+                    r#"go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:rc(?:0|[1-9]\d*)))"#
+                        .to_string()
+                }
+                ToolchainFilter::Beta => {
+                    r#"go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:beta(?:0|[1-9]\d*)))"#
+                        .to_string()
+                }
+                ToolchainFilter::Filter(s) => format!("go(.*{}.*)", s),
+            },
+        );
+        let re = Regex::new(&re)?;
+        Ok(go_releases
+            .into_iter()
+            .filter_map(|v| {
+                if re.is_match(&v.version) {
+                    Some(v.version.trim_start_matches("go").to_string())
+                } else {
+                    None
+                }
+            })
+            .rev()
             .collect())
     }
 

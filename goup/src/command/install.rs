@@ -23,6 +23,9 @@ pub struct Install {
     /// only install the version, but do not switch.
     #[arg(long, default_value_t = false)]
     dry: bool,
+    /// use git, default use http.
+    #[arg(long, default_value_t = false)]
+    use_git: bool,
 }
 
 impl Run for Install {
@@ -37,7 +40,14 @@ impl Run for Install {
                 version
             }
             Toolchain::Unstable => {
-                let version = Version::list_upstream_go_versions(Some(ToolchainFilter::Unstable))?;
+                let version = if self.use_git {
+                    Version::list_upstream_go_versions_from_git(Some(ToolchainFilter::Unstable))?
+                } else {
+                    Version::list_upstream_go_versions_from_http(
+                        &self.host,
+                        Some(ToolchainFilter::Unstable),
+                    )?
+                };
                 let version = version
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest unstable version"))?;
@@ -47,7 +57,14 @@ impl Run for Install {
                 version
             }
             Toolchain::Beta => {
-                let version = Version::list_upstream_go_versions(Some(ToolchainFilter::Beta))?;
+                let version = if self.use_git {
+                    Version::list_upstream_go_versions_from_git(Some(ToolchainFilter::Beta))?
+                } else {
+                    Version::list_upstream_go_versions_from_http(
+                        &self.host,
+                        Some(ToolchainFilter::Beta),
+                    )?
+                };
                 let version = version
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest beta version"))?;
