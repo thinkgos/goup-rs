@@ -31,7 +31,10 @@ pub fn go_source_upstream_git_url() -> String {
 /// go_version_archive returns the zip or tar.gz of the given Go version.
 /// (go1.21.5.linux-amd64.tar.gz, go1.21.5.linux-amd64.tar.gz.sha256)
 pub fn go_version_archive(version: &str) -> String {
-    let os = env::consts::OS;
+    let os = match env::consts::OS {
+        "macos" => "darwin",
+        _ => env::consts::OS
+    };
     let arch = match (os, env::consts::ARCH) {
         (_, "x86") => "386",
         (_, "x86_64") => "amd64",
