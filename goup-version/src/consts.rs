@@ -3,7 +3,7 @@ use std::env;
 pub const GOUP_GO_HOST: &str = "GOUP_GO_HOST";
 pub const GOUP_GO_DOWNLOAD_BASE_URL: &str = "GOUP_GO_DOWNLOAD_BASE_URL";
 pub const GOUP_GO_SOURCE_GIT_URL: &str = "GOUP_GO_SOURCE_GIT_URL";
-pub const GO_HOST: &str = "https://go.dev";
+pub const GO_HOST: &str = "https://golang.google.cn"; // "https://go.dev";
 pub const GO_DOWNLOAD_BASE_URL: &str = "https://dl.google.com/go";
 pub const GO_SOURCE_GIT_URL: &str = "https://github.com/golang/go";
 pub const GO_SOURCE_UPSTREAM_GIT_URL: &str = "https://go.googlesource.com/go";

@@ -15,7 +15,7 @@ impl Run for Env {
         table.add_row(row![
             consts::GOUP_GO_HOST,
             consts::go_host(),
-            "Get upstream latest go version, use by 'install'",
+            "Get upstream latest go version, use by 'install'/'search'",
         ]);
         table.add_row(row![
             consts::GOUP_GO_DOWNLOAD_BASE_URL,
