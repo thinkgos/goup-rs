@@ -52,7 +52,7 @@ impl Version {
     }
     /// list upstream go version, use http.
     #[deprecated(
-        since = "0.7.3",
+        since = "0.8.0",
         note = "use `list_upstream_go_versions_from_git` or `list_upstream_go_versions_from_http`  instead"
     )]
     pub fn list_upstream_go_versions(
