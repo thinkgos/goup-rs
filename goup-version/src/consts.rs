@@ -33,7 +33,7 @@ pub fn go_source_upstream_git_url() -> String {
 pub fn go_version_archive(version: &str) -> String {
     let os = match env::consts::OS {
         "macos" => "darwin",
-        _ => env::consts::OS
+        _ => env::consts::OS,
     };
     let arch = match (os, env::consts::ARCH) {
         (_, "x86") => "386",
@@ -117,11 +117,56 @@ mod tests {
 
     #[test]
     fn test_archive() {
-        let archive_filename = go_version_archive("1.21.5");
+        const TEST_VERSION: &str = "1.21.5";
+        let archive_filename = go_version_archive(TEST_VERSION);
+        #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+        assert_eq!(
+            archive_filename,
+            format!("{}.darwin-amd64.tar.gz", TEST_VERSION)
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        assert_eq!(
+            archive_filename,
+            format!("{}.darwin-arm64.tar.gz", TEST_VERSION)
+        );
+
+        #[cfg(all(target_os = "linux", target_arch = "x86"))]
+        assert_eq!(
+            archive_filename,
+            format!("{}.linux-386.tar.gz", TEST_VERSION)
+        );
+        #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+        assert_eq!(
+            archive_filename,
+            format!("{}.linux-amd64.tar.gz", TEST_VERSION)
+        );
+        #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+        assert_eq!(
+            archive_filename,
+            format!("{}.linux-arm64.tar.gz", TEST_VERSION)
+        );
+        #[cfg(all(target_os = "linux", target_arch = "arm"))]
+        assert_eq!(
+            archive_filename,
+            format!("{}.linux-armv6l.tar.gz", TEST_VERSION)
+        );
+        #[cfg(all(target_os = "windows", target_arch = "x86"))]
+        assert_eq!(
+            archive_filename,
+            format!("{}.windows-386.zip", TEST_VERSION)
+        );
+        #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+        assert_eq!(
+            archive_filename,
+            format!("{}.windows-amd64.zip", TEST_VERSION)
+        );
+
         assert!(archive_sha256(&archive_filename).ends_with(".sha256"));
 
         let (archive_url, archive_sha256_url) = archive_url(&archive_filename);
-        assert!(archive_url.starts_with("https://dl.google.com/go/1.21.5"));
-        assert!(archive_sha256_url.starts_with("https://dl.google.com/go/1.21.5"))
+        assert!(archive_url.starts_with(&format!("https://dl.google.com/go/{}", TEST_VERSION)));
+        assert!(
+            archive_sha256_url.starts_with(&format!("https://dl.google.com/go/{}", TEST_VERSION))
+        );
     }
 }
