@@ -4,9 +4,10 @@ use std::ops::Deref;
 use std::process::Command;
 
 use anyhow::anyhow;
-use anyhow::Ok;
+use anyhow::Result;
 use regex::Regex;
 use reqwest::blocking;
+use semver::Version as SemVersion;
 use serde::{Deserialize, Serialize};
 
 use super::consts;
@@ -304,5 +305,34 @@ impl Version {
         } else {
             format!("go{}", ver)
         }
+    }
+    /// semantic go version string.
+    /// 1           -> 1.0.0
+    /// 1.21        -> 1.21.0
+    /// 1.21.1rc2   -> 1.21.1-rc2
+    /// 1.21rc2     -> 1.21.0-rc2
+    /// 1.21.1      -> 1.21.1
+    pub fn semantic(ver: &str) -> Result<SemVersion> {
+        let idx = ver
+            .find("alpha")
+            .or_else(|| ver.find("beta"))
+            .or_else(|| ver.find("rc"));
+        let count_dot = |name: &str| name.chars().filter(|&v| v == '.').count();
+        let name = idx.map_or_else(
+            || match count_dot(ver) {
+                0 => format!("{}.0.0", ver),
+                1 => format!("{}.0", ver),
+                _ => ver.to_string(),
+            },
+            |idx| {
+                let start = &ver[..idx];
+                if count_dot(start) == 2 {
+                    format!("{}-{}", start, &ver[idx..])
+                } else {
+                    format!("{}.0-{}", start, &ver[idx..])
+                }
+            },
+        );
+        Ok(SemVersion::parse(&name)?)
     }
 }
