@@ -226,7 +226,7 @@ goup completion zsh > _goup
 
 ## How to Debug
 
-Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -v <subcommand>` to use `Debug` or `Trace` level.
+Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -vv <subcommand>` to use `Debug` or `Trace` level.
 
 ## FAQ
 
