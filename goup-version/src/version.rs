@@ -311,6 +311,8 @@ impl Version {
     /// 1.21        -> 1.21.0
     /// 1.21.1rc2   -> 1.21.1-rc2
     /// 1.21rc2     -> 1.21.0-rc2
+    /// 1.21-rc2    -> 1.21.0-rc2
+    /// 1.21.1-rc2  -> 1.21.1-rc2
     /// 1.21.1      -> 1.21.1
     pub fn semantic(ver: &str) -> Result<SemVersion> {
         let count_dot = |name: &str| name.chars().filter(|&v| v == '.').count();
@@ -325,7 +327,7 @@ impl Version {
                     _ => ver.to_string(),
                 },
                 |idx| {
-                    let start = &ver[..idx];
+                    let start = &ver[..idx].trim_end_matches('-');
                     if count_dot(start) == 2 {
                         format!("{}-{}", start, &ver[idx..])
                     } else {
