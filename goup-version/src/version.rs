@@ -61,83 +61,82 @@ impl Version {
     ) -> Result<Vec<String>, anyhow::Error> {
         Self::list_upstream_go_versions_from_git(filter)
     }
-
     /// list upstream go version, use git.
     pub fn list_upstream_go_versions_from_git(
         filter: Option<ToolchainFilter>,
     ) -> Result<Vec<String>, anyhow::Error> {
-        let output = Command::new("git")
-            .args([
-                "ls-remote",
-                "--sort=version:refname",
-                "--tags",
-                &consts::go_source_git_url(),
-            ])
-            .output()?
-            .stdout;
-        let output = String::from_utf8_lossy(&output);
-
-        let re = filter.map_or_else(
-            || "refs/tags/go(.+)".to_owned(),
-            |f| match f {
-                ToolchainFilter::Stable => {
-                    r#"refs/tags/go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?\b)"#
-                        .to_string()
-                }
-                ToolchainFilter::Unstable => {
-                    r#"refs/tags/go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:rc(?:0|[1-9]\d*)))"#
-                        .to_string()
-                }
-                ToolchainFilter::Beta => {
-                    r#"refs/tags/go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:beta(?:0|[1-9]\d*)))"#
-                        .to_string()
-                }
-                ToolchainFilter::Filter(s) => format!("refs/tags/go(.*{}.*)", s),
-            },
-        );
-        Ok(Regex::new(&re)?
-            .captures_iter(&output)
-            .map(|capture| capture[1].to_string())
-            .collect())
+        Self::list_upstream_go_versions2(None, filter)
     }
     /// list upstream go version, use http.
     pub fn list_upstream_go_versions_from_http(
         host: &str,
         filter: Option<ToolchainFilter>,
     ) -> Result<Vec<String>, anyhow::Error> {
-        let url = format!("{}/dl/?mode=json&include=all", host);
-        let go_releases: Vec<GoRelease> = blocking::get(url)?.json()?;
+        Self::list_upstream_go_versions2(Some(host), filter)
+    }
 
+    fn list_upstream_go_versions2(
+        host: Option<&str>,
+        filter: Option<ToolchainFilter>,
+    ) -> Result<Vec<String>, anyhow::Error> {
+        let ver = Self::list_upstream_go_versions_option(host)?;
         let re = filter.map_or_else(
-            || "go(.+)".to_owned(),
+            || "(.+)".to_owned(),
             |f| match f {
                 ToolchainFilter::Stable => {
-                    r#"go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?\b)"#
-                        .to_string()
+                    r#"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?\b"#.to_string()
                 }
                 ToolchainFilter::Unstable => {
-                    r#"go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:rc(?:0|[1-9]\d*)))"#
+                    r#"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:rc(?:0|[1-9]\d*))"#
                         .to_string()
                 }
                 ToolchainFilter::Beta => {
-                    r#"go((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:beta(?:0|[1-9]\d*)))"#
+                    r#"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:beta(?:0|[1-9]\d*))"#
                         .to_string()
                 }
-                ToolchainFilter::Filter(s) => format!("go(.*{}.*)", s),
+                ToolchainFilter::Filter(s) => format!("(.*{}.*)", s),
             },
         );
         let re = Regex::new(&re)?;
-        Ok(go_releases
+        Ok(ver
             .into_iter()
-            .filter_map(|v| {
-                if re.is_match(&v.version) {
-                    Some(v.version.trim_start_matches("go").to_string())
-                } else {
-                    None
-                }
-            })
-            .rev()
+            .filter_map(|v| if re.is_match(&v) { Some(v) } else { None })
             .collect())
+    }
+
+    /// list upstream go versions, host exist use http, other use git.
+    fn list_upstream_go_versions_option(host: Option<&str>) -> Result<Vec<String>, anyhow::Error> {
+        if let Some(host) = host {
+            let url = format!("{}/dl/?mode=json&include=all", host);
+            let go_releases: Vec<GoRelease> = blocking::get(url)?.json()?;
+            let re = Regex::new("go(.+)")?;
+            Ok(go_releases
+                .into_iter()
+                .filter_map(|v| {
+                    if re.is_match(&v.version) {
+                        Some(v.version.trim_start_matches("go").to_string())
+                    } else {
+                        None
+                    }
+                })
+                .rev()
+                .collect())
+        } else {
+            let output = Command::new("git")
+                .args([
+                    "ls-remote",
+                    "--sort=version:refname",
+                    "--tags",
+                    &consts::go_source_git_url(),
+                ])
+                .output()?
+                .stdout;
+            let output = String::from_utf8_lossy(&output);
+            Ok(Regex::new("refs/tags/go(.+)")?
+                .captures_iter(&output)
+                .map(|capture| capture[1].to_string())
+                .collect())
+        }
     }
 
     /// get upstream latest go version.
