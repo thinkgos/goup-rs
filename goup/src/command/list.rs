@@ -1,4 +1,5 @@
 use clap::Args;
+use colored::Colorize;
 use prettytable::{row, Table};
 use which::which;
 
@@ -21,11 +22,17 @@ impl Run for List {
                 }
             );
         } else {
+            let star = "*".yellow().bold().to_string();
             let mut table = Table::new();
 
-            table.add_row(row!["Version", "Active"]);
+            table.add_row(row!["Active", "Version"]);
             for v in vers {
-                table.add_row(row![v.version, bc -> if v.active { "*" } else { "" }]);
+                let (active, version) = if v.active {
+                    (star.as_ref(), v.version.yellow().bold())
+                } else {
+                    ("", v.version.green())
+                };
+                table.add_row(row![bc -> active, version]);
             }
             table.printstd();
         }
