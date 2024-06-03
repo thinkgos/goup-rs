@@ -163,11 +163,11 @@ $ goup rm
 ### Manage download archive files
 
 ```bash
-$ goup dl show --contain-sha256
+$ goup cache show --contain-sha256
 go1.21.6.linux-amd64.tar.gz
 go1.21.6.linux-amd64.tar.gz.sha256
 
-$ goup dl clean
+$ goup cache clean
 ✔ Do you want to clean archive file? · yes
 ```
 

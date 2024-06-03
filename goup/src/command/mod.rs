@@ -1,5 +1,5 @@
+mod cache;
 mod completion;
-mod downloads;
 mod env;
 #[cfg(unix)]
 mod init;
@@ -16,8 +16,8 @@ use log::LevelFilter;
 use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
 
+use self::cache::Cache;
 use self::completion::Completion;
-use self::downloads::Downloads;
 use self::env::Env;
 #[cfg(unix)]
 use self::init::Init;
@@ -125,9 +125,8 @@ enum Command {
     /// Modify the goup installation.
     #[command(name = "self")]
     Oneself(Oneself),
-    /// Manage download archive files.
-    #[command(visible_alias = "dl")]
-    Downloads(Downloads),
+    /// Manage cache archive files.
+    Cache(Cache),
 }
 
 impl Run for Cli {
@@ -146,7 +145,7 @@ impl Run for Cli {
             #[cfg(unix)]
             Command::Init(cmd) => cmd.run(),
             Command::Env(cmd) => cmd.run(),
-            Command::Downloads(cmd) => cmd.run(),
+            Command::Cache(cmd) => cmd.run(),
             Command::Completion(c) => completion::print_completions(c.shell, &mut Self::command()),
         }
     }

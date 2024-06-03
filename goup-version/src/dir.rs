@@ -56,13 +56,13 @@ impl Dir {
     pub fn version<P: AsRef<Path>>(&self, ver: P) -> Self {
         self.join_path(ver)
     }
-    /// Extends `self` with `dl`
-    pub fn dl(&self) -> Self {
-        self.join_path("dl")
+    /// Extends `self` with `cache`
+    pub fn cache(&self) -> Self {
+        self.join_path("cache")
     }
-    /// Extends `self` with `dl/{filename}`
-    pub fn dl_file<P: AsRef<Path>>(&self, p: P) -> Self {
-        let mut d = self.join_path("dl");
+    /// Extends `self` with `cache/{filename}`
+    pub fn cache_file<P: AsRef<Path>>(&self, p: P) -> Self {
+        let mut d = self.join_path("cache");
         d.push(p);
         d
     }
@@ -154,12 +154,12 @@ mod tests {
             Path::new("/home/dev/.goup/bin")
         );
         assert_eq!(
-            Dir::new(home_dir).dl().as_ref(),
-            Path::new("/home/dev/.goup/dl")
+            Dir::new(home_dir).cache().as_ref(),
+            Path::new("/home/dev/.goup/cache")
         );
         assert_eq!(
-            Dir::new(home_dir).dl_file("file").as_ref(),
-            Path::new("/home/dev/.goup/dl/file")
+            Dir::new(home_dir).cache_file("file").as_ref(),
+            Path::new("/home/dev/.goup/cache/file")
         );
         assert_eq!(
             Dir::new(home_dir).version("go1.21.2").as_ref(),

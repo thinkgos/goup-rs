@@ -7,7 +7,7 @@ use goup_version::Version;
 use super::Run;
 
 #[derive(Args, Debug, PartialEq)]
-pub struct Downloads {
+pub struct Cache {
     /// the download command.
     #[command(subcommand)]
     command: Command,
@@ -35,11 +35,11 @@ struct Clean {
     no_confirm: bool,
 }
 
-impl Run for Downloads {
+impl Run for Cache {
     fn run(&self) -> Result<(), anyhow::Error> {
         match self.command {
             Command::Show(ref arg) => {
-                Version::list_dl(Some(arg.contain_sha256))?
+                Version::list_cache(Some(arg.contain_sha256))?
                     .iter()
                     .for_each(|v| {
                         println!("{}", v);
@@ -51,7 +51,7 @@ impl Run for Downloads {
                         .with_prompt("Do you want to clean archive file?")
                         .interact()?;
                 if confirmation {
-                    Version::remove_dl()?;
+                    Version::remove_cache()?;
                 } else {
                     log::info!("Cancelled");
                 }

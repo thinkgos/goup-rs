@@ -229,15 +229,15 @@ impl Version {
         Ok(current)
     }
 
-    /// list `${HOME}/.goup/dl` directory items(only file, ignore directory).
-    pub fn list_dl(contain_sha256: Option<bool>) -> Result<Vec<String>, anyhow::Error> {
+    /// list `${HOME}/.goup/cache` directory items(only file, ignore directory).
+    pub fn list_cache(contain_sha256: Option<bool>) -> Result<Vec<String>, anyhow::Error> {
         let goup_home = Dir::goup_home()?;
-        // may be .goup or .goup/dl not exist
-        if !goup_home.exists() || !goup_home.dl().exists() {
+        // may be .goup or .goup/cache not exist
+        if !goup_home.exists() || !goup_home.cache().exists() {
             return Ok(Vec::new());
         }
         let contain_sha256 = contain_sha256.unwrap_or_default();
-        let dir: Result<Vec<DirEntry>, _> = goup_home.dl().read_dir()?.collect();
+        let dir: Result<Vec<DirEntry>, _> = goup_home.cache().read_dir()?.collect();
         let mut archive_files: Vec<_> = dir?
             .iter()
             .filter_map(|v| {
@@ -253,9 +253,9 @@ impl Version {
         Ok(archive_files)
     }
 
-    /// remove `${HOME}/.goup/dl` directory.
-    pub fn remove_dl() -> Result<(), anyhow::Error> {
-        let dl_dir = Dir::goup_home()?.dl();
+    /// remove `${HOME}/.goup/cache` directory.
+    pub fn remove_cache() -> Result<(), anyhow::Error> {
+        let dl_dir = Dir::goup_home()?.cache();
         if dl_dir.exists() {
             fs::remove_dir_all(&dl_dir)?;
         }

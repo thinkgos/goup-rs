@@ -115,7 +115,7 @@ impl Downloader {
             return Ok(());
         }
         // download directory
-        let dl_dest_dir = goup_home.dl();
+        let dl_dest_dir = goup_home.cache();
         // 压缩包文件名称
         let archive_filename = consts::go_version_archive(version);
         // 压缩包sha256文件名称
