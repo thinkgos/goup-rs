@@ -62,7 +62,9 @@ impl Run for Install {
                 Downloader::install_go_version(&version)?;
                 version
             }
-            Toolchain::Version(version) => {
+            Toolchain::Version(ver_req) => {
+                let version = Version::match_version_req(&self.host, &ver_req)?;
+                let version = Version::normalize(&version);
                 log::info!("Installing {} ...", version);
                 Downloader::install_go_version(&version)?;
                 version

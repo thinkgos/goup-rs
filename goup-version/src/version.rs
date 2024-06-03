@@ -5,11 +5,14 @@ use std::process::Command;
 use std::time::Duration;
 
 use anyhow::anyhow;
+use anyhow::Ok;
 use anyhow::Result;
 use regex::Regex;
 use reqwest::blocking;
 use reqwest::blocking::Client;
+use semver::Op;
 use semver::Version as SemVersion;
+use semver::VersionReq;
 use serde::{Deserialize, Serialize};
 
 use super::consts;
@@ -115,6 +118,21 @@ impl Version {
             .captures_iter(&String::from_utf8_lossy(&output))
             .map(|capture| capture[1].to_string())
             .collect())
+    }
+    pub fn match_version_req(host: &str, ver_pattern: &str) -> Result<String, anyhow::Error> {
+        log::debug!("version request pattern: {}", ver_pattern);
+        let ver_req = VersionReq::parse(ver_pattern)?;
+        // 是否是精确匹配, 如果是则直接返回
+        if ver_req.comparators.iter().all(|v| v.op == Op::Exact) {
+            return Ok(ver_pattern.trim_start_matches('=').to_owned());
+        }
+        log::debug!("list upstream go versions to find match version");
+        for ver in Self::list_upstream_go_versions(host)?.iter().rev() {
+            if ver_req.matches(&Self::semantic(ver)?) {
+                return Ok(ver.to_owned());
+            }
+        }
+        Err(anyhow!("not any match version!"))
     }
 
     /// get upstream latest go version.

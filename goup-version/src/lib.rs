@@ -26,7 +26,7 @@ impl FromStr for Toolchain {
             "unstable" => Self::Unstable,
             "nightly" | "tip" | "gotip" => Self::Nightly,
             "beta" => Self::Beta,
-            _ => Self::Version(Version::normalize(s)),
+            _ => Self::Version(s.to_owned()),
         })
     }
 }

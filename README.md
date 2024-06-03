@@ -68,19 +68,19 @@ Install the latest version for your system with the MSI-installers from the [Rel
 
 ```shell
 $ goup install
-[2024-01-30T00:38:48Z INFO ] Installing go1.21.6 ...
-[2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.6/go1.21.6.linux-amd64.tar.gz ...
-[2024-01-30T00:38:48Z INFO ] go1.21.6 installed in /home/thinkgo/.goup/go1.21.6
-[2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.6'
+[2024-01-30T00:38:48Z INFO ] Installing go1.21.10 ...
+[2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.10/go1.21.10.linux-amd64.tar.gz ...
+[2024-01-30T00:38:48Z INFO ] go1.21.10 installed in /home/thinkgo/.goup/go1.21.10
+[2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.10'
 $ goup list
 | VERSION | ACTIVE |
 |---------|--------|
-| 1.21.6  |   *    |
+| 1.21.10  |   *    |
 $ go env GOROOT
 /home/thinkgo/.goup/current
 $ go version
-go version go1.21.6 linux/amd64
-$ GOUP_GO_HOST=https://golang.google.cn goup install 1.21.6
+go version go1.21.10 linux/amd64
+$ GOUP_GO_HOST=https://golang.google.cn goup install 1.21.10
 ```
 
 ## Usage
@@ -100,7 +100,7 @@ $ goup search stable
 ...
 1.21.4
 1.21.5
-1.21.6
+1.21.10
 ```
 
 ### List all installed Go version located at `$HOME/.goup`
@@ -112,7 +112,7 @@ $ goup list
 +---------+--------+
 | 1.21.5  |        |
 +---------+--------+
-| 1.21.6  |   *    |
+| 1.21.10  |   *    |
 +---------+--------+
 | tip     |        |
 +---------+--------+
@@ -120,18 +120,29 @@ $ goup list
 
 ### Install specified version of Go
 
-`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` can be follow value 'stable'(default), 'nightly'('tip', 'gotip'), 'unstable', 'beta' or '1.21.4'('go1.21.4'), `--dry` flag means only install the version, but do not switch
+`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` can be follow value 'stable'(default), 'nightly'('tip', 'gotip'), 'unstable', 'beta' or '1.21.4', `--dry` flag means only install the version, but do not switch.  
+
+`[TOOLCHAIN]` you can use `semver` syntax to match the version:
+
+- exact: `=1.21.4`
+- greater: `>1.21.4`
+- greater equal: `>=1.21.4`
+- less: `<1.21.4`
+- less equal: `>=1.21.4`
+- tilde: `~1.21.4`
+- caret: `^1.21.4`
+- wildcard: `1.21.*`, `1.*.*`
 
 ```bash
-$ goup install
-[2024-01-30T00:38:48Z INFO ] Installing go1.21.6 ...
-[2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.6/go1.21.6.linux-amd64.tar.gz ...
-[2024-01-30T00:38:48Z INFO ] go1.21.6 installed in /home/thinkgo/.goup/go1.21.6
-[2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.6'
+$ goup install 1.21.*
+[2024-01-30T00:38:48Z INFO ] Installing go1.21.10 ...
+[2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.10/go1.21.10.linux-amd64.tar.gz ...
+[2024-01-30T00:38:48Z INFO ] go1.21.10 installed in /home/thinkgo/.goup/go1.21.10
+[2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.10'
 $ goup install 1.21.4 --dry
 [2024-01-30T00:38:48Z INFO ] Installing go1.21.4 ...
 [2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.4/go1.21.4.linux-amd64.tar.gz ...
-[2024-01-30T00:38:48Z INFO ] go1.21.6 installed in /home/thinkgo/.goup/go1.21.4
+[2024-01-30T00:38:48Z INFO ] go1.21.10 installed in /home/thinkgo/.goup/go1.21.4
 ```
 
 ### Switches to selected Go version
@@ -142,9 +153,9 @@ $ goup install 1.21.4 --dry
 $ goup use 
 ? Select a version ›
   1.21.5
-❯ 1.21.6
+❯ 1.21.10
   tip
-[2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.6'
+[2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.10'
 ```
 
 ### Remove the specified Go version list
@@ -155,17 +166,17 @@ $ goup use
 $ goup rm
 ? Select multiple version ›
 ✔ 1.21.5
-⬚ 1.21.6
+⬚ 1.21.10
 ⬚ tip
 ✔ Select multiple version · 1.21.5
 ```
 
-### Manage download archive files
+### Manage cache archive files
 
 ```bash
 $ goup cache show --contain-sha256
-go1.21.6.linux-amd64.tar.gz
-go1.21.6.linux-amd64.tar.gz.sha256
+go1.21.10.linux-amd64.tar.gz
+go1.21.10.linux-amd64.tar.gz.sha256
 
 $ goup cache clean
 ✔ Do you want to clean archive file? · yes
