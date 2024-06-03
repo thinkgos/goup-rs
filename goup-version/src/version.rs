@@ -126,7 +126,6 @@ impl Version {
         if ver_req.comparators.iter().all(|v| v.op == Op::Exact) {
             return Ok(ver_pattern.trim_start_matches('=').to_owned());
         }
-        log::debug!("list upstream go versions to find match version");
         for ver in Self::list_upstream_go_versions(host)?.iter().rev() {
             if ver_req.matches(&Self::semantic(ver)?) {
                 return Ok(ver.to_owned());

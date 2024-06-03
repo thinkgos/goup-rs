@@ -107,20 +107,20 @@ $ goup search stable
 
 ```bash
 $ goup list 
-+---------+--------+
-| Version | Active |
-+---------+--------+
-| 1.21.5  |        |
-+---------+--------+
-| 1.21.10  |   *    |
-+---------+--------+
-| tip     |        |
-+---------+--------+
++--------+---------+
+| Active | Version |
++--------+---------+
+|        | 1.21.10 |
++--------+---------+
+|   *    | 1.22.3  |
++--------+---------+
+|        | tip     |
++--------+---------+
 ```
 
 ### Install specified version of Go
 
-`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` can be follow value 'stable'(default), 'nightly'('tip', 'gotip'), 'unstable', 'beta' or '1.21.4', `--dry` flag means only install the version, but do not switch.  
+`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` can be follow value **'stable'(default)**, **'nightly'**(**'tip'**, **'gotip'**), **'unstable'**, **'beta'** or **'1.21.4'**, `--dry` flag means only install the version, but do not switch.  
 
 `[TOOLCHAIN]` you can use `semver` syntax to match the version:
 
@@ -128,7 +128,7 @@ $ goup list
 - greater: `>1.21.4`
 - greater equal: `>=1.21.4`
 - less: `<1.21.4`
-- less equal: `>=1.21.4`
+- less equal: `<=1.21.4`
 - tilde: `~1.21.4`
 - caret: `^1.21.4`
 - wildcard: `1.21.*`, `1.*.*`
@@ -139,7 +139,7 @@ $ goup install 1.21.*
 [2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.10/go1.21.10.linux-amd64.tar.gz ...
 [2024-01-30T00:38:48Z INFO ] go1.21.10 installed in /home/thinkgo/.goup/go1.21.10
 [2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.10'
-$ goup install 1.21.4 --dry
+$ goup install =1.21.4 --dry
 [2024-01-30T00:38:48Z INFO ] Installing go1.21.4 ...
 [2024-01-30T00:38:48Z INFO ] Unpacking /home/thinkgo/.goup/go1.21.4/go1.21.4.linux-amd64.tar.gz ...
 [2024-01-30T00:38:48Z INFO ] go1.21.10 installed in /home/thinkgo/.goup/go1.21.4
@@ -187,9 +187,9 @@ $ goup cache clean
 ```bash
 $ goup self update
 Checking target-arch... x86_64-unknown-linux-gnu
-Checking current version... v0.3.0
-Checking latest released version... v0.3.0
-[2024-01-30T00:38:48Z INFO ] Update status: `v0.3.0`!
+Checking current version... v0.9.0
+Checking latest released version... v0.9.0
+[2024-01-30T00:38:48Z INFO ] Update status: `v0.9.0`!
 ```
 
 ### Environment
@@ -230,7 +230,7 @@ goup completion zsh > _goup
 - `goup ls/list/show` list all installed Go version located at `$HOME/.goup`.
 - `goup remove/rm [VERSION]...` remove the specified Go version list.
 - `goup search [FILTER]` lists all available Go versions.
-- `goup downloads [COMMAND]` Manage download archive files.
+- `goup cache [COMMAND]` Manage cache archive files.
 - `goup self <COMMAND>` Modify the goup installation.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
 - `goup env` Show the specified goup environment variables and values.
