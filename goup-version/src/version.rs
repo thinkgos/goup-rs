@@ -2,11 +2,13 @@ use std::fs;
 use std::fs::DirEntry;
 use std::ops::Deref;
 use std::process::Command;
+use std::time::Duration;
 
 use anyhow::anyhow;
 use anyhow::Result;
 use regex::Regex;
 use reqwest::blocking;
+use reqwest::blocking::Client;
 use semver::Version as SemVersion;
 use serde::{Deserialize, Serialize};
 
@@ -108,7 +110,12 @@ impl Version {
     fn list_upstream_go_versions_option(host: Option<&str>) -> Result<Vec<String>, anyhow::Error> {
         if let Some(host) = host {
             let url = format!("{}/dl/?mode=json&include=all", host);
-            let go_releases: Vec<GoRelease> = blocking::get(url)?.json()?;
+            let go_releases: Vec<GoRelease> = Client::builder()
+                .timeout(Duration::from_secs(8))
+                .build()?
+                .get(url)
+                .send()?
+                .json()?;
             let re = Regex::new("go(.+)")?;
             Ok(go_releases
                 .into_iter()
