@@ -48,7 +48,7 @@ impl Run for Cache {
             Command::Clean(ref arg) => {
                 let confirmation = arg.no_confirm
                     || Confirm::with_theme(&ColorfulTheme::default())
-                        .with_prompt("Do you want to clean archive file?")
+                        .with_prompt("Do you want to clean cache file?")
                         .interact()?;
                 if confirmation {
                     Version::remove_cache()?;

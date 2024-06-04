@@ -22,7 +22,7 @@
 - List locally installed versions.
 - Switch between multiple installed versions.
 - Search available version of Go.
-- Manage locally archived files(such as `*.tar.gz`, `*.tar.gz.sha256`).
+- Manage locally cache files(such as `*.tar.gz`, `*.tar.gz.sha256`).
 - Upgrade `goup` itself.
 - Friendly prompt.
 - Should be pretty fast.
@@ -42,6 +42,9 @@ or
 ```shell
 cargo install goup-rs --git https://github.com/thinkgos/goup-rs
 ```
+
+- (*Only Linux/MacOS*)Run `goup init`, Got shell startup script at `$HOME/.goup/env`.
+- (*Only Linux/MacOS*)Add the Go bin directory to your shell startup script: `echo '. "$HOME/.goup/env"' >> ~/.bashrc` or `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
 
 ### Manual(for Linux/MacOS)
 
@@ -73,21 +76,21 @@ $ goup install
 [2024-01-30T00:38:48Z INFO ] go1.21.10 installed in /home/thinkgo/.goup/go1.21.10
 [2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.10'
 $ goup list
-| VERSION | ACTIVE |
-|---------|--------|
-| 1.21.10  |   *    |
+| ACTIVE  | VERSION |
+|---------|---------|
+|    *    | 1.21.10 |
 $ go env GOROOT
 /home/thinkgo/.goup/current
 $ go version
 go version go1.21.10 linux/amd64
-$ GOUP_GO_HOST=https://golang.google.cn goup install 1.21.10
+$ GOUP_GO_HOST=https://golang.google.cn goup install =1.21.10
 ```
 
 ## Usage
 
 ### Lists all available Go versions
 
-`goup search [FILTER]`, `[FILTER]` can be follow value 'stable', "unstable", 'beta' or any regex string.
+`goup search [FILTER]`, `[FILTER]` can be follow value **'stable'**, **'unstable'**, **'beta'** or **any regex string**.
 
 ```bash
 $ goup search
@@ -122,16 +125,18 @@ $ goup list
 
 `goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` can be follow value **'stable'(default)**, **'nightly'**(**'tip'**, **'gotip'**), **'unstable'**, **'beta'** or **'1.21.4'**, `--dry` flag means only install the version, but do not switch.  
 
-`[TOOLCHAIN]` you can use `semver` syntax to match the version:
+`[TOOLCHAIN]` you can use [`semver`](https://semver.org/) syntax to match the version:
 
-- exact: `=1.21.4`
-- greater: `>1.21.4`
-- greater equal: `>=1.21.4`
-- less: `<1.21.4`
-- less equal: `<=1.21.4`
-- tilde: `~1.21.4`
-- caret: `^1.21.4`
-- wildcard: `1.21.*`, `1.*.*`
+- exact(`=`): allow updating to the latest version that exactly the version, so `=1.21.4` means exactly match the version `1.21.4`.
+- greater(`>`): allow updating to the latest version that less than or equal the version, so `>1.21.4` means greater than `1.21.4`.
+- greater equal(`>=`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means greater than or equal to `1.21.4`.
+- less(`<`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means less than `1.21.4`.
+- less equal(`<=`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means less than or equal `1.21.4`.
+- tilde(`~`): allow updating to the latest version that does not change the major and minor version, so `~1.21.4` means greater than or equal `1.21.4`, but less than `1.22.0`.
+- caret(`^`): allow updating to the latest version that does not change the major version, so `^1.21.4` indicates that the version must be greater than or equal to `1.21.4`, but less than `2.0.0`.
+- wildcard(`*`): The operator indicates an arbitrary version. It is usually used to allow all version numbers to match.
+  - `1.21.*` match all `1.21.x` versions.
+  - `1.*.*` match all `1.x.x` versions.
 
 ```bash
 $ goup install 1.21.*
@@ -179,7 +184,7 @@ go1.21.10.linux-amd64.tar.gz
 go1.21.10.linux-amd64.tar.gz.sha256
 
 $ goup cache clean
-✔ Do you want to clean archive file? · yes
+✔ Do you want to clean cache file? · yes
 ```
 
 ### Modify the goup installation

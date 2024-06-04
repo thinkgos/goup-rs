@@ -5,10 +5,8 @@ use std::process::Command;
 use std::time::Duration;
 
 use anyhow::anyhow;
-use anyhow::Ok;
 use anyhow::Result;
 use regex::Regex;
-use reqwest::blocking;
 use reqwest::blocking::Client;
 use semver::Op;
 use semver::Version as SemVersion;
@@ -18,6 +16,8 @@ use serde::{Deserialize, Serialize};
 use super::consts;
 use super::Dir;
 use super::ToolchainFilter;
+
+const HTTP_TIMEOUT: Duration = Duration::from_secs(10);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GoFile {
@@ -93,7 +93,7 @@ impl Version {
     /// list upstream go versions from http.
     fn list_upstream_go_versions_from_http(host: &str) -> Result<Vec<String>, anyhow::Error> {
         Ok(Client::builder()
-            .timeout(Duration::from_secs(8))
+            .timeout(HTTP_TIMEOUT)
             .build()?
             .get(format!("{}/dl/?mode=json&include=all", host))
             .send()?
@@ -136,13 +136,16 @@ impl Version {
 
     /// get upstream latest go version.
     pub fn get_upstream_latest_go_version(host: &str) -> Result<String, anyhow::Error> {
-        let url = format!("{}/VERSION?m=text", host);
-        let body = blocking::get(url)?.text()?;
-        let ver = body
-            .split('\n')
+        let body = Client::builder()
+            .timeout(HTTP_TIMEOUT)
+            .build()?
+            .get(format!("{}/VERSION?m=text", host))
+            .send()?
+            .text()?;
+        body.split('\n')
             .nth(0)
-            .ok_or_else(|| anyhow!("Getting latest Go version failed"))?;
-        Ok(ver.to_owned())
+            .ok_or_else(|| anyhow!("Getting latest Go version failed"))
+            .map(|v| v.to_owned())
     }
     /// list locally installed go version.
     pub fn list_go_version() -> Result<Vec<Version>, anyhow::Error> {
