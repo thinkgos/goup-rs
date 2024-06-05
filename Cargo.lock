@@ -809,7 +809,7 @@ dependencies = [
 
 [[package]]
 name = "goup-downloader"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "anyhow",
  "flate2",
@@ -823,7 +823,7 @@ dependencies = [
 
 [[package]]
 name = "goup-rs"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -843,7 +843,7 @@ dependencies = [
 
 [[package]]
 name = "goup-version"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "anyhow",
  "dirs",
