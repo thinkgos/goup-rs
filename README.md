@@ -13,6 +13,8 @@
 
 ***NOTE***: Please keep in mind that `goup-rs` is still under active development and therefore full backward compatibility is not guaranteed before reaching v1.0.0.
 
+[![asciicast](https://asciinema.org/a/662583.svg)](https://asciinema.org/a/662583)
+
 ## Features
 
 - Minimum dependencies, only depend on `git`. we may remove this dependency in future.
