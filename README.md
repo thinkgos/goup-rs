@@ -13,7 +13,7 @@
 
 ***NOTE***: Please keep in mind that `goup-rs` is still under active development and therefore full backward compatibility is not guaranteed before reaching v1.0.0.
 
-[![asciicast](./assets/goup.gif)](https://asciinema.org/a/662583)
+[![asciicast](./assets/goup.gif)](https://asciinema.org/a/662585)
 
 ## Features
 
