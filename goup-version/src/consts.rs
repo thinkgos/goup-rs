@@ -29,11 +29,11 @@ pub fn go_source_upstream_git_url() -> String {
 }
 
 /// go_version_archive returns the zip or tar.gz of the given Go version.
-/// (go1.21.5.linux-amd64.tar.gz, go1.21.5.linux-amd64.tar.gz.sha256)
+/// go1.21.5.linux-amd64.tar.gz, go1.21.5.windows-amd64.zip
 pub fn go_version_archive(version: &str) -> String {
     let os = match env::consts::OS {
         "macos" => "darwin",
-        _ => env::consts::OS,
+        os => os,
     };
     let arch = match (os, env::consts::ARCH) {
         (_, "x86") => "386",
@@ -47,7 +47,7 @@ pub fn go_version_archive(version: &str) -> String {
 }
 
 /// archive_sha256 returns `{archive}.sha256`
-/// go1.21.5.linux-amd64.tar.gz.sha256
+/// go1.21.5.linux-amd64.tar.gz.sha256, go1.21.5.windows-amd64.zip.sha256
 #[inline]
 pub fn archive_sha256(archive_filename: &str) -> String {
     format!("{}.sha256", archive_filename)
