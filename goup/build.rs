@@ -1,3 +1,5 @@
+use shadow_rs::ShadowBuilder;
+
 const MIN_VERSION: &str = "1.74";
 
 fn main() -> Result<(), shadow_rs::ShadowError> {
@@ -9,5 +11,6 @@ fn main() -> Result<(), shadow_rs::ShadowError> {
             std::process::exit(1);
         }
     }
-    shadow_rs::new()
+    ShadowBuilder::builder().build()?;
+    Ok(())
 }
