@@ -6,6 +6,7 @@
 ![Crates.io MSRV](https://img.shields.io/crates/msrv/goup-rs)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/goup-rs)
 ![Crates.io Crates](https://img.shields.io/crates/v/goup-rs?style=flat-square)
+[![dependency status](https://deps.rs/repo/github/thinkgos/goup-rs/status.svg)](https://deps.rs/repo/github/thinkgos/goup-rs)
 [![License](https://img.shields.io/github/license/thinkgos/goup-rs)](https://raw.githubusercontent.com/thinkgos/goup-rs/main/LICENSE)
 [![Tag](https://img.shields.io/github/v/tag/thinkgos/goup-rs)](https://github.com/thinkgos/goup-rs/tags)
 
