@@ -688,6 +688,8 @@ mod tests {
             "1.23.3",
             "1.23.4",
             "1.23.5",
+            "1.24rc1",
+            "1.25rc2",
         ];
         for ver in go_versions {
             assert!(Version::semantic(ver).is_ok())
