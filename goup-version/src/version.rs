@@ -81,7 +81,7 @@ impl Version {
         let re = Regex::new(&re)?;
         Ok(ver
             .into_iter()
-            .filter_map(|v| if re.is_match(&v) { Some(v) } else { None })
+            .filter_map(|v| re.is_match(&v).then_some(v))
             .collect())
     }
 
