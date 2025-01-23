@@ -1,30 +1,5 @@
 # goup
 
-- [goup](#goup)
-  - [Features](#features)
-  - [Installation](#installation)
-    - [Cargo](#cargo)
-    - [Manual(for Linux/MacOS)](#manualfor-linuxmacos)
-    - [Manual(for Windows)](#manualfor-windows)
-      - [MSI-installers](#msi-installers)
-      - [Binary Compressed](#binary-compressed)
-  - [Quick Start](#quick-start)
-  - [Usage](#usage)
-    - [Lists all available Go versions](#lists-all-available-go-versions)
-    - [List all installed Go version located at `$HOME/.goup`](#list-all-installed-go-version-located-at-homegoup)
-    - [Install specified version of Go](#install-specified-version-of-go)
-    - [Switches to selected Go version](#switches-to-selected-go-version)
-    - [Remove the specified Go version list](#remove-the-specified-go-version-list)
-    - [Manage cache archive files](#manage-cache-archive-files)
-    - [Modify the goup installation](#modify-the-goup-installation)
-    - [Environment](#environment)
-    - [Autocompletion](#autocompletion)
-    - [More information](#more-information)
-  - [How it works](#how-it-works)
-  - [How to Debug](#how-to-debug)
-  - [FAQ](#faq)
-  - [License](#license)
-
 `goup` is an elegant Go version manager write in rust.
 
 [![Rust](https://github.com/thinkgos/goup-rs/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/thinkgos/goup-rs/actions/workflows/rust.yml)
