@@ -12,7 +12,7 @@ use super::Run;
 #[derive(Args, Debug, PartialEq)]
 #[command(disable_version_flag = true)]
 pub struct Install {
-    /// toolchain name, such as 'stable', 'nightly'('tip', 'gotip'), 'unstable', 'beta' or '1.21.4'('go1.21.4')
+    /// toolchain name, such as 'stable', 'nightly'('tip', 'gotip'), 'unstable', 'beta' or '=1.21.4'
     #[arg(default_value = "stable")]
     toolchain: String,
     /// an optional change list (CL), If the version is 'tip'

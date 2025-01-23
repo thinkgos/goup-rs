@@ -1,5 +1,30 @@
 # goup
 
+- [goup](#goup)
+  - [Features](#features)
+  - [Installation](#installation)
+    - [Cargo](#cargo)
+    - [Manual(for Linux/MacOS)](#manualfor-linuxmacos)
+    - [Manual(for Windows)](#manualfor-windows)
+      - [MSI-installers](#msi-installers)
+      - [Binary Compressed](#binary-compressed)
+  - [Quick Start](#quick-start)
+  - [Usage](#usage)
+    - [Lists all available Go versions](#lists-all-available-go-versions)
+    - [List all installed Go version located at `$HOME/.goup`](#list-all-installed-go-version-located-at-homegoup)
+    - [Install specified version of Go](#install-specified-version-of-go)
+    - [Switches to selected Go version](#switches-to-selected-go-version)
+    - [Remove the specified Go version list](#remove-the-specified-go-version-list)
+    - [Manage cache archive files](#manage-cache-archive-files)
+    - [Modify the goup installation](#modify-the-goup-installation)
+    - [Environment](#environment)
+    - [Autocompletion](#autocompletion)
+    - [More information](#more-information)
+  - [How it works](#how-it-works)
+  - [How to Debug](#how-to-debug)
+  - [FAQ](#faq)
+  - [License](#license)
+
 `goup` is an elegant Go version manager write in rust.
 
 [![Rust](https://github.com/thinkgos/goup-rs/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/thinkgos/goup-rs/actions/workflows/rust.yml)
@@ -128,18 +153,7 @@ $ goup list
 
 `goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` can be follow value **'stable'(default)**, **'nightly'**(**'tip'**, **'gotip'**), **'unstable'**, **'beta'** or **'1.21.4'**, `--dry` flag means only install the version, but do not switch.  
 
-`[TOOLCHAIN]` you can use [`semver`](https://semver.org/) syntax to match the version:
-
-- exact(`=`): allow updating to the latest version that exactly the version, so `=1.21.4` means exactly match the version `1.21.4`.
-- greater(`>`): allow updating to the latest version that less than or equal the version, so `>1.21.4` means greater than `1.21.4`.
-- greater equal(`>=`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means greater than or equal to `1.21.4`.
-- less(`<`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means less than `1.21.4`.
-- less equal(`<=`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means less than or equal `1.21.4`.
-- tilde(`~`): allow updating to the latest version that does not change the major and minor version, so `~1.21.4` means greater than or equal `1.21.4`, but less than `1.22.0`.
-- caret(`^`): allow updating to the latest version that does not change the major version, so `^1.21.4` indicates that the version must be greater than or equal to `1.21.4`, but less than `2.0.0`.
-- wildcard(`*`): The operator indicates an arbitrary version. It is usually used to allow all version numbers to match.
-  - `1.21.*` match all `1.21.x` versions.
-  - `1.*.*` match all `1.x.x` versions.
+`[TOOLCHAIN]` you can use [`semver`](https://semver.org/) syntax to match the version, See [FAQ](#faq)
 
 ```bash
 $ goup install 1.21.*
@@ -251,6 +265,17 @@ Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -vv <su
 
 - Compiling and Installing from source code failure?  
   The minimum version of Go required depends on the target version of Go, more information see [source installation instructions](https://go.dev/doc/install/source)
+- [`semver`](https://semver.org/)
+  - exact(`=`): allow updating to the latest version that exactly the version, so `=1.21.4` means exactly match the version `1.21.4`.
+  - greater(`>`): allow updating to the latest version that less than or equal the version, so `>1.21.4` means greater than `1.21.4`.
+  - greater equal(`>=`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means greater than or equal to `1.21.4`.
+  - less(`<`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means less than `1.21.4`.
+  - less equal(`<=`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means less than or equal `1.21.4`.
+  - tilde(`~`): allow updating to the latest version that does not change the major and minor version, so `~1.21.4` means greater than or equal `1.21.4`, but less than `1.22.0`.
+  - caret(`^`): allow updating to the latest version that does not change the major version, so `^1.21.4` indicates that the version must be greater than or equal to `1.21.4`, but less than `2.0.0`.
+  - wildcard(`*`): The operator indicates an arbitrary version. It is usually used to allow all version numbers to match.
+    - `1.21.*` match all `1.21.x` versions.
+    - `1.*.*` match all `1.x.x` versions.
 
 ## License
 
