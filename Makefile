@@ -1,6 +1,4 @@
 
-
-
 fmt.check:
 	cargo fmt -- --check
 
