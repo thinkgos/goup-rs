@@ -1,5 +1,5 @@
 use clap::Args;
-use prettytable::{row, Table};
+use prettytable::{Table, row};
 use which::which;
 
 use super::Run;

@@ -1,7 +1,7 @@
 use clap::Args;
 use clap::Subcommand;
-use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
+use dialoguer::theme::ColorfulTheme;
 use goup_version::Version;
 
 use super::Run;

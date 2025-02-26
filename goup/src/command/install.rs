@@ -2,10 +2,10 @@ use anyhow::anyhow;
 use clap::Args;
 
 use goup_downloader::Downloader;
-use goup_version::consts;
 use goup_version::Toolchain;
 use goup_version::ToolchainFilter;
 use goup_version::Version;
+use goup_version::consts;
 
 use super::Run;
 

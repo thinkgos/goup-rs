@@ -4,8 +4,8 @@ use std::ops::Deref;
 use std::process::Command;
 use std::time::Duration;
 
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 use regex::Regex;
 use reqwest::blocking::Client;
 use semver::Op;
@@ -13,9 +13,9 @@ use semver::Version as SemVersion;
 use semver::VersionReq;
 use serde::{Deserialize, Serialize};
 
-use super::consts;
 use super::Dir;
 use super::ToolchainFilter;
+use super::consts;
 
 const HTTP_TIMEOUT: Duration = Duration::from_secs(10);
 

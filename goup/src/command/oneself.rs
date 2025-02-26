@@ -6,8 +6,8 @@ use anyhow::anyhow;
 use clap::Args;
 use clap::CommandFactory;
 use clap::Subcommand;
-use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
+use dialoguer::theme::ColorfulTheme;
 use goup_version::Version;
 use self_update::{backends::github::Update, cargo_crate_version};
 

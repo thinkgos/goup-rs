@@ -1,5 +1,5 @@
 use clap::Args;
-use dialoguer::{theme::ColorfulTheme, MultiSelect};
+use dialoguer::{MultiSelect, theme::ColorfulTheme};
 
 use goup_version::Version;
 

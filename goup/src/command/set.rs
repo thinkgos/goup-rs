@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use clap::Args;
-use dialoguer::{theme::ColorfulTheme, Select};
+use dialoguer::{Select, theme::ColorfulTheme};
 
 use goup_version::Version;
 

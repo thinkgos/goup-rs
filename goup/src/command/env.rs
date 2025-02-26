@@ -1,6 +1,6 @@
 use clap::Args;
 use goup_version::consts;
-use prettytable::{row, Table};
+use prettytable::{Table, row};
 
 use super::Run;
 

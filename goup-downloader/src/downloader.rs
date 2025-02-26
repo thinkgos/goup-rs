@@ -9,11 +9,11 @@ use std::{
 };
 
 use anyhow::anyhow;
-use reqwest::{blocking, StatusCode};
+use reqwest::{StatusCode, blocking};
 use sha2::{Digest, Sha256};
 
-use goup_version::consts;
 use goup_version::Dir;
+use goup_version::consts;
 
 use crate::archived::Unpack;
 
