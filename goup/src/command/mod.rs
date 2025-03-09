@@ -13,7 +13,7 @@ mod set;
 use chrono::Local;
 use clap::{ArgAction, Args, CommandFactory};
 use clap::{Parser, Subcommand};
-use log::{Level, LevelFilter};
+use log::LevelFilter;
 use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
 use std::io::prelude::Write;
@@ -130,11 +130,12 @@ enum Command {
 
 impl Run for Cli {
     fn run(&self) -> Result<(), anyhow::Error> {
+        let level_filter = self.global.log_filter_level();
         env_logger::builder()
             .format(move |buf, record| {
                 let level = record.level();
                 let style = buf.default_level_style(level);
-                if level == Level::Trace || level == Level::Debug {
+                if level_filter >= LevelFilter::Debug {
                     buf.write_fmt(format_args!(
                         "[{} {} {}] {}\n",
                         Local::now().format("%Y-%m-%d %H:%M:%S"),
@@ -151,7 +152,7 @@ impl Run for Cli {
                     ))
                 }
             })
-            .filter_level(self.global.log_filter_level())
+            .filter_level(level_filter)
             .init();
         match &self.command {
             Command::Install(cmd) => cmd.run(),
