@@ -10,11 +10,13 @@ mod remove;
 mod search;
 mod set;
 
+use chrono::Local;
 use clap::{ArgAction, Args, CommandFactory};
 use clap::{Parser, Subcommand};
 use log::LevelFilter;
 use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
+use std::io::prelude::Write;
 
 use self::cache::Cache;
 use self::completion::Completion;
@@ -131,8 +133,28 @@ enum Command {
 
 impl Run for Cli {
     fn run(&self) -> Result<(), anyhow::Error> {
+        let enable_target = self.global.enable_target;
         env_logger::builder()
-            .format_target(self.global.enable_target)
+            .format(move |buf, record| {
+                let level = record.level();
+                let style = buf.default_level_style(level);
+                if enable_target {
+                    buf.write_fmt(format_args!(
+                        "[{} {} {}] {}\n",
+                        Local::now().format("%Y-%m-%d %H:%M:%S"),
+                        format_args!("{style}{level}{style:#}"),
+                        record.target(),
+                        record.args()
+                    ))
+                } else {
+                    buf.write_fmt(format_args!(
+                        "[{} {}] {}\n",
+                        Local::now().format("%Y-%m-%d %H:%M:%S"),
+                        format_args!("{style}{level}{style:#}"),
+                        record.args()
+                    ))
+                }
+            })
             .filter_level(self.global.log_filter_level())
             .init();
         match &self.command {

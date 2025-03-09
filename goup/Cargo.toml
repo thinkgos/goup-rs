@@ -35,4 +35,5 @@ prettytable-rs = "0.10"
 dialoguer = "0.11"
 self_update = {version = "0.42", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}
 shadow-rs = "1.0"
-env_logger = "0.11"
+env_logger = {version = "0.11", features = ["color"]}
+chrono = "0.4.40"
