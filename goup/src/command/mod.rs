@@ -13,7 +13,7 @@ mod set;
 use chrono::Local;
 use clap::{ArgAction, Args, CommandFactory};
 use clap::{Parser, Subcommand};
-use log::LevelFilter;
+use log::{Level, LevelFilter};
 use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
 use std::io::prelude::Write;
@@ -71,9 +71,6 @@ struct Global {
     /// Verbose log
     #[arg(short, long, action = ArgAction::Count)]
     verbose: u8,
-    /// Whether or not to write the target in the log format.
-    #[arg(short, long)]
-    enable_target: bool,
 }
 
 impl Global {
@@ -133,12 +130,11 @@ enum Command {
 
 impl Run for Cli {
     fn run(&self) -> Result<(), anyhow::Error> {
-        let enable_target = self.global.enable_target;
         env_logger::builder()
             .format(move |buf, record| {
                 let level = record.level();
                 let style = buf.default_level_style(level);
-                if enable_target {
+                if level == Level::Trace || level == Level::Debug {
                     buf.write_fmt(format_args!(
                         "[{} {} {}] {}\n",
                         Local::now().format("%Y-%m-%d %H:%M:%S"),
