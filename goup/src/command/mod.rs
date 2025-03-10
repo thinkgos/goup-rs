@@ -10,11 +10,13 @@ mod remove;
 mod search;
 mod set;
 
+use chrono::Local;
 use clap::{ArgAction, Args, CommandFactory};
 use clap::{Parser, Subcommand};
 use log::LevelFilter;
 use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
+use std::io::prelude::Write;
 
 use self::cache::Cache;
 use self::completion::Completion;
@@ -69,9 +71,6 @@ struct Global {
     /// Verbose log
     #[arg(short, long, action = ArgAction::Count)]
     verbose: u8,
-    /// Whether or not to write the target in the log format.
-    #[arg(short, long)]
-    enable_target: bool,
 }
 
 impl Global {
@@ -131,9 +130,29 @@ enum Command {
 
 impl Run for Cli {
     fn run(&self) -> Result<(), anyhow::Error> {
+        let level_filter = self.global.log_filter_level();
         env_logger::builder()
-            .format_target(self.global.enable_target)
-            .filter_level(self.global.log_filter_level())
+            .format(move |buf, record| {
+                let level = record.level();
+                let style = buf.default_level_style(level);
+                if level_filter >= LevelFilter::Debug {
+                    buf.write_fmt(format_args!(
+                        "[{} {} {}] {}\n",
+                        Local::now().format("%Y-%m-%d %H:%M:%S"),
+                        format_args!("{style}{level}{style:#}"),
+                        record.target(),
+                        record.args()
+                    ))
+                } else {
+                    buf.write_fmt(format_args!(
+                        "[{} {}] {}\n",
+                        Local::now().format("%Y-%m-%d %H:%M:%S"),
+                        format_args!("{style}{level}{style:#}"),
+                        record.args()
+                    ))
+                }
+            })
+            .filter_level(level_filter)
             .init();
         match &self.command {
             Command::Install(cmd) => cmd.run(),
