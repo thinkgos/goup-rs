@@ -135,21 +135,15 @@ impl Run for Cli {
             .format(move |buf, record| {
                 let level = record.level();
                 let style = buf.default_level_style(level);
+                let time = Local::now().format("%Y-%m-%d %H:%M:%S");
+                let args = record.args();
+                let target = record.target();
                 if level_filter >= LevelFilter::Debug {
                     buf.write_fmt(format_args!(
-                        "[{} {} {}] {}\n",
-                        Local::now().format("%Y-%m-%d %H:%M:%S"),
-                        format_args!("{style}{level}{style:#}"),
-                        record.target(),
-                        record.args()
+                        "[{time} {style}{level}{style:#} {target}] {args}\n",
                     ))
                 } else {
-                    buf.write_fmt(format_args!(
-                        "[{} {}] {}\n",
-                        Local::now().format("%Y-%m-%d %H:%M:%S"),
-                        format_args!("{style}{level}{style:#}"),
-                        record.args()
-                    ))
+                    buf.write_fmt(format_args!("[{time} {style}{level}{style:#}] {args}\n",))
                 }
             })
             .filter_level(level_filter)
