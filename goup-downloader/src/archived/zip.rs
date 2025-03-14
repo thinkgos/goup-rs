@@ -21,6 +21,10 @@ impl Unpacker for Zip {
             let path = file.mangled_name();
 
             let dest_file = dest_dir.as_ref().join(path);
+            if file.is_dir() {
+                fs::create_dir_all(&dest_file)?;
+                continue;
+            }
             let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
             if !parent.exists() {
                 fs::create_dir_all(parent)?;
