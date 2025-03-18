@@ -252,6 +252,10 @@ Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -vv <su
     - `1.21.*` match all `1.21.x` versions.
     - `1.*.*` match all `1.x.x` versions.
 
+- Go version 1.20.x or below failed to unpack.
+  resolved v0.10.3 above.
+  more information see [issue #251](https://github.com/thinkgos/goup-rs/issues/251)
+
 ## License
 
 [Apache 2.0](LICENSE)
