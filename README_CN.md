@@ -12,8 +12,6 @@
 [![License](https://img.shields.io/github/license/thinkgos/goup-rs)](https://raw.githubusercontent.com/thinkgos/goup-rs/main/LICENSE)
 [![Tag](https://img.shields.io/github/v/tag/thinkgos/goup-rs)](https://github.com/thinkgos/goup-rs/tags)
 
-`goup` 是对上述特性的一种尝试，其灵感主要来自于 [Rustup](https://rustup.rs/), [golang/dl](https://github.com/golang/dl), [goup](https://github.com/owenthereal/goup), [goenv](https://github.com/syndbg/goenv), [gvm](https://github.com/moovweb/gvm) and [getgo](https://github.com/golang/tools/tree/master/cmd/getgo).
-
 ***注意***: `goup-rs`仍在积极开发中, 因此在达到v1.0.0之前不能保证完全向后兼容
 
 [![asciicast](./assets/goup.gif)](https://asciinema.org/a/662585)
@@ -31,6 +29,8 @@
 - 支持`goup`自我更新.
 - 友好的提示.
 - 应该很快.
+
+`goup` 是对上述特性的一种尝试，其灵感主要来自于 [Rustup](https://rustup.rs/), [golang/dl](https://github.com/golang/dl), [goup](https://github.com/owenthereal/goup), [goenv](https://github.com/syndbg/goenv), [gvm](https://github.com/moovweb/gvm) and [getgo](https://github.com/golang/tools/tree/master/cmd/getgo).
 
 ## 安装
 
@@ -58,7 +58,7 @@ cargo install goup-rs --git https://github.com/thinkgos/goup-rs
 - 从[Release Page](https://github.com/thinkgos/goup-rs/releases)下载最新的`goup`.
 - 将`goup`可执行文件放到`PATH`中, 并给予可执行权限: `mv GOUP_BIN /usr/local/bin/goup && chmod +x /usr/local/bin/goup`
 - 运行`goup init`, 获取到shell启动脚本位于`$HOME/.goup/env`.
-- 在shell启动脚本中添加Go的bin目录: `echo '. "$HOME/.goup/env"' >> ~/.bashrc` or `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+- 在shell启动脚本中添加Go的bin目录: `echo '. "$HOME/.goup/env"' >> ~/.bashrc` 或 `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
 
 ### 手动安装(Windows)
 
@@ -128,7 +128,7 @@ $ goup list
 
 ### 安装指定Go版本
 
-`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` 支持的值: **'stable'(default)**, **'nightly'**(**'tip'**, **'gotip'**), **'unstable'**, **'beta'** 或 **'1.21.4'**, `--dry` 表示只安装对应版本, 但并不切换使用.  
+`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` 支持的值: **'stable'(default)**, **'nightly'**(**'tip'**, **'gotip'**), **'unstable'**, **'beta'** 或 **'=1.21.4'**, `--dry` 表示只安装对应版本, 但并不切换使用.  
 
 `[TOOLCHAIN]` 支持[`semver`](https://semver.org/)语法匹配对应版本, 详情查看[FAQ](#faq)
 

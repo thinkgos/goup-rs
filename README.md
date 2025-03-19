@@ -12,8 +12,6 @@
 [![License](https://img.shields.io/github/license/thinkgos/goup-rs)](https://raw.githubusercontent.com/thinkgos/goup-rs/main/LICENSE)
 [![Tag](https://img.shields.io/github/v/tag/thinkgos/goup-rs)](https://github.com/thinkgos/goup-rs/tags)
 
-`goup` is an attempt to fulfill the above features and is heavily inspired by [Rustup](https://rustup.rs/), [golang/dl](https://github.com/golang/dl), [goup](https://github.com/owenthereal/goup), [goenv](https://github.com/syndbg/goenv), [gvm](https://github.com/moovweb/gvm) and [getgo](https://github.com/golang/tools/tree/master/cmd/getgo).
-
 ***NOTE***: Please keep in mind that `goup-rs` is still under active development and therefore full backward compatibility is not guaranteed before reaching v1.0.0.
 
 [![asciicast](./assets/goup.gif)](https://asciinema.org/a/662585)
@@ -31,6 +29,8 @@
 - Upgrade `goup` itself.
 - Friendly prompt.
 - Should be pretty fast.
+
+`goup` is an attempt to fulfill the above features and is heavily inspired by [Rustup](https://rustup.rs/), [golang/dl](https://github.com/golang/dl), [goup](https://github.com/owenthereal/goup), [goenv](https://github.com/syndbg/goenv), [gvm](https://github.com/moovweb/gvm) and [getgo](https://github.com/golang/tools/tree/master/cmd/getgo).
 
 ## Installation
 
@@ -128,7 +128,7 @@ $ goup list
 
 ### Install specified version of Go
 
-`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` can be follow value **'stable'(default)**, **'nightly'**(**'tip'**, **'gotip'**), **'unstable'**, **'beta'** or **'1.21.4'**, `--dry` flag means only install the version, but do not switch.  
+`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` can be follow value **'stable'(default)**, **'nightly'**(**'tip'**, **'gotip'**), **'unstable'**, **'beta'** or **'=1.21.4'**, `--dry` flag means only install the version, but do not switch.  
 
 `[TOOLCHAIN]` you can use [`semver`](https://semver.org/) syntax to match the version, See [FAQ](#faq)
 
