@@ -20,7 +20,7 @@
 
 ## 特性
 
-- 最小依赖, 仅依赖于`git`. 未来将会删除此依赖.
+- 最小依赖, 仅依赖于`git`. 此依赖将会在未来删除.
 - 跨平台的能力(Linux, macOS & Windows).
 - 支持使用`goup install/remove [TOOLCHAIN]` 安装/卸载 Go版本.
 - 支持使用`goup install <nightly|tip|gotip>` 从源码安装Go.
@@ -42,14 +42,14 @@
 cargo install goup-rs
 ```
 
-or
+或
 
 ```shell
 cargo install goup-rs --git https://github.com/thinkgos/goup-rs
 ```
 
-- (*仅支持 Linux/MacOS*)运行`goup init`, 获取到shell启动脚本位于`$HOME/.goup/env`.
-- (*仅支持 Linux/MacOS*)在shell启动脚本中添加Go的bin目录: `echo '. "$HOME/.goup/env"' >> ~/.bashrc` 或者 `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+- (*仅支持 Linux/MacOS*) 运行`goup init`, 获取到shell启动脚本位于`$HOME/.goup/env`.
+- (*仅支持 Linux/MacOS*) 在shell启动脚本中添加Go的bin目录: `echo '. "$HOME/.goup/env"' >> ~/.bashrc` 或者 `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
 
 ### 手动安装(Linux/MacOS)
 
@@ -62,15 +62,15 @@ cargo install goup-rs --git https://github.com/thinkgos/goup-rs
 
 ### 手动安装(Windows)
 
-#### MSI安装包
+#### MSI安装
 
 从[Release Page](https://github.com/thinkgos/goup-rs/releases)下载最新的`goup`的MSI安装程序并运行.
 
-#### 二进制解压
+#### 二进制安装
 
 - 从[Release Page](https://github.com/thinkgos/goup-rs/releases)下载最新的`goup`的二进制程序并解压.
-- Move the `goup.exe` to `$YOUR_PATH`.
-- Add the `$YOUR_PATH` to windows environment.
+- 将`goup.exe`移至`$YOUR_PATH`.
+- 将`$YOUR_PATH`加到windows环境变量中.
 
 ## 快速入门
 
@@ -95,7 +95,7 @@ $ GOUP_GO_HOST=https://golang.google.cn goup install =1.21.10
 
 ### 列出所有可用的go版本
 
-`goup search [FILTER]`, `[FILTER]`支持这些值 **'stable'**, **'unstable'**, **'beta'** 或 **any regex string**.
+`goup search [FILTER]`, `[FILTER]`支持的值: **'stable'**, **'unstable'**, **'beta'** 或 **any regex string**.
 
 ```bash
 $ goup search
@@ -128,7 +128,7 @@ $ goup list
 
 ### 安装指定Go版本
 
-`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` 支持这些值 **'stable'(default)**, **'nightly'**(**'tip'**, **'gotip'**), **'unstable'**, **'beta'** 或 **'1.21.4'**, `--dry` 表示只安装对应版本, 但并不切换使用.  
+`goup install/update [TOOLCHAIN]`, `[TOOLCHAIN]` 支持的值: **'stable'(default)**, **'nightly'**(**'tip'**, **'gotip'**), **'unstable'**, **'beta'** 或 **'1.21.4'**, `--dry` 表示只安装对应版本, 但并不切换使用.  
 
 `[TOOLCHAIN]` 支持[`semver`](https://semver.org/)语法匹配对应版本, 详情查看[FAQ](#faq)
 
