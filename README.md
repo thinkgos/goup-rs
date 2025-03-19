@@ -1,5 +1,7 @@
 # goup
 
+[简体中文](https://github.com/thinkgos/goup-rs/blob/main/README_CN.md)
+
 `goup` is an elegant Go version manager write in rust.
 
 [![Rust](https://github.com/thinkgos/goup-rs/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/thinkgos/goup-rs/actions/workflows/rust.yml)
@@ -62,7 +64,7 @@ If you want to install manually, there are the steps:
 
 #### MSI-installers
 
-Install the latest version for your system with the MSI-installers from the [Release Page](https://github.com/thinkgos/goup-rs/releases) section
+Install the latest version for your system with the MSI-installers from the [Release Page](https://github.com/thinkgos/goup-rs/releases), then run it.
 
 #### Binary Compressed
 
@@ -179,7 +181,7 @@ $ goup cache clean
 ✔ Do you want to clean cache file? · yes
 ```
 
-### Modify the goup installation
+### Upgrade `goup`
 
 ```bash
 $ goup self update
@@ -242,9 +244,9 @@ Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -vv <su
   The minimum version of Go required depends on the target version of Go, more information see [source installation instructions](https://go.dev/doc/install/source)
 - [`semver`](https://semver.org/)
   - exact(`=`): allow updating to the latest version that exactly the version, so `=1.21.4` means exactly match the version `1.21.4`.
-  - greater(`>`): allow updating to the latest version that less than or equal the version, so `>1.21.4` means greater than `1.21.4`.
-  - greater equal(`>=`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means greater than or equal to `1.21.4`.
-  - less(`<`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means less than `1.21.4`.
+  - greater(`>`): allow updating to the latest version that greater than the version, so `>1.21.4` means greater than `1.21.4`.
+  - greater equal(`>=`): allow updating to the latest version that greater than or equal the version, so `<1.21.4` means greater than or equal to `1.21.4`.
+  - less(`<`): allow updating to the latest version that less than the version, so `<1.21.4` means less than `1.21.4`.
   - less equal(`<=`): allow updating to the latest version that less than or equal the version, so `<1.21.4` means less than or equal `1.21.4`.
   - tilde(`~`): allow updating to the latest version that does not change the major and minor version, so `~1.21.4` means greater than or equal `1.21.4`, but less than `1.22.0`.
   - caret(`^`): allow updating to the latest version that does not change the major version, so `^1.21.4` indicates that the version must be greater than or equal to `1.21.4`, but less than `2.0.0`.
