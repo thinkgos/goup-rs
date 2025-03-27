@@ -3,7 +3,7 @@ on:
   push:
     # run only against tags
     tags:
-      - "*"
+      - "v*"
 
 env:
   CARGO_INCREMENTAL: 0
@@ -57,11 +57,11 @@ jobs:
             os: windows-latest
             name: goup-i686-pc-windows-msvc.zip
             rustflags: -C target-feature=+crt-static
-# TODO: bug ring not supported
-#          - target: aarch64-pc-windows-msvc
-#            os: windows-latest
-#            name: goup-aarch64-pc-windows-msvc.zip
-#            rustflags: -C target-feature=+crt-static
+
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+            name: goup-aarch64-pc-windows-msvc.zip
+            rustflags: -C target-feature=+crt-static
 
           - target: x86_64-unknown-freebsd
             os: ubuntu-latest
