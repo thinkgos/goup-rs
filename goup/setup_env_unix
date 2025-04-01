@@ -10,3 +10,13 @@ case ":${PATH}:" in
         export PATH=$PATH:$GOROOT/bin
         ;;
 esac
+
+# affix colons on either side of $PATH to simplify matching
+case ":${PATH}:" in
+    *:"$HOME/.goup/bin":*)
+        ;;
+    *)
+        # Prepending path in case a system-installed rustc needs to be overridden
+        export PATH="$HOME/.goup/bin:$PATH"
+        ;;
+esac
