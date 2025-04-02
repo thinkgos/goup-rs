@@ -88,8 +88,13 @@ impl Version {
 
     /// list upstream go versions if get go version failure from http then fallback use git.
     pub fn list_upstream_go_versions(host: &str) -> Result<Vec<String>, anyhow::Error> {
-        Self::list_upstream_go_versions_from_http(host)
-            .or_else(|_| Self::list_upstream_go_versions_from_git())
+        Self::list_upstream_go_versions_from_http(host).or_else(|e| {
+            if which("git").is_err() {
+                // inspect git binary exist or not.
+                return Err(e);
+            }
+            Self::list_upstream_go_versions_from_git()
+        })
     }
     /// list upstream go versions from http.
     fn list_upstream_go_versions_from_http(host: &str) -> Result<Vec<String>, anyhow::Error> {
@@ -106,12 +111,6 @@ impl Version {
     }
     /// list upstream go versions from git.
     fn list_upstream_go_versions_from_git() -> Result<Vec<String>, anyhow::Error> {
-        if which("git").is_err() {
-            return Err(anyhow!(
-                r#""git" binary not found, make sure it is installed!"#
-            ));
-        }
-
         let output = Command::new("git")
             .args([
                 "ls-remote",
