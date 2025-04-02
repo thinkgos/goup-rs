@@ -37,3 +37,10 @@ self_update = {version = "0.42", default-features = false, features = ["rustls",
 shadow-rs = "1.1"
 env_logger = {version = "0.11", features = ["color"]}
 chrono = "0.4.40"
+
+[profile.release]
+opt-level = "z"
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"
