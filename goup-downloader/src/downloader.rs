@@ -27,13 +27,6 @@ impl Downloader {
         I: IntoIterator<Item = S>,
         S: AsRef<OsStr>,
     {
-        if which(&program).is_err() {
-            return Err(anyhow!(
-                "{:?} binary not found, make sure it is installed!",
-                program.as_ref(),
-            ));
-        }
-
         let mut command = Command::new(&program)
             .current_dir(working_dir)
             .args(args)
@@ -54,6 +47,12 @@ impl Downloader {
     }
 
     pub fn install_go_tip(_cl: Option<&str>) -> Result<(), anyhow::Error> {
+        if which("git").is_err() {
+            return Err(anyhow!(
+                r#""git" binary not found, make sure it is installed!"#,
+            ));
+        }
+
         let gotip_go = Dir::goup_home()?.version_go("gotip");
         let gotip_git = gotip_go.join_path(".git");
         // gotip is not clone from source
