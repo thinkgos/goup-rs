@@ -28,9 +28,9 @@ goup-downloader = {path = "../goup-downloader", version = "0.10"}
 
 anyhow.workspace = true
 log.workspace = true
+which.workspace = true
 clap = {version = "4.5", features = ["derive", "env"]}
 clap_complete = "4.5"
-which = "7.0"
 prettytable-rs = "0.10"
 dialoguer = "0.11"
 self_update = {version = "0.42", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}

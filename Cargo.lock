@@ -829,6 +829,7 @@ dependencies = [
  "reqwest",
  "sha2",
  "tar",
+ "which",
  "zip",
 ]
 
@@ -867,6 +868,7 @@ dependencies = [
  "serde_json",
  "temp-env",
  "tempfile",
+ "which",
 ]
 
 [[package]]

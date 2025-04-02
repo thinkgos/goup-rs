@@ -11,6 +11,7 @@ use std::{
 use anyhow::anyhow;
 use reqwest::{StatusCode, blocking};
 use sha2::{Digest, Sha256};
+use which::which;
 
 use goup_version::Dir;
 use goup_version::consts;
@@ -26,7 +27,14 @@ impl Downloader {
         I: IntoIterator<Item = S>,
         S: AsRef<OsStr>,
     {
-        let mut command = Command::new(program)
+        if which(&program).is_err() {
+            return Err(anyhow!(
+                "{:?} binary not found, make sure it is installed!",
+                program.as_ref(),
+            ));
+        }
+
+        let mut command = Command::new(&program)
             .current_dir(working_dir)
             .args(args)
             .stdout(Stdio::piped())

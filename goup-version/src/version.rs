@@ -12,6 +12,7 @@ use semver::Op;
 use semver::Version as SemVersion;
 use semver::VersionReq;
 use serde::{Deserialize, Serialize};
+use which::which;
 
 use super::Dir;
 use super::ToolchainFilter;
@@ -105,6 +106,12 @@ impl Version {
     }
     /// list upstream go versions from git.
     fn list_upstream_go_versions_from_git() -> Result<Vec<String>, anyhow::Error> {
+        if which("git").is_err() {
+            return Err(anyhow!(
+                r#""git" binary not found, make sure it is installed!"#
+            ));
+        }
+
         let output = Command::new("git")
             .args([
                 "ls-remote",
