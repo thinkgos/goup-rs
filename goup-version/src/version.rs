@@ -89,11 +89,7 @@ impl Version {
     /// list upstream go versions if get go version failure from http then fallback use git.
     pub fn list_upstream_go_versions(host: &str) -> Result<Vec<String>, anyhow::Error> {
         Self::list_upstream_go_versions_from_http(host).or_else(|e| {
-            if which("git").is_err() {
-                // inspect git binary exist or not.
-                return Err(e);
-            }
-            Self::list_upstream_go_versions_from_git()
+            which("git").map_or_else(|_| Err(e), |_| Self::list_upstream_go_versions_from_git())
         })
     }
     /// list upstream go versions from http.
