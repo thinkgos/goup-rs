@@ -15,7 +15,7 @@ body:
       label: rust version
       description: output of `rustc -V`
     validations:
-      required: true
+      required: false
   - type: input
     attributes:
       label: goup-rs version
