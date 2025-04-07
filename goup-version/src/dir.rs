@@ -1,11 +1,13 @@
 use std::{
-    fs,
-    fs::File,
+    env,
+    fs::{self, File},
     ops::{Deref, DerefMut},
     path::{Path, PathBuf},
 };
 
 use anyhow::anyhow;
+
+use super::consts::GOUP_HOME;
 
 /// Dir `${path}/.goup` contain a `PathBuf`.
 #[derive(Debug, Clone, PartialEq)]
@@ -16,7 +18,7 @@ pub struct Dir {
 impl Dir {
     /// Returns the path to the user's home directory.
     pub fn home_dir() -> Result<PathBuf, anyhow::Error> {
-        dirs::home_dir().ok_or_else(|| anyhow!("where is home"))
+        dirs::home_dir().ok_or_else(|| anyhow!("home dir get failed"))
     }
     /// Allocates a Dir as `${path}/.goup`
     pub fn new<P: AsRef<Path>>(p: P) -> Self {
@@ -24,9 +26,17 @@ impl Dir {
         path.push(".goup");
         Self { path }
     }
-    /// Allocates a `GOUP_HOME` Dir as `${HOME}/.goup`
+    /// Allocates a `GOUP_HOME` Dir as Environment Or `${HOME}/.goup`
     pub fn goup_home() -> Result<Self, anyhow::Error> {
-        Ok(Self::new(Self::home_dir()?))
+        env::var(GOUP_HOME)
+            .ok()
+            .filter(|s| !s.is_empty())
+            .map(|s| {
+                Ok(Self {
+                    path: PathBuf::from(s),
+                })
+            })
+            .unwrap_or_else(|| Self::home_dir().map(Self::new))
     }
     // Creates an owned [`Dir`] with `path` adjoined to `self`.
     pub fn join_path<P: AsRef<Path>>(&self, path: P) -> Self {
@@ -117,6 +127,14 @@ impl Deref for Dir {
 impl DerefMut for Dir {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.path
+    }
+}
+
+impl Default for Dir {
+    fn default() -> Self {
+        Self {
+            path: PathBuf::new(),
+        }
     }
 }
 

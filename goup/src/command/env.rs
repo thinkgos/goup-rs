@@ -1,5 +1,5 @@
 use clap::Args;
-use goup_version::consts;
+use goup_version::{Dir, consts};
 use prettytable::{Table, row};
 
 use super::Run;
@@ -12,6 +12,11 @@ impl Run for Env {
         let mut table = Table::new();
 
         table.add_row(row!["Key", "Value", "Explain"]);
+        table.add_row(row![
+            consts::GOUP_HOME,
+            Dir::goup_home().unwrap_or_default().to_string_lossy(),
+            "Get goup home directory, default: '$HOME/.goup'",
+        ]);
         table.add_row(row![
             consts::GOUP_GO_HOST,
             consts::go_host(),
