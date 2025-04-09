@@ -1,23 +1,25 @@
 #!/bin/sh
 
-GOUP_HOME=${GOUP_HOME:-$HOME/.goup}
+local GOUP_HOME=${GOUP_HOME:-$HOME/.goup}
 
 # goup shell setup
 # affix colons on either side of $PATH to simplify matching
 case ":${PATH}:" in
-*:"$GOUP_HOME/current/bin":*) ;;
-*)
-    # Prepending path in case a system-installed go needs to be overridden
-    export GOROOT=$GOUP_HOME/current
-    export PATH=$PATH:$GOROOT/bin
-    ;;
+    *:"$GOUP_HOME/current/bin":*) 
+        ;;
+    *)
+        # Prepending path in case a system-installed go needs to be overridden
+        export GOROOT=$GOUP_HOME/current
+        export PATH=$PATH:$GOROOT/bin
+        ;;
 esac
 
 # affix colons on either side of $PATH to simplify matching
 case ":${PATH}:" in
-*:"$GOUP_HOME/bin":*) ;;
-*)
-    # Prepending path in case a system-installed rustc needs to be overridden
-    export PATH="$GOUP_HOME/bin:$PATH"
-    ;;
+    *:"$GOUP_HOME/bin":*) 
+        ;;
+    *)
+        # Prepending path in case a system-installed rustc needs to be overridden
+        export PATH="$GOUP_HOME/bin:$PATH"
+        ;;
 esac
