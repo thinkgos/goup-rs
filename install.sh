@@ -132,9 +132,9 @@ function main() {
     local dld=$(get_dld)
 
     local _url="https://github.com/thinkgos/goup-rs/releases/latest/download/${_target}"
-    local GOUP_DIR="$HOME/.goup"
-    local GOUP_BIN_DIR="${GOUP_DIR}/bin"
-    local GOUP_BIN_FILE="${GOUP_DIR}/bin/goup"
+    local GOUP_HOME=${GOUP_HOME:-$HOME/.goup}
+    local GOUP_BIN_DIR="${GOUP_HOME}/bin"
+    local GOUP_BIN_FILE="${GOUP_HOME}/bin/goup"
 
     local _dir
     if ! _dir="$(ensure mktemp -d)"; then
@@ -144,7 +144,7 @@ function main() {
     fi
     local _target_file="${_dir}/${_target}"
 
-    ensure mkdir -p ${GOUP_DIR}
+    ensure mkdir -p ${GOUP_HOME}
     ensure mkdir -p ${GOUP_BIN_DIR}
 
     echo "[1/3] Download goup..."
@@ -162,7 +162,7 @@ function main() {
     ignore rm "$_target_file"
     ignore rmdir "$_dir"
 
-    echo "[3/3] Please add '. "\$HOME/.goup/env"' to your shell environment!!"
+    echo "[3/3] Please add '. "${GOUP_HOME}/env"' to your shell environment!!"
     echo "      And then try to run 'goup --version'"
 }
 

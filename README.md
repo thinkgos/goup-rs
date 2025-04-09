@@ -27,6 +27,7 @@
 - Search available version of Go.
 - Manage locally cache files(such as `*.tar.gz`, `*.tar.gz.sha256`).
 - Upgrade `goup` itself.
+- Customize `GOUP_HOME`(default `$HOME/.goup`)(>= v0.11.x);
 - Friendly prompt.
 - Should be pretty fast.
 
