@@ -1,5 +1,6 @@
 use std::env;
 
+pub const GOUP_HOME: &str = "GOUP_HOME";
 pub const GOUP_GO_HOST: &str = "GOUP_GO_HOST";
 pub const GOUP_GO_DOWNLOAD_BASE_URL: &str = "GOUP_GO_DOWNLOAD_BASE_URL";
 pub const GOUP_GO_SOURCE_GIT_URL: &str = "GOUP_GO_SOURCE_GIT_URL";
