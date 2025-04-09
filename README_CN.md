@@ -30,7 +30,7 @@
 - 友好的提示.
 - 应该很快.
 
-`goup` 是对上述特性的一种尝试，其灵感主要来自于 [Rustup](https://rustup.rs/), [golang/dl](https://github.com/golang/dl), [goup](https://github.com/owenthereal/goup), [goenv](https://github.com/syndbg/goenv), [gvm](https://github.com/moovweb/gvm) and [getgo](https://github.com/golang/tools/tree/master/cmd/getgo).
+`goup` 是对上述特性的一种尝试, 其灵感主要来自于 [Rustup](https://rustup.rs/), [golang/dl](https://github.com/golang/dl), [goup](https://github.com/owenthereal/goup), [goenv](https://github.com/syndbg/goenv), [gvm](https://github.com/moovweb/gvm) and [getgo](https://github.com/golang/tools/tree/master/cmd/getgo).
 
 ## 安装
 
@@ -243,7 +243,7 @@ goup completion zsh > _goup
 - 编译和安装源代码失败?  
   所需的Go最低版本取决于Go的目标版本, 更多信息请参见[source installation instructions](https://go.dev/doc/install/source)
 - [`semver`](https://semver.org/)
-  - exact(`=`):  允许更新到与版本完全一致的最新版本, 因此`=1.21.4`表示与版本`1.21.4`完全一致。
+  - exact(`=`):  允许更新到与版本完全一致的最新版本, 因此`=1.21.4`表示与版本`1.21.4`完全一致.
   - greater(`>`): 允许更新到大于该版本的最新版本, 因此`>1.21.4`表示大于`1.21.4`.
   - greater equal(`>=`): 允许更新到大于或等于该版本的最新版本, 因此 `>1.21.4` 表示大于或等于`1.21.4`.
   - less(`<`): 允许更新到小于该版本的最新版本, 因此`>1.21.4`表示大于`1.21.4`.
@@ -257,6 +257,9 @@ goup completion zsh > _goup
 - Go版本小于等于1.20.x解压失败.
   大于v0.10.3版本已解决.
   看多信息查看[issue #251](https://github.com/thinkgos/goup-rs/issues/251)
+
+- 如何自定义 GOUP_HOME？
+  `goup`使用`$HOME/.goup`目录作为 `GOUP_HOME`. 如果需要自定义`GOUP_HOME`(大多数是Windows用户), 可以设置`GOUP_HOME`环境变量来使用其他目录, 安装`goup`之前, 请确保已设置自定义`GOUP_HOME`环境变量和目标目录权限, 否则可能会导致令人惊讶的结果, 请参阅issue [#265](https://github.com/thinkgos/goup-rs/issues/265) [#270](https://github.com/thinkgos/goup-rs/pull/270)
 
 ## 许可证
 

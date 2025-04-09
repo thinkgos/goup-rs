@@ -258,6 +258,9 @@ Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -vv <su
   resolved v0.10.3 above.
   more information see [issue #251](https://github.com/thinkgos/goup-rs/issues/251)
 
+- How to customize `GOUP_HOME`?
+  `goup` use the `$HOME/.goup` directory as `GOUP_HOME`. if you want to customize the `GOUP_HOME`(most are Windows users), you can set `GOUP_HOME` environment variable to use another directory, before install `goup`, make sure you has set the customize `GOUP_HOME` environment variable and the target directory permissions, otherwise, it may lead to surprising results, refer issue [#265](https://github.com/thinkgos/goup-rs/issues/265) [#270](https://github.com/thinkgos/goup-rs/pull/270)
+
 ## License
 
 [Apache 2.0](LICENSE)
