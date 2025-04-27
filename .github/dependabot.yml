@@ -25,36 +25,3 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
-
-  - package-ecosystem: "cargo"
-    directory: "/goup"
-    schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "04:30"
-      timezone: "Asia/Shanghai"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-
-  - package-ecosystem: "cargo"
-    directory: "/goup-downloader"
-    schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "04:30"
-      timezone: "Asia/Shanghai"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-
-  - package-ecosystem: "cargo"
-    directory: "/goup-version"
-    schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "04:30"
-      timezone: "Asia/Shanghai"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
