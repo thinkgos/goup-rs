@@ -1,0 +1,6 @@
+[default.extend-words]
+# Don't correct the surname "goup"
+goup = "goup"
+
+[files]
+extend-exclude = ["assets/*"]

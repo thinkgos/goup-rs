@@ -11,7 +11,10 @@ check:
 test:
 	cargo test --all-features
 
-lint: fmt.check clippy check test
+typos:
+	typos
+
+lint: typos fmt.check clippy check test
 
 coverage:
 	cargo tarpaulin -p ${Package} --out lcov
