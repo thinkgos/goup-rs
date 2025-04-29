@@ -1,6 +1,6 @@
 #!/bin/sh
 
-local GOUP_HOME=${GOUP_HOME:-$HOME/.goup}
+GOUP_HOME=${GOUP_HOME:-$HOME/.goup}
 
 # goup shell setup
 # affix colons on either side of $PATH to simplify matching
