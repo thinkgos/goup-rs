@@ -11,6 +11,12 @@ check:
 test:
 	cargo test --all-features
 
+udeps:
+	cargo +nightly udeps
+
+shear:
+	cargo shear
+
 typos:
 	typos
 
