@@ -22,6 +22,6 @@ which.workspace = true
 sha2 = "0.10"
 flate2 = "1.1"
 tar = "0.4"
-zip = "2.6"
+zip = "3.0"
 
 # git2 = "0.18"
