@@ -1,0 +1,20 @@
+#!/usr/bin/env fish
+
+set -g GOUP_HOME $GOUP_HOME
+if test -z "$GOUP_HOME"
+    set -g GOUP_HOME $HOME/.goup
+end
+
+# goup shell setup
+# Check if GOUP_HOME/current/bin is already in PATH
+if not contains "$GOUP_HOME/current/bin" $fish_user_paths
+    # Prepending path in case a system-installed go needs to be overridden
+    set -gx GOROOT $GOUP_HOME/current
+    set -g fish_user_paths "$GOUP_HOME/current/bin" $fish_user_paths
+end
+
+# Check if GOUP_HOME/bin is already in PATH
+if not contains "$GOUP_HOME/bin" $fish_user_paths
+    # Prepending path in case a system-installed goup needs to be overridden
+    set -g fish_user_paths "$GOUP_HOME/bin" $fish_user_paths
+end 
