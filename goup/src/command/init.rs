@@ -28,7 +28,7 @@ impl Init {
                 return SETUP_ENV_FISH;
             }
         }
-        
+
         // Fallback to POSIX shell script (bash, zsh, etc.)
         log::info!("Using POSIX shell setup script");
         SETUP_ENV_UNIX
