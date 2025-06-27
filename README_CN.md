@@ -50,7 +50,10 @@ cargo install goup-rs --git https://github.com/thinkgos/goup-rs
 ```
 
 - (*仅支持 Linux/MacOS*) 运行`goup init`, 获取到shell启动脚本位于`$HOME/.goup/env`.
-- (*仅支持 Linux/MacOS*) 在shell启动脚本中添加Go的bin目录: `echo '. "$HOME/.goup/env"' >> ~/.bashrc` 或者 `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+- (*仅支持 Linux/MacOS*) 在shell启动脚本中添加Go的bin目录:
+  - bash: `echo '. "$HOME/.goup/env"' >> ~/.bashrc`
+  - zsh:  `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+  - fish: `echo 'source ~/.goup/env' >> ~/.config/fish/config.fish`
 
 ### 手动安装(Linux/MacOS)
 
@@ -59,7 +62,10 @@ cargo install goup-rs --git https://github.com/thinkgos/goup-rs
 - 从[Release Page](https://github.com/thinkgos/goup-rs/releases)下载最新的`goup`.
 - 将`goup`可执行文件放到`PATH`中, 并给予可执行权限: `mv GOUP_BIN /usr/local/bin/goup && chmod +x /usr/local/bin/goup`
 - 运行`goup init`, 获取到shell启动脚本位于`$HOME/.goup/env`.
-- 在shell启动脚本中添加Go的bin目录: `echo '. "$HOME/.goup/env"' >> ~/.bashrc` 或 `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+- 在shell启动脚本中添加Go的bin目录:
+  - bash: `echo '. "$HOME/.goup/env"' >> ~/.bashrc`
+  - zsh:  `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+  - fish: `echo 'source ~/.goup/env' >> ~/.config/fish/config.fish`
 
 ### 手动安装(Windows)
 

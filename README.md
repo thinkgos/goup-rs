@@ -50,7 +50,10 @@ cargo install goup-rs --git https://github.com/thinkgos/goup-rs
 ```
 
 - (*Only Linux/MacOS*)Run `goup init`, Got shell startup script at `$HOME/.goup/env`.
-- (*Only Linux/MacOS*)Add the Go bin directory to your shell startup script: `echo '. "$HOME/.goup/env"' >> ~/.bashrc` or `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+- (*Only Linux/MacOS*)Add the Go bin directory to your shell startup script:
+   - For bash: `echo '. "$HOME/.goup/env"' >> ~/.bashrc`
+   - For zsh:  `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+   - For fish: `echo 'source ~/.goup/env' >> ~/.config/fish/config.fish`
 
 ### Manual(for Linux/MacOS)
 
@@ -59,7 +62,10 @@ If you want to install manually, there are the steps:
 - Download the latest `goup` from [Release Page](https://github.com/thinkgos/goup-rs/releases)
 - Drop the `goup` executable to your `PATH` and make it executable: `mv GOUP_BIN /usr/local/bin/goup && chmod +x /usr/local/bin/goup`
 - Run `goup init`, Got shell startup script at `$HOME/.goup/env`.
-- Add the Go bin directory to your shell startup script: `echo '. "$HOME/.goup/env"' >> ~/.bashrc` or `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+- Add the Go bin directory to your shell startup script:
+   - For bash: `echo '. "$HOME/.goup/env"' >> ~/.bashrc`
+   - For zsh:  `echo '. "$HOME/.goup/env"' >> ~/.zshenv`
+   - For fish: `echo 'source ~/.goup/env' >> ~/.config/fish/config.fish`
 
 ### Manual(for Windows)
 
