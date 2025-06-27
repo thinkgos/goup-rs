@@ -19,7 +19,7 @@ impl Run for Search {
         Version::list_upstream_go_versions_filter(&self.host, filter)?
             .iter()
             .for_each(|v| {
-                println!("{}", v);
+                println!("{v}");
             });
         Ok(())
     }

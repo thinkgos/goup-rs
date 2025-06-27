@@ -76,7 +76,7 @@ impl Version {
                     r#"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?(?:beta(?:0|[1-9]\d*))"#
                         .to_string()
                 }
-                ToolchainFilter::Filter(s) => format!("(.*{}.*)", s),
+                ToolchainFilter::Filter(s) => format!("(.*{s}.*)"),
             },
         );
         let re = Regex::new(&re)?;
@@ -97,7 +97,7 @@ impl Version {
         Ok(Client::builder()
             .timeout(HTTP_TIMEOUT)
             .build()?
-            .get(format!("{}/dl/?mode=json&include=all", host))
+            .get(format!("{host}/dl/?mode=json&include=all"))
             .send()?
             .json::<Vec<GoRelease>>()?
             .into_iter()
@@ -122,7 +122,7 @@ impl Version {
             .collect())
     }
     pub fn match_version_req(host: &str, ver_pattern: &str) -> Result<String, anyhow::Error> {
-        log::debug!("version request pattern: {}", ver_pattern);
+        log::debug!("version request pattern: {ver_pattern}");
         let ver_req = VersionReq::parse(ver_pattern)?;
         // 是否是精确匹配, 如果是则直接返回
         if ver_req.comparators.iter().all(|v| v.op == Op::Exact) {
@@ -141,7 +141,7 @@ impl Version {
         let body = Client::builder()
             .timeout(HTTP_TIMEOUT)
             .build()?
-            .get(format!("{}/VERSION?m=text", host))
+            .get(format!("{host}/VERSION?m=text"))
             .send()?
             .text()?;
         body.split('\n')
@@ -211,7 +211,7 @@ impl Version {
         let version = Self::normalize(version);
         let cur = Self::current_go_version()?;
         if Some(&version) == cur.as_ref() {
-            log::warn!("{} is current active version,  ignore deletion!", version);
+            log::warn!("{version} is current active version,  ignore deletion!");
         } else {
             let version_dir = Dir::goup_home()?.version(version);
             if version_dir.exists() {
@@ -229,7 +229,7 @@ impl Version {
             for ver in vers {
                 let version = Self::normalize(ver);
                 if Some(&version) == cur.as_ref() {
-                    log::warn!("{} is current active version, ignore deletion!", ver);
+                    log::warn!("{ver} is current active version, ignore deletion!");
                     continue;
                 }
                 let version_dir = goup_home.version(&version);
@@ -302,7 +302,7 @@ impl Version {
         if ver.starts_with("go") {
             ver.to_string()
         } else {
-            format!("go{}", ver)
+            format!("go{ver}")
         }
     }
     /// semantic go version string.
@@ -321,8 +321,8 @@ impl Version {
             .or_else(|| ver.find("rc"))
             .map_or_else(
                 || match count_dot(ver) {
-                    0 => format!("{}.0.0", ver),
-                    1 => format!("{}.0", ver),
+                    0 => format!("{ver}.0.0"),
+                    1 => format!("{ver}.0"),
                     _ => ver.to_string(),
                 },
                 |idx| {

@@ -7,7 +7,7 @@ fn main() -> Result<(), shadow_rs::ShadowError> {
         Some(true) => {}
         // rustc version too small or can't figure it out
         _ => {
-            eprintln!("'goup' requires rustc >= {}", MIN_VERSION);
+            eprintln!("'goup' requires rustc >= {MIN_VERSION}");
             std::process::exit(1);
         }
     }

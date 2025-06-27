@@ -42,7 +42,7 @@ impl Run for Cache {
                 Version::list_cache(Some(arg.contain_sha256))?
                     .iter()
                     .for_each(|v| {
-                        println!("{}", v);
+                        println!("{v}");
                     });
             }
             Command::Clean(ref arg) => {
