@@ -8,7 +8,7 @@ members = [
 default-members = ["goup"]
 
 [workspace.package]
-version = "0.11.2"
+version = "0.11.3"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2024"
 rust-version = "1.85"
@@ -32,7 +32,7 @@ regex = "1.11"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls-native-roots", "json"] }
 serde = {version = "1", features = ["derive"]}
 serde_json = "1"
-which = "7.0"
+which = "8.0"
 
 # dev
 tempfile = "3"
