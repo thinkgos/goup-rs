@@ -268,6 +268,9 @@ goup completion zsh > _goup
 - 如何自定义 `GOUP_HOME`? (>= v0.11.x)  
   `goup`使用`$HOME/.goup`目录作为 `GOUP_HOME`. 如果需要自定义`GOUP_HOME`(大多数是Windows用户), 可以设置`GOUP_HOME`环境变量来使用其他目录, 安装`goup`之前, 请确保已设置自定义`GOUP_HOME`环境变量和目标目录权限, 否则可能会导致令人惊讶的结果, 请参阅issue [#265](https://github.com/thinkgos/goup-rs/issues/265) [#270](https://github.com/thinkgos/goup-rs/pull/270)
 
+- 有一些版本没有ha256文件, 如何安装这些版本?
+  `goup` (>= v0.11.3) 支持 `skip-verify` 选项, 如果这些版本没有ha256文件, 你可以尝试添加选项. 请参阅issue [#300](https://github.com/thinkgos/goup-rs/issues/300) [#301](https://github.com/thinkgos/goup-rs/pull/301) [#305](https://github.com/thinkgos/goup-rs/pull/305)
+
 ## 许可证
 
 [Apache 2.0](LICENSE)

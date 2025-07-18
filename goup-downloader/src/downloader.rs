@@ -110,6 +110,9 @@ impl Downloader {
         Ok(())
     }
     pub fn install_go_version(version: &str) -> Result<(), anyhow::Error> {
+        Self::install_go_version2(version, &false)
+    }
+    pub fn install_go_version2(version: &str, skip_verify: &bool) -> Result<(), anyhow::Error> {
         let goup_home = Dir::goup_home()?;
         let version_dest_dir = goup_home.version(version);
         // 是否已解压成功并且存在
@@ -137,10 +140,7 @@ impl Downloader {
         // 压缩包文件
         let archive_file = dl_dest_dir.join_path(archive_filename);
         let archive_sha256_file = dl_dest_dir.join_path(archive_sha256_filename);
-        if !archive_file.exists()
-            || !archive_sha256_file.exists()
-            || Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file).is_err()
-        {
+        if !archive_file.exists() {
             log::debug!(
                 "Download archive file from {} to {}",
                 archive_url,
@@ -162,13 +162,24 @@ impl Downloader {
                     archive_content_length,
                 ));
             }
+        }
+        if !skip_verify
+            && (!archive_sha256_file.exists()
+                || Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file).is_err())
+        {
             // 下载压缩包sha256
             log::debug!(
                 "Download archive sha256 file from {} to {}",
                 archive_sha256_url,
                 archive_sha256_file.display()
             );
-            Self::download_archive_sha256(&archive_sha256_file, &archive_sha256_url)?;
+            let r = Self::download_archive_sha256(&archive_sha256_file, &archive_sha256_url);
+            if r.is_err() {
+                log::warn!(
+                    "Download archive sha256 file failure, maybe the version '{version}' miss it, try add option '--skip-verify'",
+                );
+                return r;
+            }
             // 校验压缩包sha256
             Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file)?;
         }
