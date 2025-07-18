@@ -26,6 +26,9 @@ pub struct Install {
     /// skip sha256 verification.
     #[arg(long, default_value_t = false)]
     skip_verify: bool,
+    // disable semver, use raw version, toolchain name such as '1.21.4'
+    #[arg(long, default_value_t = false)]
+    disable_semver: bool,
 }
 
 impl Run for Install {
@@ -66,7 +69,11 @@ impl Run for Install {
                 version
             }
             Toolchain::Version(ver_req) => {
-                let version = Version::match_version_req(&self.host, &ver_req)?;
+                let version = if self.disable_semver {
+                    ver_req
+                } else {
+                    Version::match_version_req(&self.host, &ver_req)?
+                };
                 let version = Version::normalize(&version);
                 log::info!("Installing {version} ...");
                 Downloader::install_go_version2(&version, &self.skip_verify)?;
