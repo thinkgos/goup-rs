@@ -23,6 +23,9 @@ pub struct Install {
     /// only install the version, but do not switch.
     #[arg(long, default_value_t = false)]
     dry: bool,
+    /// skip sha256 verification.
+    #[arg(long, default_value_t = false)]
+    skip_verify: bool,
 }
 
 impl Run for Install {
@@ -33,7 +36,7 @@ impl Run for Install {
                 let version = Version::get_upstream_latest_go_version(&self.host)?;
                 let version = Version::normalize(&version);
                 log::info!("Installing {version} ...");
-                Downloader::install_go_version(&version)?;
+                Downloader::install_go_version2(&version, &self.skip_verify)?;
                 version
             }
             Toolchain::Unstable => {
@@ -46,7 +49,7 @@ impl Run for Install {
                     .ok_or_else(|| anyhow!("failed get latest unstable version"))?;
                 let version = Version::normalize(version);
                 log::info!("Installing {version} ...");
-                Downloader::install_go_version(&version)?;
+                Downloader::install_go_version2(&version, &self.skip_verify)?;
                 version
             }
             Toolchain::Beta => {
@@ -59,14 +62,14 @@ impl Run for Install {
                     .ok_or_else(|| anyhow!("failed get latest beta version"))?;
                 let version = Version::normalize(version);
                 log::info!("Installing {version} ...");
-                Downloader::install_go_version(&version)?;
+                Downloader::install_go_version2(&version, &self.skip_verify)?;
                 version
             }
             Toolchain::Version(ver_req) => {
                 let version = Version::match_version_req(&self.host, &ver_req)?;
                 let version = Version::normalize(&version);
                 log::info!("Installing {version} ...");
-                Downloader::install_go_version(&version)?;
+                Downloader::install_go_version2(&version, &self.skip_verify)?;
                 version
             }
             Toolchain::Nightly => {
