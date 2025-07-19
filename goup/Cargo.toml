@@ -23,8 +23,8 @@ version_check = "0.9"
 shadow-rs = "1.2"
 
 [dependencies]
-goup-version = {path = "../goup-version", version = "0.11"}
-goup-downloader = {path = "../goup-downloader", version = "0.11"}
+goup-version = {path = "../goup-version", version = "0.12"}
+goup-downloader = {path = "../goup-downloader", version = "0.12"}
 
 anyhow.workspace = true
 log.workspace = true

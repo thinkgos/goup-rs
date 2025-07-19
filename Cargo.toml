@@ -8,7 +8,7 @@ members = [
 default-members = ["goup"]
 
 [workspace.package]
-version = "0.11.3"
+version = "0.12.0"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2024"
 rust-version = "1.85"
