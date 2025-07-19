@@ -26,6 +26,9 @@ pub struct Install {
     /// skip sha256 verification.
     #[arg(long, default_value_t = false)]
     skip_verify: bool,
+    /// use raw version, disable semver, toolchain name such as '1.21.4'
+    #[arg(long, default_value_t = false)]
+    use_raw_version: bool,
 }
 
 impl Run for Install {
@@ -66,7 +69,13 @@ impl Run for Install {
                 version
             }
             Toolchain::Version(ver_req) => {
-                let version = Version::match_version_req(&self.host, &ver_req)?;
+                let version = if self.use_raw_version {
+                    ver_req
+                } else {
+                    Version::match_version_req(&self.host, &ver_req).inspect_err(|_| {
+                        log::warn!("'semver' parse failure, If you want to use versions like '1.19beta1' or '1.25rc2' (non-standard semantic versions), try add option '--use-raw-version'");
+                    })?
+                };
                 let version = Version::normalize(&version);
                 log::info!("Installing {version} ...");
                 Downloader::install_go_version2(&version, &self.skip_verify)?;
