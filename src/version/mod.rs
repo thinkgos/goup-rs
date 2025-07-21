@@ -8,8 +8,8 @@ use std::ops::Deref;
 use std::process::Command;
 use std::time::Duration;
 
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 use regex::Regex;
 use reqwest::blocking::Client;
 use semver::Op;
