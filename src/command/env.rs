@@ -1,8 +1,8 @@
 use clap::Args;
-use goup_version::{Dir, consts};
 use prettytable::{Table, row};
 
 use super::Run;
+use crate::version::{consts, dir::Dir};
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Env;

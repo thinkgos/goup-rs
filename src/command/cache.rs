@@ -2,9 +2,9 @@ use clap::Args;
 use clap::Subcommand;
 use dialoguer::Confirm;
 use dialoguer::theme::ColorfulTheme;
-use goup_version::Version;
 
 use super::Run;
+use crate::version::Version;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Cache {

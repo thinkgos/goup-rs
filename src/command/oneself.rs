@@ -8,11 +8,11 @@ use clap::CommandFactory;
 use clap::Subcommand;
 use dialoguer::Confirm;
 use dialoguer::theme::ColorfulTheme;
-use goup_version::Version;
 use self_update::{backends::github::Update, cargo_crate_version};
 
 use super::Cli;
 use super::Run;
+use crate::version::Version;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Oneself {

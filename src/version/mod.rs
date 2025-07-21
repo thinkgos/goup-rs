@@ -1,3 +1,7 @@
+pub mod consts;
+pub mod dir;
+pub mod toolchain;
+
 use std::fs;
 use std::fs::DirEntry;
 use std::ops::Deref;
@@ -14,9 +18,9 @@ use semver::VersionReq;
 use serde::{Deserialize, Serialize};
 use which::which;
 
-use super::Dir;
-use super::ToolchainFilter;
-use super::consts;
+// use consts;
+use dir::Dir;
+use toolchain::ToolchainFilter;
 
 const HTTP_TIMEOUT: Duration = Duration::from_secs(10);
 
@@ -207,6 +211,7 @@ impl Version {
         Ok(())
     }
     /// remove the go version, if it is current active go version, will ignore deletion.
+    #[allow(dead_code)]
     pub fn remove_go_version(version: &str) -> Result<(), anyhow::Error> {
         let version = Self::normalize(version);
         let cur = Self::current_go_version()?;

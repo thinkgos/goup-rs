@@ -1,13 +1,13 @@
 use anyhow::anyhow;
 use clap::Args;
 
-use goup_downloader::Downloader;
-use goup_version::Toolchain;
-use goup_version::ToolchainFilter;
-use goup_version::Version;
-use goup_version::consts;
+use crate::version::Version;
+use crate::version::consts;
+use crate::version::toolchain::Toolchain;
+use crate::version::toolchain::ToolchainFilter;
 
 use super::Run;
+use crate::downloader::Downloader;
 
 #[derive(Args, Debug, PartialEq)]
 #[command(disable_version_flag = true)]

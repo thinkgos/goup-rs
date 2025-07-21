@@ -5,7 +5,7 @@ use anyhow::anyhow;
 use flate2::read::GzDecoder;
 use tar::Archive;
 
-use super::Unpacker;
+use super::archived::Unpacker;
 
 /// archive *.tar.gz
 pub(crate) struct Tgz;

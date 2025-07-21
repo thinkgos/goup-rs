@@ -1,8 +1,8 @@
 use clap::Args;
 
 use super::Run;
-use goup_version::Version;
-use goup_version::consts;
+use crate::version::Version;
+use crate::version::consts;
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Search {

@@ -26,8 +26,6 @@ coverage:
 	cargo tarpaulin -p ${Package} --out lcov
 
 publish:
-	cargo publish --registry crates-io -p goup-version
-	cargo publish --registry crates-io -p goup-downloader
-	cargo publish --registry crates-io -p goup-rs
+	cargo publish --registry crates-io
 
 .PHONY:  fmt.check clippy check test lint coverage publish

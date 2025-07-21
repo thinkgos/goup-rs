@@ -1,3 +1,7 @@
+mod archived;
+mod tgz;
+mod zip;
+
 use std::{
     env,
     ffi::OsStr,
@@ -13,10 +17,9 @@ use reqwest::{StatusCode, blocking};
 use sha2::{Digest, Sha256};
 use which::which;
 
-use goup_version::Dir;
-use goup_version::consts;
-
-use crate::archived::Unpack;
+use crate::version::consts;
+use crate::version::dir::Dir;
+use archived::Unpack;
 
 pub struct Downloader;
 
@@ -109,6 +112,7 @@ impl Downloader {
         )?;
         Ok(())
     }
+    #[allow(dead_code)]
     pub fn install_go_version(version: &str) -> Result<(), anyhow::Error> {
         Self::install_go_version2(version, &false)
     }

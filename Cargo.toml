@@ -1,14 +1,8 @@
-[workspace]
-resolver = "2"
-members = [
-    "goup",
-    "goup-version",
-    "goup-downloader"
-]
-default-members = ["goup"]
 
-[workspace.package]
-version = "0.12.0"
+
+[package]
+name = "goup-rs"
+version = "0.13.0"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2024"
 rust-version = "1.85"
@@ -25,7 +19,17 @@ readme = "README.md"
 homepage = "https://github.com/thinkgos/goup-rs"
 repository = "https://github.com/thinkgos/goup-rs"
 
-[workspace.dependencies]
+build = "build.rs"
+
+[[bin]]
+name = "goup"
+path = "src/main.rs"
+
+[build-dependencies]
+version_check = "0.9"
+shadow-rs = "1.2"
+
+[dependencies]
 anyhow = "1.0"
 log = "0.4"
 regex = "1.11"
@@ -33,7 +37,25 @@ reqwest = { version = "0.12", default-features = false, features = ["blocking", 
 serde = {version = "1", features = ["derive"]}
 serde_json = "1"
 which = "8.0"
+clap = {version = "4.5", features = ["derive", "env"]}
+clap_complete = "4.5"
+prettytable-rs = "0.10"
+dialoguer = "0.11"
+self_update = {version = "0.42", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}
+shadow-rs = "1.2"
+env_logger = {version = "0.11", features = ["color"]}
+chrono = "0.4.40"
+sha2 = "0.10"
+flate2 = "1.1"
+tar = "0.4"
+zip = "4.3"
+dirs = "6.0"
+semver = "1.0"
 
+[target.'cfg(windows)'.dependencies]
+junction = "1.2"
+
+[dev-dependencies]
 # dev
 tempfile = "3"
 temp-env = "0.3"

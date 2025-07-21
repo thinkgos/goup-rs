@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use clap::Args;
 use dialoguer::{Select, theme::ColorfulTheme};
 
-use goup_version::Version;
+use crate::version::Version;
 
 use super::Run;
 

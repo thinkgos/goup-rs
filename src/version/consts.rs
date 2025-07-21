@@ -74,10 +74,9 @@ fn get_var_or_else(key: &str, op: impl FnOnce() -> String) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::consts::{archive_sha256, archive_url, go_version_archive};
-
     use super::{GO_DOWNLOAD_BASE_URL, GO_HOST, GO_SOURCE_GIT_URL, GO_SOURCE_UPSTREAM_GIT_URL};
     use super::{GOUP_GO_DOWNLOAD_BASE_URL, GOUP_GO_HOST, GOUP_GO_SOURCE_GIT_URL};
+    use super::{archive_sha256, archive_url, go_version_archive};
     use super::{go_download_base_url, go_host, go_source_git_url, go_source_upstream_git_url};
 
     #[test]
