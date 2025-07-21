@@ -45,6 +45,7 @@ impl Dir {
         }
     }
     /// Extends `self` with `env`
+    #[allow(dead_code)]
     pub fn env(&self) -> Self {
         self.join_path("env")
     }
