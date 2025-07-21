@@ -8,8 +8,8 @@ use std::ops::Deref;
 use std::process::Command;
 use std::time::Duration;
 
-use anyhow::Result;
 use anyhow::anyhow;
+use anyhow::Result;
 use regex::Regex;
 use reqwest::blocking::Client;
 use semver::Op;
@@ -52,6 +52,7 @@ pub struct Version {
 
 impl Version {
     /// initializes the environment file.
+    #[allow(dead_code)]
     pub fn init_env(s: &str) -> Result<(), anyhow::Error> {
         let goup_home = Dir::goup_home()?;
         if !goup_home.exists() {
