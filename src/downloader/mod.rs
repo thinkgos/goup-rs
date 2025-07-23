@@ -112,11 +112,7 @@ impl Downloader {
         )?;
         Ok(())
     }
-    #[allow(dead_code)]
-    pub fn install_go_version(version: &str) -> Result<(), anyhow::Error> {
-        Self::install_go_version2(version, &false)
-    }
-    pub fn install_go_version2(version: &str, skip_verify: &bool) -> Result<(), anyhow::Error> {
+    pub fn install_go_version(version: &str, skip_verify: &bool) -> Result<(), anyhow::Error> {
         let goup_home = Dir::goup_home()?;
         let version_dest_dir = goup_home.version(version);
         // 是否已解压成功并且存在
@@ -186,6 +182,8 @@ impl Downloader {
             }
             // 校验压缩包sha256
             Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file)?;
+        } else {
+            log::info!("Skip verify archive file sha256");
         }
 
         // 解压
@@ -202,7 +200,7 @@ impl Downloader {
             .to_string_lossy()
             .parse::<Unpack>()?
             .unpack(&version_dest_dir, &archive_file)?;
-        // 设置解压成功
+        // 设置解压成功标记
         goup_home.create_dot_unpacked_success_file(version)?;
         log::info!("{} installed in {}", version, version_dest_dir.display());
         Ok(())
