@@ -17,6 +17,9 @@ udeps:
 shear:
 	cargo shear
 
+audit:
+	cargo audit
+
 typos:
 	typos
 
