@@ -99,7 +99,7 @@ pub struct Cli {
 #[non_exhaustive] // 表明未来还有其它元素添加
 enum Command {
     /// Install Go with a version
-    #[command(visible_alias = "update")]
+    #[command(visible_aliases = ["update", "i"])]
     Install(Install),
     /// List all installed Go
     #[command(visible_aliases = ["ls", "show"])]
@@ -109,6 +109,7 @@ enum Command {
     #[command(visible_alias = "rm")]
     Remove(Remove),
     /// Search Go versions to install
+    #[command(visible_aliases = ["ls-remote"])]
     Search(Search),
     /// Set the default Go version to one specified.
     /// If no version is provided, a prompt will show to select a installed Go version.

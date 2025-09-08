@@ -231,11 +231,11 @@ goup completion zsh > _goup
 
 - `goup completion <SHELL>` 为指定shell生成补全脚本.
 - `goup [help]`  打印此信息或给定子命令的帮助信息.
-- `goup install/update [TOOLCHAIN]` 下载指定的Go版本到`$HOME/.goup/go<VERSION|tip>/go`并创建一个软链接到`$HOME/.goup/current`.
+- `goup install/update/i [TOOLCHAIN]` 下载指定的Go版本到`$HOME/.goup/go<VERSION|tip>/go`并创建一个软链接到`$HOME/.goup/current`.
 - `goup use/set [VERSION]` 切换到选择的Go版本.
 - `goup ls/list/show` 列出所有位置`$HOME/.goup`已安装的Go版本.
 - `goup remove/rm [VERSION]...` 移除指定的Go版本列表.
-- `goup search [FILTER]` 列出所有可用的 o版本.
+- `goup search/ls-remote [FILTER]` 列出所有可用的Go版本.
 - `goup cache [COMMAND]` 管理缓存归档文件.
 - `goup self <COMMAND>` 修改`goup`安装程序.
 - `goup init` 将所有必要的环境变量和值写入`$HOME/.goup/env`.

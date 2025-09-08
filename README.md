@@ -231,11 +231,11 @@ goup completion zsh > _goup
 
 - `goup completion <SHELL>` Generate the autocompletion script for the specified shell.
 - `goup [help]` Print this message or the help of the given subcommand(s).
-- `goup install/update [TOOLCHAIN]` downloads specified version of Go to`$HOME/.goup/go<VERSION|tip>/go` and symlinks it to `$HOME/.goup/current`.
+- `goup install/update/i [TOOLCHAIN]` downloads specified version of Go to`$HOME/.goup/go<VERSION|tip>/go` and symlinks it to `$HOME/.goup/current`.
 - `goup use/set [VERSION]` switches to selected Go version.
 - `goup ls/list/show` list all installed Go version located at `$HOME/.goup`.
 - `goup remove/rm [VERSION]...` remove the specified Go version list.
-- `goup search [FILTER]` lists all available Go versions.
+- `goup search/ls-remote [FILTER]` lists all available Go versions.
 - `goup cache [COMMAND]` Manage cache archive files.
 - `goup self <COMMAND>` Modify the goup installation.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
