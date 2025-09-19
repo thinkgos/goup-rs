@@ -24,6 +24,7 @@ use toolchain::ToolchainFilter;
 
 const HTTP_TIMEOUT: Duration = Duration::from_secs(10);
 
+#[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GoFile {
     pub arch: String,
