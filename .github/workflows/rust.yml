@@ -29,6 +29,7 @@ jobs:
         with:
           toolchain: stable
           target: ${{ matrix.target }}
+          components: clippy,rustfmt
       - name: Use cache
         uses: Swatinem/rust-cache@v2
       - name: Run code format

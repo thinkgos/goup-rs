@@ -82,6 +82,7 @@ jobs:
         with:
           toolchain: stable
           target: ${{ matrix.target }}
+          components: clippy,rustfmt
 
       - name: Setup | Install cargo-wix [Windows]
         continue-on-error: true
