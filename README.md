@@ -272,7 +272,7 @@ Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -vv <su
   `goup`(>= v0.12.x) support `--skip-verify` option, if some version miss sha256 file, you can try add the option. refer issue [#300](https://github.com/thinkgos/goup-rs/issues/300) [#301](https://github.com/thinkgos/goup-rs/pull/301) [#305](https://github.com/thinkgos/goup-rs/pull/305)
 
 - How to install specific version? Why cause `Error: expected comma after minor version number, found 'r'`?
-  Sometimes, we know the exact version, we can use `goup install =1.24.5`, but some version do not comply with [`semver`](https://semver.org/), like `1.25rc1`, we can use `goup install unstable`, but this only install latest unstable version. so I add a `--use-raw-version` option(>= v0.12.x), we can install any version we exactly know. refer issue [#299](https://github.com/thinkgos/goup-rs/issues/299) [#306](https://github.com/thinkgos/goup-rs/pull/306)
+  Sometimes, we know the exact version, we can use `goup install =1.24.5`, but some version do not comply with [`semver`](https://semver.org/), like `1.25rc1`, we can use `goup install unstable`, but this only install latest unstable version. so I add a `--use-raw-version` option(>= v0.12.x), we can install any version we exactly know. refer issue [#299](https://github.com/thinkgos/goup-rs/issues/299) [#307](https://github.com/thinkgos/goup-rs/pull/307)
 
 ## License
 

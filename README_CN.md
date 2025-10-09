@@ -272,7 +272,7 @@ goup completion zsh > _goup
   `goup`(>= v0.12.x) 支持 `--skip-verify` 选项, 如果这些版本没有ha256文件, 你可以尝试添加选项. 请参阅issue [#300](https://github.com/thinkgos/goup-rs/issues/300) [#301](https://github.com/thinkgos/goup-rs/pull/301) [#305](https://github.com/thinkgos/goup-rs/pull/305)
 
 - 如何安装特定版本? 为什么会出现错误`Error: expected comma after minor version number, found 'r'`?
-  有时, 我们知道确切的版本, 可以使用 `goup install =1.24.5`, 但有些版本不符合[`semver`](https://semver.org/), 如 `1.25rc1`, 我们可以使用`goup install unstable`, 但这只能安装最新的不稳定版本. 所以我添加了一个 `--use-raw-version` 选项(>= v0.12.x), 这样我们就可以安装任何我们确切知道的版本. 请参阅issue [#299](https://github.com/thinkgos/goup-rs/issues/299) [#306](https://github.com/thinkgos/goup-rs/pull/307)
+  有时, 我们知道确切的版本, 可以使用 `goup install =1.24.5`, 但有些版本不符合[`semver`](https://semver.org/), 如 `1.25rc1`, 我们可以使用`goup install unstable`, 但这只能安装最新的不稳定版本. 所以我添加了一个 `--use-raw-version` 选项(>= v0.12.x), 这样我们就可以安装任何我们确切知道的版本. 请参阅issue [#299](https://github.com/thinkgos/goup-rs/issues/299) [#307](https://github.com/thinkgos/goup-rs/pull/307)
 
 ## 许可证
 
