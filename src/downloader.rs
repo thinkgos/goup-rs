@@ -56,7 +56,7 @@ impl Downloader {
             ));
         }
 
-        let gotip_go = Dir::goup_home()?.version_go("gotip");
+        let gotip_go = Dir::goup_home()?.version("gotip");
         let gotip_git = gotip_go.join_path(".git");
         // gotip is not clone from source
         if !gotip_git.exists() {

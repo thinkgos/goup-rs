@@ -175,12 +175,14 @@ impl Version {
                 }
 
                 let ver = v.file_name().to_string_lossy().to_string();
-                if ver != "gotip" && !goup_home.is_dot_unpacked_success_file_exists(&ver) {
+                if ver == "current"
+                    || ver != "gotip" && !goup_home.is_dot_unpacked_success_file_exists(&ver)
+                {
                     return None;
                 }
                 Some(Version {
                     version: ver.trim_start_matches("go").into(),
-                    active: current.is_ok_and(|vv| vv == goup_home.version_go(ver).deref()),
+                    active: current.is_ok_and(|vv| vv == goup_home.version(ver).deref()),
                 })
             })
             .collect();
@@ -192,7 +194,7 @@ impl Version {
     pub fn set_go_version(version: &str) -> Result<(), anyhow::Error> {
         let version = Self::normalize(version);
         let goup_home = Dir::goup_home()?;
-        let original = goup_home.version_go(&version);
+        let original = goup_home.version(&version);
         if !original.exists() {
             return Err(anyhow!(
                 "Go version {version} is not installed. Install it with `goup install`."
@@ -251,10 +253,11 @@ impl Version {
     /// current active go version
     pub fn current_go_version() -> Result<Option<String>, anyhow::Error> {
         // may be current not exist
-        let current = Dir::goup_home()?.current().read_link().ok().and_then(|p| {
-            p.parent()
-                .and_then(|v| v.file_name().map(|vv| vv.to_string_lossy().to_string()))
-        });
+        let current = Dir::goup_home()?
+            .current()
+            .read_link()
+            .ok()
+            .and_then(|p| p.file_name().map(|vv| vv.to_string_lossy().to_string()));
         Ok(current)
     }
 
@@ -707,6 +710,11 @@ mod tests {
             "1.24.3",
             "1.24.4",
             "1.25rc1",
+            "1.25rc2",
+            "1.25.0",
+            "1.25.1",
+            "1.25.2",
+            "1.25.3",
         ];
         for ver in go_versions {
             assert!(Version::semantic(ver).is_ok())

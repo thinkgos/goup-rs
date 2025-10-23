@@ -80,12 +80,6 @@ impl Dir {
         d.push(p);
         d
     }
-    /// Extends `self` with `{version}/go`
-    pub fn version_go<P: AsRef<Path>>(&self, ver: P) -> Self {
-        let mut d = self.join_path(ver);
-        d.push("go");
-        d
-    }
     /// Extends `self` with `{version}/.unpacked-success`
     fn version_dot_unpacked_success<P: AsRef<Path>>(&self, ver: P) -> Self {
         let mut d = self.join_path(ver);
@@ -186,18 +180,6 @@ mod tests {
         assert_eq!(
             Dir::new(home_dir).version("go1.21.2").as_ref(),
             Path::new("/home/dev/.goup/go1.21.2")
-        );
-        assert_eq!(
-            Dir::new(home_dir).version_go("go1.21.2").as_ref(),
-            Path::new("/home/dev/.goup/go1.21.2/go")
-        );
-        assert_eq!(
-            Dir::new(home_dir).version_go("go1.21.2").as_ref(),
-            Path::new("/home/dev/.goup/go1.21.2/go")
-        );
-        assert_eq!(
-            Dir::new(home_dir).version_go("go1.21.2").as_ref(),
-            Path::new("/home/dev/.goup/go1.21.2/go")
         );
     }
 
