@@ -21,12 +21,16 @@ impl Unpacker for Tgz {
             let mut entry = entry?;
             let path = entry.path()?;
 
-            let dest_file = dest_dir.as_ref().join(path);
-            let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
-            if !parent.exists() {
-                fs::create_dir_all(parent)?;
+            if let Some(path_str) = path.to_str() {
+                if let Some(relative_path) = path_str.strip_prefix("go/") {
+                    let dest_file = dest_dir.as_ref().join(relative_path);
+                    let parent = dest_file.parent().ok_or(anyhow!("No parent path found"))?;
+                    if !parent.exists() {
+                        fs::create_dir_all(parent)?;
+                    }
+                    entry.unpack(dest_file)?;
+                }
             }
-            entry.unpack(dest_file)?;
         }
         Ok(())
     }
