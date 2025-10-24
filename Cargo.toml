@@ -23,6 +23,10 @@ build = "build.rs"
 name = "goup"
 path = "src/main.rs"
 
+[features]
+default = []
+no-self-update = []
+
 [build-dependencies]
 version_check = "0.9"
 shadow-rs = "1.4"
