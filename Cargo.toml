@@ -43,6 +43,7 @@ clap = {version = "4.5", features = ["derive", "env"]}
 clap_complete = "4.5"
 prettytable-rs = "0.10"
 dialoguer = "0.12"
+indicatif="0.18"
 self_update = {version = "0.42", default-features = false, features = ["rustls", "compression-flate2", "compression-zip-deflate"]}
 shadow-rs = "1.4"
 env_logger = {version = "0.11", features = ["color"]}
