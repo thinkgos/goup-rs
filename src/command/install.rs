@@ -38,7 +38,6 @@ impl Run for Install {
             Toolchain::Stable => {
                 let version = Version::get_upstream_latest_go_version(&self.host)?;
                 let version = Version::normalize(&version);
-                log::info!("Installing {version} ...");
                 Downloader::install_go_version(&version, &self.skip_verify)?;
                 version
             }
@@ -51,7 +50,6 @@ impl Run for Install {
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest unstable version"))?;
                 let version = Version::normalize(version);
-                log::info!("Installing {version} ...");
                 Downloader::install_go_version(&version, &self.skip_verify)?;
                 version
             }
@@ -64,7 +62,6 @@ impl Run for Install {
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest beta version"))?;
                 let version = Version::normalize(version);
-                log::info!("Installing {version} ...");
                 Downloader::install_go_version(&version, &self.skip_verify)?;
                 version
             }
@@ -77,7 +74,6 @@ impl Run for Install {
                     })?
                 };
                 let version = Version::normalize(&version);
-                log::info!("Installing {version} ...");
                 Downloader::install_go_version(&version, &self.skip_verify)?;
                 version
             }

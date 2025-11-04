@@ -5,21 +5,26 @@ mod zip;
 use std::{
     env,
     ffi::OsStr,
-    fs,
-    fs::File,
-    io::{BufRead, BufReader, Read},
+    fs::{self, File},
+    io::{BufRead, BufReader, Read, Write},
     path::Path,
     process::{Command, Stdio},
+    time::{Duration, Instant},
 };
 
 use anyhow::anyhow;
-use reqwest::{StatusCode, blocking};
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
+use reqwest::{
+    StatusCode,
+    blocking::{self, Client},
+    header::CONTENT_LENGTH,
+};
 use sha2::{Digest, Sha256};
 use which::which;
 
+use crate::downloader::archived::Unpack;
 use crate::version::consts;
 use crate::version::dir::Dir;
-use archived::Unpack;
 
 pub struct Downloader;
 
@@ -115,13 +120,19 @@ impl Downloader {
     pub fn install_go_version(version: &str, skip_verify: &bool) -> Result<(), anyhow::Error> {
         let goup_home = Dir::goup_home()?;
         let version_dest_dir = goup_home.version(version);
+
+        let mp = MultiProgress::new();
+        let pb = mp.add(ProgressBar::new_spinner());
+        pb.enable_steady_tick(Duration::from_millis(100));
+        pb.set_message(format!("Installing {version}"));
+
         // 是否已解压成功并且存在
         if goup_home.is_dot_unpacked_success_file_exists(version) {
-            log::info!(
-                "{}: already installed in {:?}",
+            pb.finish_with_message(format!(
+                "Already installed {} in {:?}",
                 version,
                 version_dest_dir.display()
-            );
+            ));
             return Ok(());
         }
         // download directory
@@ -141,13 +152,14 @@ impl Downloader {
         let archive_file = dl_dest_dir.join_path(archive_filename);
         let archive_sha256_file = dl_dest_dir.join_path(archive_sha256_filename);
         if !archive_file.exists() {
-            log::debug!(
-                "Download archive file from {} to {}",
+            pb.set_message(format!(
+                "Downloading archive file from {} to {}",
                 archive_url,
-                archive_file.display(),
-            );
+                archive_file.display()
+            ));
             // 下载压缩包文件
-            Self::download_file(&archive_file, &archive_url)?;
+            Self::download_file(&archive_file, &archive_url, Some(&mp))?;
+
             log::debug!("Check archive file content length");
             // 压缩包长度
             let archive_content_length =
@@ -163,36 +175,38 @@ impl Downloader {
                 ));
             }
         }
-        if !skip_verify
-            && (!archive_sha256_file.exists()
-                || Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file).is_err())
-        {
-            // 下载压缩包sha256
-            log::debug!(
-                "Download archive sha256 file from {} to {}",
-                archive_sha256_url,
-                archive_sha256_file.display()
-            );
-            // 下载压缩包sha256文件
-            let r = Self::download_file(&archive_sha256_file, &archive_sha256_url);
-            if r.is_err() {
-                log::warn!(
-                    "Download archive sha256 file failure, maybe the version '{version}' miss it, try add option '--skip-verify'",
-                );
-                return r;
+        if *skip_verify {
+            pb.set_message("Skip verify archive file sha256");
+        } else {
+            if !archive_sha256_file.exists()
+                || Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file).is_err()
+            {
+                // 下载压缩包sha256
+                pb.set_message(format!(
+                    "Download archive sha256 file from {} to {}",
+                    archive_sha256_url,
+                    archive_sha256_file.display()
+                ));
+                // 下载压缩包sha256文件
+                let r = Self::download_file(&archive_sha256_file, &archive_sha256_url, None);
+                if r.is_err() {
+                    log::warn!(
+                        "Download archive sha256 file failure, maybe the version '{version}' miss it, try add option '--skip-verify'",
+                    );
+                    return r;
+                }
             }
             // 校验压缩包sha256
+            pb.set_message(format!("Verifying '{}' sha256", archive_file.display()));
             Self::verify_archive_file_sha256(&archive_file, &archive_sha256_file)?;
-        } else {
-            log::info!("Skip verify archive file sha256");
         }
 
         // 解压
-        log::info!(
-            "Unpacking {} to {} ...",
+        pb.set_message(format!(
+            "Unpacking {} to {}",
             archive_file.display(),
             version_dest_dir.display()
-        );
+        ));
         if !version_dest_dir.exists() {
             log::debug!("Create version directory: {}", version_dest_dir.display());
             fs::create_dir_all(&version_dest_dir)?
@@ -203,7 +217,12 @@ impl Downloader {
             .unpack(&version_dest_dir, &archive_file)?;
         // 设置解压成功标记
         goup_home.create_dot_unpacked_success_file(version)?;
-        log::info!("{} installed in {}", version, version_dest_dir.display());
+        pb.finish_with_message(format!(
+            "Installed {} in {}",
+            version,
+            version_dest_dir.display()
+        ));
+
         Ok(())
     }
 
@@ -241,13 +260,83 @@ impl Downloader {
     }
 
     /// download_file 下载文件
-    fn download_file<P: AsRef<Path>>(dest: P, url: &str) -> Result<(), anyhow::Error> {
-        let mut response = blocking::get(url)?;
-        if !response.status().is_success() {
-            return Err(anyhow!("Downloading file failure"));
+    fn download_file<P: AsRef<Path>>(
+        dest: P,
+        url: &str,
+        mp: Option<&MultiProgress>,
+    ) -> Result<(), anyhow::Error> {
+        if let Some(mp) = mp {
+            let client = Client::new();
+            let content_length = client
+                .head(url)
+                .header("User-Agent", "goup-rs Client")
+                .timeout(Duration::from_secs(10))
+                .send()?
+                .headers()
+                .get(CONTENT_LENGTH)
+                .ok_or_else(|| anyhow!("no content length header"))?
+                .to_str()?
+                .parse::<u64>()?;
+            let mut dest_file = fs::File::create(dest)?;
+
+            let pb = mp.add(ProgressBar::new(content_length));
+            pb.set_style(
+                ProgressStyle::default_bar()
+                    .template(
+                        "  [{elapsed_precise}] [{bar:30.cyan/blue}] {bytes}/{total_bytes} ({eta})",
+                    )?
+                    .progress_chars("#>-"),
+            );
+            pb.enable_steady_tick(Duration::from_millis(100));
+
+            const CHUNK_SIZE: u64 = 1024 * 1024; // 1MB
+            const MAX_CHUNK_SIZE: u64 = 1024 * 1024 * 16; // 16MB
+
+            let mut speed = 0.0;
+            let mut chunk_size = 2 * CHUNK_SIZE;
+            let mut start = 0;
+            while start < content_length {
+                let end = start + chunk_size - 1;
+                let instant = Instant::now();
+                let buf = client
+                    .get(url)
+                    .header("User-Agent", "GOUP Client")
+                    .header("Range", format!("bytes={start}-{end}"))
+                    .timeout(Duration::from_secs(30))
+                    .send()?
+                    .bytes()?;
+                let elapsed = instant.elapsed();
+                dest_file.write_all(&buf)?;
+
+                let real_chunk_size = buf.len() as u64;
+                let real_speed = (real_chunk_size as f32) / elapsed.as_secs_f32();
+
+                start = end + 1;
+                speed = if speed == 0.0 {
+                    real_speed
+                } else {
+                    0.8 * speed + 0.2 * real_speed
+                };
+                chunk_size = if speed * 1.2 < real_speed {
+                    (chunk_size as f32 * 1.25) as u64
+                } else {
+                    (chunk_size as f64 * 0.75) as u64
+                };
+                chunk_size = chunk_size.clamp(CHUNK_SIZE, MAX_CHUNK_SIZE);
+
+                pb.inc(real_chunk_size);
+            }
+
+            pb.finish_and_clear();
+            mp.remove(&pb);
+        } else {
+            let mut response = blocking::get(url)?;
+            if !response.status().is_success() {
+                return Err(anyhow!("Downloading file failure"));
+            }
+            let mut file = File::create(dest)?;
+            response.copy_to(&mut file)?;
         }
-        let mut file = File::create(dest)?;
-        response.copy_to(&mut file)?;
         Ok(())
     }
 
