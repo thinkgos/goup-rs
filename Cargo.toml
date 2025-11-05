@@ -1,6 +1,6 @@
 [package]
 name = "goup-rs"
-version = "0.14.1"
+version = "0.14.2"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2024"
 rust-version = "1.86"
