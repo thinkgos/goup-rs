@@ -18,10 +18,10 @@
 
 ## 特性
 
-- 最小依赖, 仅依赖于`git`. 此依赖将会在未来删除.
+- 最小依赖, 依赖于`git`(仅`nightly|tip|gotip`版本需要`git`).
 - 跨平台的能力(Linux, macOS & Windows).
 - 支持使用`goup install/remove [TOOLCHAIN]` 安装/卸载 Go版本.
-- 支持使用`goup install <nightly|tip|gotip>` 从源码安装Go.
+- 支持使用`goup install <nightly|tip|gotip>` 从源码安装Go, 需要`git`.
 - 支持列出本地已安装的版本.
 - 支持在多个已安装的版本中切换.
 - 支持搜索可用的Go版本.
@@ -240,6 +240,10 @@ goup completion zsh > _goup
 - `goup self <COMMAND>` 修改`goup`安装程序.
 - `goup init` 将所有必要的环境变量和值写入`$HOME/.goup/env`.
 - `goup env`  显示`goup`的环境变量和值.
+
+## 构建功能标志
+
+- `no-self-update` 关闭自我更新.
 
 ## How to Debug
 

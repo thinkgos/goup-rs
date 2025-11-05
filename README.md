@@ -18,10 +18,10 @@
 
 ## Features
 
-- Minimum dependencies, only depend on `git`. we may remove this dependency in future.
+- Minimum dependencies, depend on `git`(only `nightly|tip|gotip` version require `git`).
 - Multi-platform compatible (Linux, macOS & Windows).
 - Install/Remove Go versions with `goup install/remove [TOOLCHAIN]`.
-- Support Installing Go from source with `goup install <nightly|tip|gotip>`.
+- Support Installing Go from source with `goup install <nightly|tip|gotip>`, require `git`.
 - List locally installed versions.
 - Switch between multiple installed versions.
 - Search available version of Go.
@@ -240,6 +240,10 @@ goup completion zsh > _goup
 - `goup self <COMMAND>` Modify the goup installation.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
 - `goup env` Show the specified goup environment variables and values.
+
+## Build feature flags
+
+- `no-self-update` Disable self-update feature.
 
 ## How to Debug
 
