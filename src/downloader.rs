@@ -285,7 +285,7 @@ impl Downloader {
                     .template(
                         "  [{elapsed_precise}] [{bar:30.cyan/blue}] {bytes}/{total_bytes} ({eta})",
                     )?
-                    .progress_chars("#>-"),
+                    .progress_chars("=> "),
             );
             pb.enable_steady_tick(Duration::from_millis(100));
 
