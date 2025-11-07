@@ -24,11 +24,11 @@ impl Init {
     /// Detect the current shell and return the appropriate setup script
     fn detect_shell_and_get_script() -> &'static str {
         // Check if SHELL environment variable is set
-        if let Ok(shell) = env::var("SHELL") {
-            if shell.contains("fish") {
-                log::info!("Detected fish shell, using fish setup script");
-                return SETUP_ENV_FISH;
-            }
+        if let Ok(shell) = env::var("SHELL")
+            && shell.contains("fish")
+        {
+            log::info!("Detected fish shell, using fish setup script");
+            return SETUP_ENV_FISH;
         }
 
         // Fallback to POSIX shell script (bash, zsh, etc.)
