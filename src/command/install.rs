@@ -21,13 +21,13 @@ pub struct Install {
     #[arg(long, default_value_t = consts::GO_HOST.to_owned(), env = consts::GOUP_GO_HOST)]
     host: String,
     /// only install the version, but do not switch.
-    #[arg(long, default_value_t = false)]
+    #[arg(long)]
     dry: bool,
     /// skip sha256 verification.
-    #[arg(long, default_value_t = false)]
+    #[arg(long)]
     skip_verify: bool,
     /// use raw version, disable semver, toolchain name such as '1.21.4'
-    #[arg(long, default_value_t = false)]
+    #[arg(long)]
     use_raw_version: bool,
 }
 

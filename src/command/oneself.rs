@@ -32,7 +32,7 @@ enum Command {
 #[derive(Args, Clone, Debug, PartialEq)]
 struct Uninstall {
     /// Skip interact prompt.
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short, long)]
     no_confirm: bool,
 }
 

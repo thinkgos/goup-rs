@@ -24,14 +24,14 @@ enum Command {
 #[derive(Args, Clone, Debug, PartialEq)]
 struct Show {
     /// Contain archive sha256 file
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short, long)]
     contain_sha256: bool,
 }
 
 #[derive(Args, Clone, Debug, PartialEq)]
 struct Clean {
     /// Skip interact prompt.
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short, long)]
     no_confirm: bool,
 }
 
