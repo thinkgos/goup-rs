@@ -315,13 +315,13 @@ impl Downloader {
                 speed = if speed == 0.0 {
                     real_speed
                 } else {
-                    0.8 * speed + 0.2 * real_speed
+                    (speed + real_speed) * 0.5
                 };
-                chunk_size = if speed * 1.25 < real_speed {
-                    (chunk_size as f32 * 1.5) as u64
+                chunk_size = if speed < real_speed {
+                    chunk_size as f32 * 1.25
                 } else {
-                    (chunk_size as f64 * 0.75) as u64
-                };
+                    chunk_size as f32 * 0.75
+                } as u64;
                 chunk_size = chunk_size.clamp(CHUNK_SIZE, MAX_CHUNK_SIZE);
 
                 pb.inc(real_chunk_size);
