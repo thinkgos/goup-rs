@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::{
     env,
     fs::{self, File},
@@ -45,7 +46,6 @@ impl Dir {
         }
     }
     /// Extends `self` with `env`
-    #[allow(dead_code)]
     pub fn env(&self) -> Self {
         self.join_path("env")
     }
@@ -54,14 +54,12 @@ impl Dir {
         self.join_path("current")
     }
     /// Extends `self` with `/current/bin`
-    #[allow(dead_code)]
     pub fn current_bin(&self) -> Self {
         let mut d = self.join_path("current");
         d.push("bin");
         d
     }
     /// Extends `self` with `/bin`
-    #[allow(dead_code)]
     pub fn bin(&self) -> Self {
         self.join_path("bin")
     }
@@ -74,7 +72,6 @@ impl Dir {
         self.join_path("cache")
     }
     /// Extends `self` with `cache/{filename}`
-    #[allow(dead_code)]
     pub fn cache_file<P: AsRef<Path>>(&self, p: P) -> Self {
         let mut d = self.join_path("cache");
         d.push(p);

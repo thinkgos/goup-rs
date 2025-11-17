@@ -1,6 +1,6 @@
 [package]
 name = "goup-rs"
-version = "0.15.0"
+version = "0.15.1"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2024"
 rust-version = "1.91"
@@ -64,7 +64,7 @@ junction = "1.3"
 tempfile = "3"
 temp-env = "0.3"
 
-[workspace.lints.rust]
+[lints.rust]
 unsafe_code = "forbid"
 # unused = "allow" # for experimental dev
 
