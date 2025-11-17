@@ -114,7 +114,8 @@ enum Command {
     Search(Search),
     /// Set the default Go version to one specified.
     /// If no version is provided, a prompt will show to select a installed Go version.
-    #[command(visible_alias = "use")]
+    #[command(name = "default")]
+    #[command(visible_aliases = ["set", "use"])]
     Set(Set),
     /// Generate the autocompletion script for the specified shell
     Completion(Completion),

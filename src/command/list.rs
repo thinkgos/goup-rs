@@ -1,5 +1,6 @@
+use std::io::{self, Write};
+
 use clap::Args;
-use prettytable::{Table, row};
 use which::which;
 
 use super::Run;
@@ -21,16 +22,18 @@ impl Run for List {
                 }
             );
         } else {
-            let mut table = Table::new();
-            table.add_row(row!["Active", "Version"]);
+            let mut stdout = io::stdout().lock();
             for v in vers {
-                if v.active {
-                    table.add_row(row![Fycb -> "*", Fycb -> &v.version]);
-                } else {
-                    table.add_row(row![Fgc -> "", Fgc -> &v.version]);
+                match (v.active, v.session_active) {
+                    (true, true) => {
+                        writeln!(stdout, "{}   (active, default & session)", v.version)?
+                    }
+                    (true, _) => writeln!(stdout, "{}  (active, default)", v.version)?,
+                    (_, true) => writeln!(stdout, "{}  (active, session)", v.version)?,
+                    _ => writeln!(stdout, "{}", v.version)?,
                 };
             }
-            table.printstd();
+            stdout.flush()?;
         }
         Ok(())
     }

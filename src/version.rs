@@ -4,7 +4,6 @@ pub mod toolchain;
 
 use std::fs;
 use std::fs::DirEntry;
-use std::ops::Deref;
 use std::process::Command;
 use std::time::Duration;
 
@@ -49,6 +48,8 @@ pub struct Version {
     pub version: String,
     // active or not
     pub active: bool,
+    // session active or not.
+    pub session_active: bool,
 }
 
 impl Version {
@@ -162,33 +163,36 @@ impl Version {
         if !goup_home.exists() {
             return Ok(Vec::new());
         }
-
-        // may be current active not exist
-        let active = consts::go_version()
+        // may be active not exist
+        let active = goup_home.current().read_link().ok();
+        let session_active = consts::go_version()
             .map(|ver| goup_home.version(ver).to_path_buf())
-            .filter(|p| p.exists())
-            .or_else(|| goup_home.current().read_link().ok());
+            .filter(|p| p.exists());
+
         let dir: Result<Vec<DirEntry>, _> = goup_home.read_dir()?.collect();
         let mut version_dirs: Vec<_> = dir?
             .iter()
             .filter_map(|v| {
-                if !v.path().is_dir() {
-                    return None;
-                }
-                let ver = v.file_name();
-                let ver = ver.to_string_lossy();
-                if ver == "current"
-                    || ver != "gotip"
-                        && !goup_home.is_dot_unpacked_success_file_exists(ver.as_ref())
-                {
-                    return None;
-                }
-                Some(Version {
-                    version: ver.trim_start_matches("go").into(),
-                    active: active
-                        .as_ref()
-                        .is_some_and(|vv| vv == goup_home.version(ver.as_ref()).deref()),
-                })
+                v.path()
+                    .is_dir()
+                    .then(|| {
+                        let ver = v.file_name();
+                        let ver = ver.to_string_lossy();
+                        (ver.starts_with("go")
+                            && (ver == "gotip"
+                                || goup_home.is_dot_unpacked_success_file_exists(ver.as_ref())))
+                        .then(|| {
+                            let vvx = goup_home.version(ver.as_ref());
+                            Version {
+                                version: ver.trim_start_matches("go").into(),
+                                active: active.as_ref().is_some_and(|vv| vv == vvx.as_ref()),
+                                session_active: session_active
+                                    .as_ref()
+                                    .is_some_and(|vv| vv == vvx.as_ref()),
+                            }
+                        })
+                    })
+                    .flatten()
             })
             .collect();
         version_dirs.sort();
