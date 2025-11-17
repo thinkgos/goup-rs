@@ -89,9 +89,7 @@ $ goup install
 [2024-01-30T00:38:48Z INFO ] go1.21.10 installed in /home/thinkgo/.goup/go1.21.10
 [2024-01-30T00:38:48Z INFO ] Default Go is set to 'go1.21.10'
 $ goup list
-| ACTIVE  | VERSION |
-|---------|---------|
-|    *    | 1.21.10 |
+1.21.10  (active, default)
 $ go env GOROOT
 /home/thinkgo/.goup/current
 $ go version
@@ -123,15 +121,9 @@ $ goup search stable
 
 ```bash
 $ goup list 
-+--------+---------+
-| Active | Version |
-+--------+---------+
-|        | 1.21.10 |
-+--------+---------+
-|   *    | 1.22.3  |
-+--------+---------+
-|        | tip     |
-+--------+---------+
+1.21.10
+1.22.3  (active, default)
+tip
 ```
 
 ### Install specified version of Go
@@ -191,13 +183,8 @@ $ goup shell 1.21.10
 $ go version
 go version go1.21.10 linux/amd64
 $ goup list 
-+--------+---------+
-| Active | Version |
-+--------+---------+
-|        | 1.21.5 |
-+--------+---------+
-|   *    | 1.21.10  |
-+--------+---------+
+1.21.5
+1.21.10  (active, default)
 ```
 
 ### Manage cache archive files
