@@ -12,7 +12,7 @@ use clap::Args;
 use dialoguer::{Select, theme::ColorfulTheme};
 
 use crate::{
-    shell,
+    shell::ShellType,
     version::{Version, consts::GOUP_GO_VERSION, dir::Dir},
 };
 
@@ -23,6 +23,9 @@ use super::Run;
 pub struct Shell {
     /// target go version
     version: Option<String>,
+    /// custom shell type
+    #[arg(short, long)]
+    shell: Option<ShellType>,
 }
 
 impl Run for Shell {
@@ -58,7 +61,8 @@ impl Run for Shell {
             ));
         }
 
-        let shell = shell::get_shell(None).ok_or_else(|| anyhow!("Failed to get shell"))?;
+        let shell =
+            ShellType::get_or_current(self.shell).ok_or_else(|| anyhow!("Failed to get shell"))?;
         let env_separator = if cfg!(windows) { ";" } else { ":" };
 
         let go_root_path = goup_home.version(&go_version);

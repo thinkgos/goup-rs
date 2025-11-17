@@ -6,14 +6,6 @@ use std::{
     str::FromStr,
 };
 
-mod bash;
-mod elvish;
-mod fish;
-mod nushell;
-mod powershell;
-mod xonsh;
-mod zsh;
-
 pub static SHELL: LazyLock<Option<ShellType>> = LazyLock::new(|| {
     #[cfg(unix)]
     {
@@ -33,38 +25,27 @@ pub static SHELL: LazyLock<Option<ShellType>> = LazyLock::new(|| {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
 pub enum ShellType {
+    Sh,
     Bash,
     Elvish,
     Fish,
-    NuShell,
+    Nu,
     Xonsh,
     Zsh,
-    PowerShell,
+    Pwsh,
 }
 
-impl ShellType {
-    pub fn as_shell(&self) -> Box<dyn Shell> {
-        match self {
-            Self::Bash => Box::new(bash::Bash),
-            Self::Elvish => Box::new(elvish::Elvish),
-            Self::Fish => Box::new(fish::Fish),
-            Self::NuShell => Box::new(nushell::Nushell),
-            Self::Xonsh => Box::new(xonsh::Xonsh),
-            Self::Zsh => Box::new(zsh::Zsh),
-            Self::PowerShell => Box::new(powershell::PowerShell),
-        }
-    }
-}
 impl Display for ShellType {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::Sh => write!(f, "sh"),
             Self::Bash => write!(f, "bash"),
             Self::Elvish => write!(f, "elvish"),
             Self::Fish => write!(f, "fish"),
-            Self::NuShell => write!(f, "nu"),
+            Self::Nu => write!(f, "nu"),
             Self::Xonsh => write!(f, "xonsh"),
             Self::Zsh => write!(f, "zsh"),
-            Self::PowerShell => write!(f, "pwsh"),
+            Self::Pwsh => write!(f, "pwsh"),
         }
     }
 }
@@ -76,24 +57,21 @@ impl FromStr for ShellType {
         let s = s.to_lowercase();
         let s = s.rsplit_once('/').map(|(_, s)| s).unwrap_or(&s);
         match s {
-            "bash" | "sh" => Ok(Self::Bash),
+            "sh" => Ok(Self::Sh),
+            "bash" => Ok(Self::Bash),
             "elvish" => Ok(Self::Elvish),
             "fish" => Ok(Self::Fish),
-            "nu" => Ok(Self::NuShell),
+            "nu" => Ok(Self::Nu),
             "xonsh" => Ok(Self::Xonsh),
             "zsh" => Ok(Self::Zsh),
-            "pwsh" => Ok(Self::PowerShell),
+            "pwsh" => Ok(Self::Pwsh),
             _ => Err(format!("unsupported shell type: {s}")),
         }
     }
 }
 
-pub trait Shell: Display {
-    fn set_env(&self, k: &str, v: &str) -> String;
-    fn prepend_env(&self, k: &str, v: &str) -> String;
-    fn unset_env(&self, k: &str) -> String;
-}
-
-pub fn get_shell(shell: Option<ShellType>) -> Option<Box<dyn Shell>> {
-    shell.or(*SHELL).map(|st| st.as_shell())
+impl ShellType {
+    pub fn get_or_current(shell: Option<ShellType>) -> Option<ShellType> {
+        shell.or(*SHELL)
+    }
 }
