@@ -1,6 +1,6 @@
 [package]
 name = "goup-rs"
-version = "0.14.3"
+version = "0.15.0"
 authors = ["thinkgo <thinkgo@aliyun.com>"]
 edition = "2024"
 rust-version = "1.91"
@@ -54,9 +54,6 @@ tar = "0.4"
 zip = "6.0"
 dirs = "6.0"
 semver = "1.0"
-shell-escape="0.1" # shlex?
-itertools="0.14"
-indoc = "2"
 
 [target.'cfg(windows)'.dependencies]
 junction = "1.3"
