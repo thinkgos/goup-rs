@@ -25,6 +25,7 @@
 - List locally installed versions.
 - Switch between multiple installed versions.
 - Search available version of Go.
+- Using a specific Go version in a shell session(>= v0.15.x).
 - Manage locally cache files(such as `*.tar.gz`, `*.tar.gz.sha256`).
 - Upgrade `goup` itself.
 - Customize `GOUP_HOME`(default `$HOME/.goup`)(>= v0.11.x);
@@ -177,6 +178,28 @@ $ goup rm
 ✔ Select multiple version · 1.21.5
 ```
 
+### Using a specific Go version in a shell session
+
+`goup shell [VERSION]`, Using a specific Go version in a shell session, If no version is provided, a prompt will show to select a installed Go version.
+
+```bash
+$ goup shell 1.21.10
+? Select a version ›
+  1.21.5
+❯ 1.21.10
+  tip
+$ go version
+go version go1.21.10 linux/amd64
+$ goup list 
++--------+---------+
+| Active | Version |
++--------+---------+
+|        | 1.21.5 |
++--------+---------+
+|   *    | 1.21.10  |
++--------+---------+
+```
+
 ### Manage cache archive files
 
 ```bash
@@ -205,7 +228,11 @@ $ goup env
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
 | Key                       | Value                          | Explain                                                                         |
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
-| GOUP_GO_HOST              | https://golang.google.cn                 | Get upstream latest/all go version, use by 'install'/'search'                                |
+| GOUP_HOME                 | /home/thinkgo/.goup            | Get goup home directory, default: '$HOME/.goup'                                 |
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+| GOUP_GO_VERSION           | current                        | Shell session target go version, default: 'current'                             |
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+| GOUP_GO_HOST              | https://golang.google.cn       | Get upstream latest go version, use by 'install'/'search'                       |
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
 | GOUP_GO_DOWNLOAD_BASE_URL | https://dl.google.com/go       | Download go archive file base url, use by 'install'                             |
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
@@ -240,6 +267,7 @@ goup completion zsh > _goup
 - `goup self <COMMAND>` Modify the goup installation.
 - `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
 - `goup env` Show the specified goup environment variables and values.
+- `goup shell [VERSION]` Using a specific Go version in a shell session.
 
 ## Build feature flags
 
@@ -277,6 +305,9 @@ Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -vv <su
 
 - How to install specific version? Why cause `Error: expected comma after minor version number, found 'r'`?
   Sometimes, we know the exact version, we can use `goup install =1.24.5`, but some version do not comply with [`semver`](https://semver.org/), like `1.25rc1`, we can use `goup install unstable`, but this only install latest unstable version. so I add a `--use-raw-version` option(>= v0.12.x), we can install any version we exactly know. refer issue [#299](https://github.com/thinkgos/goup-rs/issues/299) [#307](https://github.com/thinkgos/goup-rs/pull/307)
+
+- How to use a specific Go version in a shell session?
+  `goup`(>= v0.15.x) support a specified Go version in a shell session. if you use `goup shell`, on `*nix` system, you need run `goup init` first, because the previous `env` file is too old and not contain `GOUP_GO_VERSION` environment variable. on `windows` system, only support `powershell`, maybe no need do anything, if you system's `COMSPEC` use `powershell`. refer issue [#360](https://github.com/thinkgos/goup-rs/issues/360).
 
 ## License
 

@@ -1,6 +1,7 @@
 use std::env;
 
 pub const GOUP_HOME: &str = "GOUP_HOME";
+pub const GOUP_GO_VERSION: &str = "GOUP_GO_VERSION";
 pub const GOUP_GO_HOST: &str = "GOUP_GO_HOST";
 pub const GOUP_GO_DOWNLOAD_BASE_URL: &str = "GOUP_GO_DOWNLOAD_BASE_URL";
 pub const GOUP_GO_SOURCE_GIT_URL: &str = "GOUP_GO_SOURCE_GIT_URL";
@@ -11,6 +12,10 @@ pub const GO_SOURCE_UPSTREAM_GIT_URL: &str = "https://go.googlesource.com/go";
 
 pub fn go_host() -> String {
     get_var_or_else(GOUP_GO_HOST, || GO_HOST.to_owned())
+}
+
+pub fn go_version() -> Option<String> {
+    env::var(GOUP_GO_VERSION).ok().filter(|s| !s.is_empty())
 }
 
 pub fn go_download_base_url() -> String {

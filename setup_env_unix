@@ -1,15 +1,16 @@
 #!/bin/sh
 
 GOUP_HOME=${GOUP_HOME:-$HOME/.goup}
+GOUP_GO_VERSION=${GOUP_GO_VERSION:-current}
 
 # goup shell setup
 # affix colons on either side of $PATH to simplify matching
 case ":${PATH}:" in
-    *:"$GOUP_HOME/current/bin":*) 
+    *:"$GOUP_HOME/$GOUP_GO_VERSION/bin":*) 
         ;;
     *)
         # Prepending path in case a system-installed go needs to be overridden
-        export GOROOT=$GOUP_HOME/current
+        export GOROOT=$GOUP_HOME/$GOUP_GO_VERSION
         export PATH=$PATH:$GOROOT/bin
         ;;
 esac
