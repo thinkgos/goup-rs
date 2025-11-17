@@ -14,6 +14,10 @@ pub fn go_host() -> String {
     get_var_or_else(GOUP_GO_HOST, || GO_HOST.to_owned())
 }
 
+pub fn go_version() -> Option<String> {
+    env::var(GOUP_GO_VERSION).ok().filter(|s| !s.is_empty())
+}
+
 pub fn go_download_base_url() -> String {
     get_var_or_else(GOUP_GO_DOWNLOAD_BASE_URL, || {
         GO_DOWNLOAD_BASE_URL.to_owned()

@@ -163,8 +163,11 @@ impl Version {
             return Ok(Vec::new());
         }
 
-        // may be current not exist
-        let current = goup_home.current().read_link().ok();
+        // may be current active not exist
+        let active = consts::go_version()
+            .map(|ver| goup_home.version(ver).to_path_buf())
+            .filter(|p| p.exists())
+            .or_else(|| goup_home.current().read_link().ok());
         let dir: Result<Vec<DirEntry>, _> = goup_home.read_dir()?.collect();
         let mut version_dirs: Vec<_> = dir?
             .iter()
@@ -182,7 +185,7 @@ impl Version {
                 }
                 Some(Version {
                     version: ver.trim_start_matches("go").into(),
-                    active: current
+                    active: active
                         .as_ref()
                         .is_some_and(|vv| vv == goup_home.version(ver.as_ref()).deref()),
                 })
