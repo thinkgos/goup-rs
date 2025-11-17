@@ -1,6 +1,7 @@
 use std::io::{self, Write};
 
 use clap::Args;
+use owo_colors::OwoColorize;
 use which::which;
 
 use super::Run;
@@ -25,12 +26,25 @@ impl Run for List {
             let mut stdout = io::stdout().lock();
             for v in vers {
                 match (v.default, v.session) {
-                    (true, true) => {
-                        writeln!(stdout, "{}   (active, default & session)", v.version)?
-                    }
-                    (true, _) => writeln!(stdout, "{}  (active, default)", v.version)?,
-                    (_, true) => writeln!(stdout, "{}  (active, session)", v.version)?,
-                    _ => writeln!(stdout, "{}", v.version)?,
+                    (true, true) => writeln!(
+                        stdout,
+                        "{:<10}{}",
+                        v.version.yellow(),
+                        "(active, default & session)".yellow()
+                    )?,
+                    (true, _) => writeln!(
+                        stdout,
+                        "{:<10}{}",
+                        v.version.yellow(),
+                        "(active, default)".yellow()
+                    )?,
+                    (_, true) => writeln!(
+                        stdout,
+                        "{:<10}{}",
+                        v.version.yellow().dimmed(),
+                        "(active, session)".yellow().dimmed()
+                    )?,
+                    _ => writeln!(stdout, "{:<10}", v.version)?,
                 };
             }
             stdout.flush()?;
