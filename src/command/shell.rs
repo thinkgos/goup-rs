@@ -43,7 +43,7 @@ impl Run for Shell {
             let mut pos = 0;
             for (i, v) in vers.iter().enumerate() {
                 items.push(v.version.as_ref());
-                if v.active {
+                if v.default {
                     pos = i;
                 }
             }

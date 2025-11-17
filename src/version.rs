@@ -46,10 +46,10 @@ struct GoRelease {
 pub struct Version {
     // Version: 1.21.1
     pub version: String,
-    // active or not
-    pub active: bool,
-    // session active or not.
-    pub session_active: bool,
+    // default or not
+    pub default: bool,
+    // session or not.
+    pub session: bool,
 }
 
 impl Version {
@@ -164,8 +164,8 @@ impl Version {
             return Ok(Vec::new());
         }
         // may be active not exist
-        let active = goup_home.current().read_link().ok();
-        let session_active = consts::go_version()
+        let default = goup_home.current().read_link().ok();
+        let session = consts::go_version()
             .map(|ver| goup_home.version(ver).to_path_buf())
             .filter(|p| p.exists());
 
@@ -185,10 +185,8 @@ impl Version {
                             let vvx = goup_home.version(ver.as_ref());
                             Version {
                                 version: ver.trim_start_matches("go").into(),
-                                active: active.as_ref().is_some_and(|vv| vv == vvx.as_ref()),
-                                session_active: session_active
-                                    .as_ref()
-                                    .is_some_and(|vv| vv == vvx.as_ref()),
+                                default: default.as_ref().is_some_and(|vv| vv == vvx.as_ref()),
+                                session: session.as_ref().is_some_and(|vv| vv == vvx.as_ref()),
                             }
                         })
                     })

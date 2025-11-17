@@ -24,7 +24,7 @@ impl Run for List {
         } else {
             let mut stdout = io::stdout().lock();
             for v in vers {
-                match (v.active, v.session_active) {
+                match (v.default, v.session) {
                     (true, true) => {
                         writeln!(stdout, "{}   (active, default & session)", v.version)?
                     }
