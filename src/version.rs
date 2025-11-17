@@ -164,8 +164,7 @@ impl Version {
         }
 
         // may be current not exist
-        let current = goup_home.current().read_link();
-        let current = current.as_ref();
+        let current = goup_home.current().read_link().ok();
         let dir: Result<Vec<DirEntry>, _> = goup_home.read_dir()?.collect();
         let mut version_dirs: Vec<_> = dir?
             .iter()
@@ -173,16 +172,19 @@ impl Version {
                 if !v.path().is_dir() {
                     return None;
                 }
-
-                let ver = v.file_name().to_string_lossy().to_string();
+                let ver = v.file_name();
+                let ver = ver.to_string_lossy();
                 if ver == "current"
-                    || ver != "gotip" && !goup_home.is_dot_unpacked_success_file_exists(&ver)
+                    || ver != "gotip"
+                        && !goup_home.is_dot_unpacked_success_file_exists(ver.as_ref())
                 {
                     return None;
                 }
                 Some(Version {
                     version: ver.trim_start_matches("go").into(),
-                    active: current.is_ok_and(|vv| vv == goup_home.version(ver).deref()),
+                    active: current
+                        .as_ref()
+                        .is_some_and(|vv| vv == goup_home.version(ver.as_ref()).deref()),
                 })
             })
             .collect();
@@ -195,7 +197,7 @@ impl Version {
         let version = Self::normalize(version);
         let goup_home = Dir::goup_home()?;
         let original = goup_home.version(&version);
-        if !original.exists() {
+        if !original.exists() || !goup_home.is_dot_unpacked_success_file_exists(&version) {
             return Err(anyhow!(
                 "Go version {version} is not installed. Install it with `goup install`."
             ));

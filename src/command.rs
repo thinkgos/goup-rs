@@ -9,6 +9,7 @@ mod oneself;
 mod remove;
 mod search;
 mod set;
+mod shell;
 
 use chrono::Local;
 use clap::{ArgAction, Args, CommandFactory};
@@ -127,6 +128,9 @@ enum Command {
     Oneself(Oneself),
     /// Manage cache archive files.
     Cache(Cache),
+    /// Open a shell session with the specified Go version.
+    /// If no version is provided, a prompt will show to select a installed Go version.
+    Shell(shell::Shell),
 }
 
 impl Run for Cli {
@@ -161,6 +165,7 @@ impl Run for Cli {
             Command::Env(cmd) => cmd.run(),
             Command::Cache(cmd) => cmd.run(),
             Command::Completion(c) => completion::print_completions(c.shell, &mut Self::command()),
+            Command::Shell(c) => c.run(),
         }
     }
 }

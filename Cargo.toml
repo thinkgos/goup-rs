@@ -54,6 +54,9 @@ tar = "0.4"
 zip = "6.0"
 dirs = "6.0"
 semver = "1.0"
+shell-escape="0.1" # shlex?
+itertools="0.14"
+indoc = "2"
 
 [target.'cfg(windows)'.dependencies]
 junction = "1.3"
