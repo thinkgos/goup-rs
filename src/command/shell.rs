@@ -93,7 +93,7 @@ impl Run for Shell {
             .collect::<Vec<_>>()
             .join(env_separator);
 
-        log::debug!("Enter new shell with go version: {}", go_version,);
+        log::info!("Enter new shell session with go version: {}", go_version,);
         let mut command = Command::new(shell.to_string());
         let command = command
             .stdin(Stdio::inherit())
