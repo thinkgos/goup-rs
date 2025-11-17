@@ -17,7 +17,7 @@ pub static SHELL: LazyLock<Option<ShellType>> = LazyLock::new(|| {
     #[cfg(windows)]
     {
         env::var("COMSPEC")
-            .unwrap_or_else(|_| "cmd.exe".into())
+            .unwrap_or_else(|_| "powershell".into())
             .parse()
             .ok()
     }
@@ -32,7 +32,7 @@ pub enum ShellType {
     Nu,
     Xonsh,
     Zsh,
-    Pwsh,
+    Powershell,
 }
 
 impl Display for ShellType {
@@ -45,7 +45,7 @@ impl Display for ShellType {
             Self::Nu => write!(f, "nu"),
             Self::Xonsh => write!(f, "xonsh"),
             Self::Zsh => write!(f, "zsh"),
-            Self::Pwsh => write!(f, "pwsh"),
+            Self::Powershell => write!(f, "powershell"),
         }
     }
 }
@@ -55,7 +55,11 @@ impl FromStr for ShellType {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let s = s.to_lowercase();
-        let s = s.rsplit_once('/').map(|(_, s)| s).unwrap_or(&s);
+        let s = s
+            .rsplit_once(['/', '\\'])
+            .map(|(_, s)| s.trim_end_matches(".exe"))
+            .unwrap_or(&s);
+
         match s {
             "sh" => Ok(Self::Sh),
             "bash" => Ok(Self::Bash),
@@ -64,7 +68,7 @@ impl FromStr for ShellType {
             "nu" => Ok(Self::Nu),
             "xonsh" => Ok(Self::Xonsh),
             "zsh" => Ok(Self::Zsh),
-            "pwsh" => Ok(Self::Pwsh),
+            "powershell" => Ok(Self::Powershell),
             _ => Err(format!("unsupported shell type: {s}")),
         }
     }
@@ -72,6 +76,7 @@ impl FromStr for ShellType {
 
 impl ShellType {
     pub fn get_or_current(shell: Option<ShellType>) -> Option<ShellType> {
+        log::debug!("current: {:?}", *SHELL);
         shell.or(*SHELL)
     }
 }
