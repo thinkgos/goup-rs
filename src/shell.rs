@@ -79,3 +79,38 @@ impl ShellType {
         shell.or(*SHELL)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::ShellType;
+
+    #[test]
+    fn test_parse() {
+        assert_eq!("sh".parse(), Ok(ShellType::Sh));
+        assert_eq!("bash".parse(), Ok(ShellType::Bash));
+        assert_eq!("elvish".parse(), Ok(ShellType::Elvish));
+        assert_eq!("fish".parse(), Ok(ShellType::Fish));
+        assert_eq!("nu".parse(), Ok(ShellType::Nu));
+        assert_eq!("xonsh".parse(), Ok(ShellType::Xonsh));
+        assert_eq!("zsh".parse(), Ok(ShellType::Zsh));
+        assert_eq!("powershell".parse(), Ok(ShellType::Powershell));
+
+        assert_eq!("/bin/zsh".parse(), Ok(ShellType::Zsh));
+        assert_eq!(
+            "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe".parse(),
+            Ok(ShellType::Powershell)
+        );
+    }
+
+    #[test]
+    fn test_display() {
+        assert_eq!(ShellType::Sh.to_string(), "sh");
+        assert_eq!(ShellType::Bash.to_string(), "bash");
+        assert_eq!(ShellType::Elvish.to_string(), "elvish");
+        assert_eq!(ShellType::Fish.to_string(), "fish");
+        assert_eq!(ShellType::Nu.to_string(), "nu");
+        assert_eq!(ShellType::Xonsh.to_string(), "xonsh");
+        assert_eq!(ShellType::Zsh.to_string(), "zsh");
+        assert_eq!(ShellType::Powershell.to_string(), "powershell");
+    }
+}
