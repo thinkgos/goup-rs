@@ -25,6 +25,7 @@
 - 支持列出本地已安装的版本.
 - 支持在多个已安装的版本中切换.
 - 支持搜索可用的Go版本.
+- 支持在shell会话中使用特定的Go版本(>= v0.15.x).
 - 支持管理本地缓存文件(如 `*.tar.gz`, `*.tar.gz.sha256`).
 - 支持`goup`自我更新.
 - 支持自定义`GOUP_HOME`(默认`$HOME/.goup`)(>= v0.11.x);
@@ -177,6 +178,28 @@ $ goup rm
 ✔ Select multiple version · 1.21.5
 ```
 
+### 使用特定的Go版本在shell会话中
+
+`goup shell [VERSION]`, 使用特定的Go版本在shell会话中, 如果没有提供版本, 将提示选择一个已安装的Go版本.
+
+```bash
+$ goup shell 1.21.10
+? Select a version ›
+  1.21.5
+❯ 1.21.10
+  tip
+$ go version
+go version go1.21.10 linux/amd64
+$ goup list 
++--------+---------+
+| Active | Version |
++--------+---------+
+|        | 1.21.5 |
++--------+---------+
+|   *    | 1.21.10  |
++--------+---------+
+```
+
 ### 管理缓存归档文件
 
 ```bash
@@ -205,7 +228,11 @@ $ goup env
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
 | Key                       | Value                          | Explain                                                                         |
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
-| GOUP_GO_HOST              | https://golang.google.cn                 | Get upstream latest/all go version, use by 'install'/'search'                                |
+| GOUP_HOME                 | /home/thinkgo/.goup            | Get goup home directory, default: '$HOME/.goup'                                 |
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+| GOUP_GO_VERSION           | current                        | Shell session target go version, default: 'current'                             |
++---------------------------+--------------------------------+---------------------------------------------------------------------------------+
+| GOUP_GO_HOST              | https://golang.google.cn       | Get upstream latest go version, use by 'install'/'search'                       |
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
 | GOUP_GO_DOWNLOAD_BASE_URL | https://dl.google.com/go       | Download go archive file base url, use by 'install'                             |
 +---------------------------+--------------------------------+---------------------------------------------------------------------------------+
@@ -240,6 +267,7 @@ goup completion zsh > _goup
 - `goup self <COMMAND>` 修改`goup`安装程序.
 - `goup init` 将所有必要的环境变量和值写入`$HOME/.goup/env`.
 - `goup env`  显示`goup`的环境变量和值.
+- `goup shell [VERSION]` 在shell会话中使用特定的Go版本.
 
 ## 构建功能标志
 
@@ -277,6 +305,9 @@ goup completion zsh > _goup
 
 - 如何安装特定版本? 为什么会出现错误`Error: expected comma after minor version number, found 'r'`?
   有时, 我们知道确切的版本, 可以使用 `goup install =1.24.5`, 但有些版本不符合[`semver`](https://semver.org/), 如 `1.25rc1`, 我们可以使用`goup install unstable`, 但这只能安装最新的不稳定版本. 所以我添加了一个 `--use-raw-version` 选项(>= v0.12.x), 这样我们就可以安装任何我们确切知道的版本. 请参阅issue [#299](https://github.com/thinkgos/goup-rs/issues/299) [#307](https://github.com/thinkgos/goup-rs/pull/307)
+
+- 如何在shell会话中使用特定的Go版本?
+  `goup`(>= v0.15.x) 支持在一个`shell`会话中指定go版本. 如果你使用`goup shell`, 在`*nix`系统上需要先运行`goup init`, 因为之前的`env`文件较旧且不包含`GOUP_GO_VERSION`环境变量. 在`Windows`系统 上, 仅支持`powershell`, 如果系统的`COMSPEC`已经指向 powershell, 可能无需做任何操作. 请参阅issue [#360](https://github.com/thinkgos/goup-rs/issues/360).
 
 ## 许可证
 

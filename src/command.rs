@@ -128,7 +128,7 @@ enum Command {
     Oneself(Oneself),
     /// Manage cache archive files.
     Cache(Cache),
-    /// Open a shell session with the specified Go version.
+    /// Using a specific Go version in a shell session.
     /// If no version is provided, a prompt will show to select a installed Go version.
     Shell(shell::Shell),
 }

@@ -76,7 +76,6 @@ impl FromStr for ShellType {
 
 impl ShellType {
     pub fn get_or_current(shell: Option<ShellType>) -> Option<ShellType> {
-        log::debug!("current: {:?}", *SHELL);
         shell.or(*SHELL)
     }
 }
