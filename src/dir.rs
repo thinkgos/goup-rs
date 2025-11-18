@@ -8,7 +8,7 @@ use std::{
 
 use anyhow::anyhow;
 
-use super::consts::GOUP_HOME;
+use crate::consts::GOUP_HOME;
 
 /// Dir `${path}/.goup` contain a `PathBuf`.
 #[derive(Debug, Clone, PartialEq)]

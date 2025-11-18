@@ -1,6 +1,10 @@
+mod archived;
 mod command;
-mod downloader;
+mod consts;
+mod dir;
+mod registry;
 mod shell;
+mod toolchain;
 mod version;
 
 pub use command::Cli;

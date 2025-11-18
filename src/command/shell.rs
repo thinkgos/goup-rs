@@ -11,10 +11,7 @@ use anyhow::anyhow;
 use clap::Args;
 use dialoguer::{Select, theme::ColorfulTheme};
 
-use crate::{
-    shell::ShellType,
-    version::{Version, consts::GOUP_GO_VERSION, dir::Dir},
-};
+use crate::{consts::GOUP_GO_VERSION, dir::Dir, shell::ShellType, toolchain, version::Version};
 
 use super::Run;
 
@@ -31,7 +28,7 @@ pub struct Shell {
 impl Run for Shell {
     fn run(&self) -> Result<(), anyhow::Error> {
         let go_version = if let Some(version) = &self.version {
-            Version::normalize(version)
+            toolchain::normalize(version)
         } else {
             let vers = Version::list_go_version()?;
             if vers.is_empty() {
@@ -52,7 +49,7 @@ impl Run for Shell {
                 .items(&items)
                 .default(pos)
                 .interact()?;
-            Version::normalize(items[selection])
+            toolchain::normalize(items[selection])
         };
         let goup_home = Dir::goup_home()?;
         if !goup_home.is_dot_unpacked_success_file_exists(&go_version) {

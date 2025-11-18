@@ -4,7 +4,7 @@ use std::{fs::File, io, path::Path};
 use anyhow::anyhow;
 use zip::ZipArchive;
 
-use super::archived::Unpacker;
+use super::Unpacker;
 
 /// archive *.zip
 pub(crate) struct Zip;

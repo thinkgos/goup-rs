@@ -1,9 +1,12 @@
+mod tgz;
+mod zip;
+
 use std::{path::Path, str::FromStr};
 
 use anyhow::anyhow;
 
-use super::tgz::Tgz;
-use super::zip::Zip;
+use self::tgz::Tgz;
+use self::zip::Zip;
 
 /// unpack format,
 /// such as zip,tar.gz.
