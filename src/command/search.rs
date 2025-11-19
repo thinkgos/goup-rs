@@ -8,7 +8,7 @@ pub struct Search {
     /// a filter, such as 'stable', "unstable", 'beta' or any regex string(1.22.*).
     filter: Option<String>,
     /// registry index that is used to update Go version index.
-    #[arg(long, default_value_t = consts::GO_REGISTRY_INDEX.to_owned(), env = consts::GOUP_GO_REGISTRY_INDEX)]
+    #[arg(long, default_value_t = consts::GO_REGISTRY_INDEX.to_owned(), env = consts::GO_REGISTRY_INDEX)]
     registry_index: String,
 }
 

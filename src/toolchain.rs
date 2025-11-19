@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use anyhow::Result;
-use semver::Version as SemVersion;
+use semver::Version;
 
 /// support toolchain
 #[derive(Debug, Eq, Hash, PartialEq)]
@@ -69,7 +69,7 @@ pub fn normalize(ver: &str) -> String {
 /// 1.21-rc2    -> 1.21.0-rc2
 /// 1.21.1-rc2  -> 1.21.1-rc2
 /// 1.21.1      -> 1.21.1
-pub fn semantic(ver: &str) -> Result<SemVersion> {
+pub fn semantic(ver: &str) -> Result<Version> {
     let count_dot = |name: &str| name.chars().filter(|&v| v == '.').count();
     let name = ver
         .find("alpha")
@@ -90,7 +90,7 @@ pub fn semantic(ver: &str) -> Result<SemVersion> {
                 }
             },
         );
-    Ok(SemVersion::parse(&name)?)
+    Ok(Version::parse(&name)?)
 }
 
 #[cfg(test)]
@@ -107,33 +107,30 @@ mod tests {
 
     #[test]
     fn test_semantic() {
-        assert_eq!(
-            semantic("1").unwrap(),
-            "1.0.0".parse::<SemVersion>().unwrap(),
-        );
+        assert_eq!(semantic("1").unwrap(), "1.0.0".parse::<Version>().unwrap(),);
         assert_eq!(
             semantic("1.21").unwrap(),
-            "1.21.0".parse::<SemVersion>().unwrap(),
+            "1.21.0".parse::<Version>().unwrap(),
         );
         assert_eq!(
             semantic("1.21rc2").unwrap(),
-            "1.21.0-rc2".parse::<SemVersion>().unwrap(),
+            "1.21.0-rc2".parse::<Version>().unwrap(),
         );
         assert_eq!(
             semantic("1.21.1rc2").unwrap(),
-            "1.21.1-rc2".parse::<SemVersion>().unwrap(),
+            "1.21.1-rc2".parse::<Version>().unwrap(),
         );
         assert_eq!(
             semantic("1.21-rc2").unwrap(),
-            "1.21.0-rc2".parse::<SemVersion>().unwrap(),
+            "1.21.0-rc2".parse::<Version>().unwrap(),
         );
         assert_eq!(
             semantic("1.21.1-rc2").unwrap(),
-            "1.21.1-rc2".parse::<SemVersion>().unwrap(),
+            "1.21.1-rc2".parse::<Version>().unwrap(),
         );
         assert_eq!(
             semantic("1.21.1").unwrap(),
-            "1.21.1".parse::<SemVersion>().unwrap(),
+            "1.21.1".parse::<Version>().unwrap(),
         );
     }
 

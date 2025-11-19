@@ -103,6 +103,10 @@ impl Dir {
         File::create(&dot_unpacked_success_file)?;
         Ok(())
     }
+    /// Extends `self` with `index-go.json`
+    pub fn index_go(&self) -> Self {
+        self.join_path("index-go.json")
+    }
 }
 
 impl AsRef<Path> for Dir {
