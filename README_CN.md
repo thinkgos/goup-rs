@@ -25,11 +25,11 @@
 - 支持列出本地已安装的版本.
 - 支持在多个已安装的版本中切换.
 - 支持搜索可用的Go版本.
-- 支持在shell会话中使用特定的Go版本(>= v0.15.x).
+- ✨支持在shell会话中使用特定的Go版本(>= v0.15.x).
+- ✨支持多个下载后端`GOUP_GO_REGISTRY_INDEX`/`GOUP_GO_REGISTRY`(>=v0.16.x).
 - 支持管理本地缓存文件(如 `*.tar.gz`, `*.tar.gz.sha256`).
 - 支持`goup`自我更新.
 - 支持自定义`GOUP_HOME`(默认`$HOME/.goup`)(>= v0.11.x);
-- 支持多个下载后端`GOUP_GO_REGISTRY_INDEX`/`GOUP_GO_REGISTRY`(>=v0.16.x).
 - 友好的提示.
 - 应该很快.
 
