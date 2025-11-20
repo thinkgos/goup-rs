@@ -149,13 +149,19 @@ impl Shell {
                 ));
             }
             let mut items = Vec::new();
-            let mut pos = 0;
+
+            let mut session_pos = None;
+            let mut default_pos = None;
             for (i, v) in local_versions.iter().enumerate() {
                 items.push(&v.version);
+                if v.session {
+                    session_pos = Some(i);
+                }
                 if v.default {
-                    pos = i;
+                    default_pos = Some(i);
                 }
             }
+            let pos = session_pos.unwrap_or(default_pos.unwrap_or(0));
             let selection = Select::with_theme(&ColorfulTheme::default())
                 .with_prompt("Select a version")
                 .items(&items)
