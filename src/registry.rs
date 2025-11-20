@@ -190,9 +190,9 @@ impl RegistryIndex {
             .ok_or_else(|| anyhow!("Getting latest Go version failed"))
             .map(|v| v.to_owned())
     }
-    pub fn match_version_req(&self, ver_pattern: &str) -> Result<String, anyhow::Error> {
-        log::debug!("version request pattern: {ver_pattern}");
-        let ver_req = VersionReq::parse(ver_pattern)?;
+    pub fn match_version_req(&self, version_req: &str) -> Result<String, anyhow::Error> {
+        log::debug!("version request: {version_req}");
+        let ver_req = VersionReq::parse(version_req)?;
         let index_go = LocalGoIndex::read();
         let search_type = index_go.map_or(Ok(SearchType::Upstream), |v| v.try_search(&ver_req))?;
         if let SearchType::Local(ver) = search_type {

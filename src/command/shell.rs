@@ -2,7 +2,7 @@
 use std::os::unix::process::CommandExt;
 
 use std::{
-    env,
+    env, fs,
     path::Path,
     process::{Command, Stdio},
 };
@@ -12,8 +12,13 @@ use clap::Args;
 use dialoguer::{Select, theme::ColorfulTheme};
 
 use crate::{
-    command::utils::InstallOptions, consts::GOUP_GO_VERSION, dir::Dir, registry::Registry,
-    shell::ShellType, toolchain, version::Version,
+    command::utils::InstallOptions,
+    consts::GOUP_GO_VERSION,
+    dir::Dir,
+    registry::{Registry, RegistryIndex},
+    shell::ShellType,
+    toolchain,
+    version::Version,
 };
 
 use super::Run;
@@ -32,7 +37,33 @@ pub struct Shell {
 
 impl Run for Shell {
     fn run(&self) -> Result<(), anyhow::Error> {
-        let go_version = self.get_target_version()?;
+        let local_versions = Version::list_go_version()?;
+        let go_version = self.get_target_version(&local_versions)?;
+
+        let mut current_shell_version = None;
+        let mut current_default_version = None;
+        for v in local_versions.iter() {
+            if v.session {
+                current_shell_version = Some(&v.version);
+            }
+            if v.default {
+                current_default_version = Some(&v.version);
+            }
+        }
+
+        if current_shell_version == Some(&go_version)
+            || current_shell_version.is_none() && current_default_version == Some(&go_version)
+        {
+            // 如果当前会话和目标一样, 则不切换
+            // 不在会话当中, 如果默认和目标一样, 则不切换
+            log::info!(
+                "Current environment already uses Go {go_version}, skip enter new shell session.",
+            );
+
+            return Ok(());
+        }
+
+        let go_version = toolchain::normalize(&go_version);
         let goup_home = Dir::goup_home()?;
         if !goup_home.is_dot_unpacked_success_file_exists(&go_version) {
             return Err(anyhow!(
@@ -72,7 +103,7 @@ impl Run for Shell {
             .collect::<Vec<_>>()
             .join(env_separator);
 
-        log::info!("Enter new shell session with go version: {}", go_version,);
+        log::info!("Enter new shell session with Go {go_version}");
         let mut command = Command::new(shell.to_string());
         let command = command
             .stdin(Stdio::inherit())
@@ -98,10 +129,9 @@ impl Run for Shell {
 }
 
 impl Shell {
-    fn get_target_version(&self) -> Result<String, anyhow::Error> {
-        let versions = Version::list_go_version()?;
+    fn get_target_version(&self, local_versions: &[Version]) -> Result<String, anyhow::Error> {
         let target_version = if let Some(version) = &self.version {
-            if !versions.iter().any(|v| v.version == *version) {
+            if !local_versions.iter().any(|v| v.version == *version) {
                 let registry = Registry::new(
                     &self.install_options.registry,
                     self.install_options.skip_verify,
@@ -109,16 +139,18 @@ impl Shell {
                 );
                 registry.install_go(&toolchain::normalize(version))?
             }
-            version
+            version.to_owned()
+        } else if let Some(ver) = self.get_mod_file_version(local_versions) {
+            ver
         } else {
-            if versions.is_empty() {
+            if local_versions.is_empty() {
                 return Err(anyhow!(
                     "Not any go is installed, Install it with `goup install`."
                 ));
             }
             let mut items = Vec::new();
             let mut pos = 0;
-            for (i, v) in versions.iter().enumerate() {
+            for (i, v) in local_versions.iter().enumerate() {
                 items.push(&v.version);
                 if v.default {
                     pos = i;
@@ -129,8 +161,66 @@ impl Shell {
                 .items(&items)
                 .default(pos)
                 .interact()?;
-            items[selection]
+            items[selection].to_owned()
         };
-        Ok(toolchain::normalize(target_version))
+
+        Ok(target_version)
+    }
+
+    fn get_mod_file_version(&self, local_versions: &[Version]) -> Option<String> {
+        let current_dir = env::current_dir().ok()?;
+        let mod_go_version = ["go.work", "go.mod"]
+            .into_iter()
+            .find_map(|filename| Self::parse_go_mod_or_work_file(current_dir.join(filename)))?;
+
+        let version_req = match mod_go_version.chars().filter(|&v| v == '.').count() {
+            0 | 1 => format!("~{mod_go_version}"),
+            _ => format!("={mod_go_version}"),
+        };
+        let version = RegistryIndex::new(&self.install_options.registry_index)
+            .match_version_req(&version_req)
+            .ok()?;
+        if !local_versions.iter().any(|v| v.version == version) {
+            let registry = Registry::new(
+                &self.install_options.registry,
+                self.install_options.skip_verify,
+                self.install_options.enable_check_archive_size,
+            );
+            registry.install_go(&toolchain::normalize(&version)).ok();
+        }
+        Some(version)
+    }
+    fn parse_go_mod_or_work_file(path: impl AsRef<Path>) -> Option<String> {
+        if !path.as_ref().exists() {
+            return None;
+        }
+        let mut target = None;
+        let content = fs::read_to_string(path).ok()?;
+        for line in content.lines() {
+            let line = line.trim();
+            if line.starts_with("//") || line.is_empty() {
+                continue;
+            }
+            // https://go.dev/ref/mod#go-mod-file-go
+            // go directive
+            if let Some(rest) = line.strip_prefix("go ") {
+                // go 1.22
+                let v = rest.trim().to_string();
+                target = Some(v);
+                continue;
+            }
+            // https://go.dev/ref/mod#go-mod-file-toolchain
+            // toolchain directive
+            if let Some(rest) = line.strip_prefix("toolchain ") {
+                // toolchain go1.22.3
+                let rest = rest.trim().trim_start_matches("go").to_string();
+                if rest.is_empty() {
+                    continue;
+                }
+                target = Some(rest);
+                continue;
+            }
+        }
+        target
     }
 }
