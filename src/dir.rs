@@ -8,7 +8,7 @@ use std::{
 
 use anyhow::anyhow;
 
-use super::consts::GOUP_HOME;
+use crate::consts::GOUP_HOME;
 
 /// Dir `${path}/.goup` contain a `PathBuf`.
 #[derive(Debug, Clone, PartialEq)]
@@ -102,6 +102,10 @@ impl Dir {
         }
         File::create(&dot_unpacked_success_file)?;
         Ok(())
+    }
+    /// Extends `self` with `index-go.json`
+    pub fn index_go(&self) -> Self {
+        self.join_path("index-go.json")
     }
 }
 

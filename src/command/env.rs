@@ -2,7 +2,7 @@ use clap::Args;
 use prettytable::{Table, row};
 
 use super::Run;
-use crate::version::{consts, dir::Dir};
+use crate::{consts, dir::Dir};
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Env;
@@ -19,28 +19,28 @@ impl Run for Env {
         ]);
         table.add_row(row![
             consts::GOUP_GO_VERSION,
-            "current",
+            consts::go_version().unwrap_or("current".to_owned()),
             "Shell session target go version, default: 'current'",
         ]);
         table.add_row(row![
-            consts::GOUP_GO_HOST,
-            consts::go_host(),
-            "Get upstream latest go version, use by 'install'/'search'",
+            consts::GOUP_GO_REGISTRY_INDEX,
+            consts::go_registry_index(),
+            "Registry index of go version",
         ]);
         table.add_row(row![
-            consts::GOUP_GO_DOWNLOAD_BASE_URL,
-            consts::go_download_base_url(),
-            "Download go archive file base url, use by 'install'",
+            consts::GOUP_GO_REGISTRY,
+            consts::go_registry(),
+            "Registry of go archive file",
         ]);
         table.add_row(row![
             consts::GOUP_GO_SOURCE_GIT_URL,
             consts::go_source_git_url(),
-            "Upstream source git url and get upstream go versions, use by 'install'/'search'",
+            "Source git url, use by tip|nightly or index of go version",
         ]);
         table.add_row(row![
             consts::GOUP_GO_SOURCE_GIT_URL,
             consts::go_source_upstream_git_url(),
-            "Upstream source git url, use by 'install' the gotip",
+            "Source upstream git url, use by tip|nightly",
         ]);
         table.printstd();
         Ok(())

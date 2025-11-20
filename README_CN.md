@@ -94,7 +94,7 @@ $ go env GOROOT
 /home/thinkgo/.goup/current
 $ go version
 go version go1.21.10 linux/amd64
-$ GOUP_GO_HOST=https://golang.google.cn goup install =1.21.10
+$ GOUP_GO_REGISTRY_INDEX=https://golang.google.cn goup install =1.21.10
 ```
 
 ## 使用方法
@@ -213,21 +213,21 @@ Checking latest released version... v0.9.0
 
 ```bash
 $ goup env
-+---------------------------+--------------------------------+---------------------------------------------------------------------------------+
-| Key                       | Value                          | Explain                                                                         |
-+---------------------------+--------------------------------+---------------------------------------------------------------------------------+
-| GOUP_HOME                 | /home/thinkgo/.goup            | Get goup home directory, default: '$HOME/.goup'                                 |
-+---------------------------+--------------------------------+---------------------------------------------------------------------------------+
-| GOUP_GO_VERSION           | current                        | Shell session target go version, default: 'current'                             |
-+---------------------------+--------------------------------+---------------------------------------------------------------------------------+
-| GOUP_GO_HOST              | https://golang.google.cn       | Get upstream latest go version, use by 'install'/'search'                       |
-+---------------------------+--------------------------------+---------------------------------------------------------------------------------+
-| GOUP_GO_DOWNLOAD_BASE_URL | https://dl.google.com/go       | Download go archive file base url, use by 'install'                             |
-+---------------------------+--------------------------------+---------------------------------------------------------------------------------+
-| GOUP_GO_SOURCE_GIT_URL    | https://github.com/golang/go   | Upstream source git url and get upstream go versions, use by 'install'/'search' |
-+---------------------------+--------------------------------+---------------------------------------------------------------------------------+
-| GOUP_GO_SOURCE_GIT_URL    | https://go.googlesource.com/go | Upstream source git url, use by 'install' the gotip                             |
-+---------------------------+--------------------------------+---------------------------------------------------------------------------------+
++------------------------+--------------------------------+-----------------------------------------------------------+
+| Key                    | Value                          | Explain                                                   |
++------------------------+--------------------------------+-----------------------------------------------------------+
+| GOUP_HOME              | /home/thinkgo/.goup            | Get goup home directory, default: '$HOME/.goup'           |
++------------------------+--------------------------------+-----------------------------------------------------------+
+| GOUP_GO_VERSION        | current                        | Shell session target go version, default: 'current'       |
++------------------------+--------------------------------+-----------------------------------------------------------+
+| GOUP_GO_REGISTRY_INDEX | https://golang.google.cn       | Registry index of go version                              |
++------------------------+--------------------------------+-----------------------------------------------------------+
+| GOUP_GO_REGISTRY       | https://dl.google.com/go       | Registry of go archive file                               |
++------------------------+--------------------------------+-----------------------------------------------------------+
+| GOUP_GO_SOURCE_GIT_URL | https://github.com/golang/go   | Source git url, use by tip|nightly or index of go version |
++------------------------+--------------------------------+-----------------------------------------------------------+
+| GOUP_GO_SOURCE_GIT_URL | https://go.googlesource.com/go | Source upstream git url, use by tip|nightly               |
++------------------------+--------------------------------+-----------------------------------------------------------+
 ```
 
 ### Shell补全
@@ -241,6 +241,34 @@ goup completion zsh > _goup
 ### 更多信息
 
 执行`goup -h`获取更多信息
+
+## 镜像站
+
+### 索引镜像站
+
+- 官方1(默认): https://golang.google.cn
+- 官方2: https://go.dev
+
+### 仓库镜像站
+
+| 仓库 | 地址 | 支持SHA256文件 | 支持HTTP获取压缩包长度 |
+|---|---|---|---|---|
+| 官方1 | https://dl.google.com/go | ✅ | ✅ |
+| 官方2 | https://go.dev/dl | ❌ | ✅ |
+| 官方3 | https://golang.org/dl | ❌ | ✅ |
+| 阿里云 | https://mirrors.aliyun.com/golang | ❌ | ❌ |
+| 南京大学 | https://mirrors.nju.edu.cn/golang | ✅ | ✅ |
+| 华中科技大学 | https://mirrors.hust.edu.cn/golang | ✅ | ✅ |
+| 中国科学技术大学 | https://mirrors.ustc.edu.cn/golang | ✅ | ✅ |
+
+***NOTE***: 镜像站不提供**SHA256校验文件**, 在下载时需要使用`--skip-verify`选项.
+
+### 设置镜像站环境变量
+
+```shell
+export GOUP_GO_REGISTRY_INDEX=https://golang.google.cn
+export GOUP_GO_REGISTRY=https://mirrors.aliyun.com/golang
+```
 
 ## 工作原理
 

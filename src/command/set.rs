@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use clap::Args;
 use dialoguer::{Select, theme::ColorfulTheme};
 
-use crate::version::Version;
+use crate::{command::utils::InstallOptions, registry::Registry, toolchain, version::Version};
 
 use super::Run;
 
@@ -11,24 +11,33 @@ use super::Run;
 pub struct Set {
     /// target go version
     version: Option<String>,
+    #[command(flatten)]
+    install_options: InstallOptions,
 }
 
 impl Run for Set {
     fn run(&self) -> Result<(), anyhow::Error> {
-        if let Some(version) = &self.version {
-            Version::set_go_version(version)
+        let versions = Version::list_go_version()?;
+        let target_version = if let Some(version) = &self.version {
+            if !versions.iter().any(|v| v.version == *version) {
+                let registry = Registry::new(
+                    &self.install_options.registry,
+                    self.install_options.skip_verify,
+                    self.install_options.enable_check_archive_size,
+                );
+                registry.install_go(&toolchain::normalize(version))?
+            }
+            version
         } else {
-            let vers = Version::list_go_version()?;
-            if vers.is_empty() {
+            if versions.is_empty() {
                 return Err(anyhow!(
                     "Not any go is installed, Install it with `goup install`."
                 ));
             }
-
             let mut items = Vec::new();
             let mut pos = 0;
-            for (i, v) in vers.iter().enumerate() {
-                items.push(v.version.as_ref());
+            for (i, v) in versions.iter().enumerate() {
+                items.push(&v.version);
                 if v.default {
                     pos = i;
                 }
@@ -38,7 +47,8 @@ impl Run for Set {
                 .items(&items)
                 .default(pos)
                 .interact()?;
-            Version::set_go_version(items[selection])
-        }
+            items[selection]
+        };
+        Version::set_go_version(target_version)
     }
 }

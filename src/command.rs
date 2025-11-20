@@ -10,6 +10,7 @@ mod remove;
 mod search;
 mod set;
 mod shell;
+mod utils;
 
 use chrono::Local;
 use clap::{ArgAction, Args, CommandFactory};
