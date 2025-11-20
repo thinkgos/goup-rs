@@ -256,7 +256,7 @@ goup completion zsh > _goup
 | Official 2 | https://go.dev/dl | ❌ | ✅ |
 | Official 3 | https://golang.org/dl | ❌ | ✅ |
 | Aliyun | https://mirrors.aliyun.com/golang | ❌ | ❌ |
-| Nanjing University | https://mirrors.nju.edu.cn/golang | 🔘 | 🔘 |
+| Nanjing University | https://mirrors.nju.edu.cn/golang | ✅ | ✅ |
 | Huazhong University of Science and Technology | https://mirrors.hust.edu.cn/golang | ✅ | ✅ |
 | University of Science and Technology of China | https://mirrors.ustc.edu.cn/golang | ✅ | ✅ |
 

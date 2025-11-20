@@ -14,9 +14,10 @@ use std::{
 use anyhow::anyhow;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use regex::Regex;
+use reqwest::StatusCode;
 use reqwest::blocking::{self, Client};
 use reqwest::header::CONTENT_LENGTH;
-use semver::{Op, Version, VersionReq};
+use semver::{Version, VersionReq};
 use serde::Deserialize;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
@@ -46,16 +47,23 @@ struct GoRelease {
     pub stable: bool,
     // pub files: Vec<GoFile>,
 }
+
+#[derive(Debug)]
+enum SearchType {
+    Upstream,
+    Local(String),
+}
+
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CacheGoVersion {
+pub struct LocalGoIndex {
     pub versions: Vec<String>, // 已发布go版本列表
     pub latest: String,        // 最新稳定版本
-    pub second_latest: String, // 次新稳定版本
+    pub secondary: String,     // 次新稳定版本
     pub sha256: String,        // 版本列表的sha256
 }
 
-impl CacheGoVersion {
-    fn read() -> Option<CacheGoVersion> {
+impl LocalGoIndex {
+    fn read() -> Option<LocalGoIndex> {
         let goup_home = Dir::goup_home().ok()?;
         let index_go = goup_home.index_go();
         if index_go.exists() {
@@ -69,7 +77,7 @@ impl CacheGoVersion {
         let index_go = Dir::goup_home()?.index_go();
         if index_go.exists()
             && let Ok(file) = File::open(&index_go)
-            && let Ok(old) = serde_json::from_reader::<_, CacheGoVersion>(file)
+            && let Ok(old) = serde_json::from_reader::<_, LocalGoIndex>(file)
             && old.sha256 == self.sha256
         {
             return Ok(());
@@ -78,124 +86,50 @@ impl CacheGoVersion {
         serde_json::to_writer(file, self)?;
         Ok(())
     }
-    /// is_match_archived 是否版本请求匹配归档版本.
-    fn is_match_archived(&self, ver_req: &VersionReq) -> Result<bool, anyhow::Error> {
+    fn try_search(&self, ver_req: &VersionReq) -> Result<SearchType, anyhow::Error> {
+        if self.versions.is_empty() || self.latest.is_empty() || self.secondary.is_empty() {
+            return Ok(SearchType::Upstream);
+        }
+        if ver_req.comparators.len() != 1 {
+            // 先匹配本地版本
+            let ver = self.versions.iter().rev().find_map(|v| {
+                toolchain::semantic(v)
+                    .ok()
+                    .filter(|semver| ver_req.matches(semver))
+                    .map(|_| v)
+            });
+            let search_type = if let Some(ver) = ver
+                && (ver != &self.latest || ver != &self.secondary)
+            {
+                SearchType::Local(ver.to_owned())
+            } else {
+                SearchType::Upstream
+            };
+            return Ok(search_type);
+        }
+
         let latest = Version::parse(&self.latest)?;
-        let second_latest = Version::parse(&self.second_latest)?;
-        if self.versions.is_empty() || ver_req.comparators.len() != 1 {
-            return Ok(false);
+        let secondary = Version::parse(&self.secondary)?;
+        let is_match_archived = toolchain::is_match_archived(&latest, &secondary, ver_req);
+        if is_match_archived {
+            self.versions
+                .iter()
+                .rev()
+                .find_map(|v| {
+                    toolchain::semantic(v)
+                        .ok()
+                        .filter(|semver| ver_req.matches(semver))
+                        .map(|_| v)
+                })
+                .map(|v| SearchType::Local(v.to_owned()))
+                .ok_or_else(|| anyhow!("no matching version found!"))
+        } else {
+            Ok(SearchType::Upstream)
         }
-        let comp = ver_req.comparators.first().unwrap();
-        if !comp.pre.is_empty() {
-            return Ok(false);
-        }
-        let major = comp.major;
-        let search_local = match comp.op {
-            // = 精确匹配
-            //  =1.24.1 精确匹配
-            //  =1.24 匹配1.24.*
-            //  =1 匹配1.*.*
-            Op::Exact => match (comp.minor, comp.patch) {
-                // =1.24.1
-                (Some(minor), Some(patch)) => {
-                    // 主版本号 < 次新版本号
-                    // 主版本号 == 次新版本号 且 (次版号比次新版本的小 或则 次版本号一致, 修订版版本 < 次修订版本号)
-                    // 主版本号 == 最新版本号 且 次版号 == 最新版本号 且 修订版版本 <= 最新版本号
-                    major < second_latest.major
-                        || (major == second_latest.major
-                            && (minor < second_latest.minor
-                                || (minor == second_latest.minor && patch <= second_latest.patch)))
-                        || (major == latest.major && minor == latest.minor && patch <= latest.patch)
-                }
-                // =1.24
-                (Some(minor), None) => {
-                    major < second_latest.major
-                        || (major == second_latest.major && minor < second_latest.minor)
-                }
-                (None, None) => major < second_latest.major,
-                _ => false,
-            },
-            // ~ 不改变主次版本的最新版本
-            //  ~1.24.1 匹配1.24.*
-            //  ~1.24   匹配1.24.*
-            //  ~1      匹配1.*.*
-            Op::Tilde => {
-                if let Some(minor) = comp.minor {
-                    major < second_latest.major
-                        || (major == second_latest.major && minor < second_latest.minor)
-                } else {
-                    major < second_latest.major
-                }
-            }
-            // <= 小于等于
-            //  <=1.24.1 匹配 <=1.24.1
-            //  <=1.24   匹配 1.24.*
-            //  <=1      匹配 1.*.*
-            Op::LessEq => match (comp.minor, comp.patch) {
-                // <=1.24.1
-                (Some(minor), Some(patch)) => {
-                    // 主版本号 < 次新版本号
-                    // 主版本号 == 次新版本号 且 (次版号比次新版本的小 或则 次版本号一致, 修订版版本 < 次修订版本号)
-                    // 主版本号 == 最新版本号 且 次版号 == 最新版本号 且 修订版版本 <= 最新版本号
-                    major < second_latest.major
-                        || (major == second_latest.major
-                            && (minor < second_latest.minor
-                                || (minor == second_latest.minor && patch <= second_latest.patch)))
-                        || (major == latest.major && minor == latest.minor && patch <= latest.patch)
-                }
-                // <=1.24
-                (Some(minor), None) => {
-                    major < second_latest.major
-                        || (major == second_latest.major && minor < second_latest.minor)
-                }
-                (None, None) => major < second_latest.major,
-                _ => false,
-            },
-            // < 小于
-            //  <1.24.1 匹配 <1.24.1
-            //  <1.24   匹配 <1.24.0即(1.23.*)
-            //  <1      匹配 <1.0.0即(0.*.*)
-            Op::Less => match (comp.minor, comp.patch) {
-                (Some(minor), Some(patch)) => {
-                    major < second_latest.major
-                        || (major == second_latest.major
-                            && (minor < second_latest.minor
-                                || (minor == second_latest.minor
-                                    && (patch - 1) <= second_latest.patch)))
-                        || (major == latest.major
-                            && minor == latest.minor
-                            && (patch - 1) <= latest.patch)
-                }
-                (Some(minor), None) => {
-                    major < second_latest.major
-                        || (major == second_latest.major && minor - 1 < second_latest.minor)
-                }
-                (None, None) => major - 1 < second_latest.major,
-                _ => false,
-            },
-            // * 通配符
-            //  1.24.* 匹配 1.24.*
-            //  1.*    匹配 1.*.*
-            //  *      匹配 最新版本
-            Op::Wildcard => {
-                if let Some(minor) = comp.minor {
-                    major < second_latest.major
-                        || (major == second_latest.major && minor < second_latest.minor)
-                } else {
-                    major < second_latest.major
-                }
-            }
-            // ^ 不改变主版本的最新版本
-            //  ^1.24.1, ^1.24, ^1 均匹配 1.*.*
-            //  1.24.1, 1.24, 1 均匹配 1.*.*
-            Op::Caret => comp.major < second_latest.major,
-            _ => false, // Op::Greater | Op::GreaterEq
-        };
-        Ok(search_local)
     }
 }
 
-impl From<Vec<String>> for CacheGoVersion {
+impl From<Vec<String>> for LocalGoIndex {
     fn from(versions: Vec<String>) -> Self {
         let mut context = Sha256::new();
         // major.minor -> 最新稳定版本
@@ -216,7 +150,7 @@ impl From<Vec<String>> for CacheGoVersion {
                     .or_insert((ver, v));
             }
         }
-        let (latest, second_latest) = {
+        let (latest, secondary) = {
             let mut iter = latest_stable.values().rev().take(2).map(|v| v.1);
             let latest = iter.next().unwrap_or_default();
             let second_latest = iter.next().unwrap_or(latest);
@@ -226,7 +160,7 @@ impl From<Vec<String>> for CacheGoVersion {
         Self {
             versions,
             latest,
-            second_latest,
+            secondary,
             sha256,
         }
     }
@@ -259,24 +193,25 @@ impl RegistryIndex {
     pub fn match_version_req(&self, ver_pattern: &str) -> Result<String, anyhow::Error> {
         log::debug!("version request pattern: {ver_pattern}");
         let ver_req = VersionReq::parse(ver_pattern)?;
-        let index_go = CacheGoVersion::read().unwrap_or_default();
-        let is_match_archived = index_go.is_match_archived(&ver_req)?;
-        let vers = if is_match_archived {
+        let index_go = LocalGoIndex::read();
+        let search_type = index_go.map_or(Ok(SearchType::Upstream), |v| v.try_search(&ver_req))?;
+        if let SearchType::Local(ver) = search_type {
             log::debug!("use local!!!");
-            &index_go.versions
+            Ok(ver)
         } else {
             log::debug!("use upstream!!!");
-            &self.list_upstream_go_versions_filter(None)?
-        };
-        vers.iter()
-            .rev()
-            .find_map(|v| {
-                toolchain::semantic(v)
-                    .ok()
-                    .filter(|semver| ver_req.matches(semver))
-                    .map(|_| v.clone())
-            })
-            .ok_or_else(|| anyhow!("no matching version found!"))
+            self.list_upstream_go_versions_filter(None)?
+                .iter()
+                .rev()
+                .find_map(|v| {
+                    toolchain::semantic(v)
+                        .ok()
+                        .filter(|semver| ver_req.matches(semver))
+                        .map(|_| v)
+                })
+                .map(|v| v.to_owned())
+                .ok_or_else(|| anyhow!("no matching version found!"))
+        }
     }
     /// list upstream go versions filter by toolchain filter.
     /// NOTE: 此方法每次都更新缓存!
@@ -285,7 +220,7 @@ impl RegistryIndex {
         filter: Option<ToolchainFilter>,
     ) -> Result<Vec<String>, anyhow::Error> {
         let ver = self.list_upstream_go_versions()?;
-        CacheGoVersion::write_if_modify(&ver.clone().into()).ok();
+        LocalGoIndex::write_if_modify(&ver.clone().into()).ok();
         let Some(filter) = filter else {
             return Ok(ver);
         };
@@ -379,14 +314,20 @@ impl RegistryIndex {
 
 pub struct Registry<'a> {
     host: &'a str,
+    enable_check_archive_size: bool,
+    skip_verify: bool,
 }
 
 impl<'a> Registry<'a> {
-    pub fn new(host: &'a str) -> Self {
-        Self { host }
+    pub fn new(host: &'a str, skip_verify: bool, enable_check_archive_size: bool) -> Self {
+        Self {
+            host,
+            enable_check_archive_size,
+            skip_verify,
+        }
     }
 
-    pub fn install_go(&self, version: &str, skip_verify: &bool) -> Result<(), anyhow::Error> {
+    pub fn install_go(&self, version: &str) -> Result<(), anyhow::Error> {
         let goup_home = Dir::goup_home()?;
         let version_dest_dir = goup_home.version(version);
 
@@ -429,25 +370,25 @@ impl<'a> Registry<'a> {
             // 下载压缩包文件
             Self::download_file(&archive_file, &archive_url, Some(&mp))?;
 
-            //  一些镜像仓库不支持获取压缩包长度
-            // {
-            //     log::debug!("Check archive file content length");
-            //     // 压缩包长度
-            //     let archive_content_length =
-            //         Self::get_archive_content_length(version, &archive_url)?;
-            //     // 检查大小
-            //     let got_archive_content_length = archive_file.metadata()?.len();
-            //     if got_archive_content_length != archive_content_length {
-            //         return Err(anyhow!(
-            //             "downloaded file {} size {} doesn't match server size {}",
-            //             archive_file.display(),
-            //             got_archive_content_length,
-            //             archive_content_length,
-            //         ));
-            //     }
-            // }
+            //  有一些镜像仓库不支持获取压缩包长度, 默认不验证
+            if self.enable_check_archive_size {
+                log::debug!("Check archive file content length");
+                // 压缩包长度
+                let archive_content_length =
+                    Self::get_archive_content_length(version, &archive_url)?;
+                // 检查大小
+                let got_archive_content_length = archive_file.metadata()?.len();
+                if got_archive_content_length != archive_content_length {
+                    return Err(anyhow!(
+                        "downloaded file {} size {} doesn't match server size {}",
+                        archive_file.display(),
+                        got_archive_content_length,
+                        archive_content_length,
+                    ));
+                }
+            }
         }
-        if *skip_verify {
+        if self.skip_verify {
             pb.set_message("Skip verify archive file sha256");
         } else {
             if !archive_sha256_file.exists()
@@ -499,34 +440,34 @@ impl<'a> Registry<'a> {
     }
 
     // get_archive_content_length 获取压缩包文件长度
-    // fn get_archive_content_length(version: &str, archive_url: &str) -> Result<u64, anyhow::Error> {
-    //     let resp = blocking::Client::builder()
-    //         .build()?
-    //         .head(archive_url)
-    //         .send()?;
-    //     if resp.status() == StatusCode::NOT_FOUND {
-    //         return Err(anyhow!(
-    //             "no binary release of {} for {}/{} at {}",
-    //             version,
-    //             env::consts::OS,
-    //             env::consts::ARCH,
-    //             archive_url,
-    //         ));
-    //     }
-    //     if !resp.status().is_success() {
-    //         return Err(anyhow!(
-    //             "server returned {} checking size of {}",
-    //             resp.status().canonical_reason().unwrap_or_default(),
-    //             archive_url,
-    //         ));
-    //     }
-    //     let content_length = if let Some(header_value) = resp.headers().get("Content-Length") {
-    //         header_value.to_str()?.parse()?
-    //     } else {
-    //         0
-    //     };
-    //     Ok(content_length)
-    // }
+    fn get_archive_content_length(version: &str, archive_url: &str) -> Result<u64, anyhow::Error> {
+        let resp = blocking::Client::builder()
+            .build()?
+            .head(archive_url)
+            .send()?;
+        if resp.status() == StatusCode::NOT_FOUND {
+            return Err(anyhow!(
+                "no binary release of {} for {}/{} at {}",
+                version,
+                env::consts::OS,
+                env::consts::ARCH,
+                archive_url,
+            ));
+        }
+        if !resp.status().is_success() {
+            return Err(anyhow!(
+                "server returned {} checking size of {}",
+                resp.status().canonical_reason().unwrap_or_default(),
+                archive_url,
+            ));
+        }
+        let content_length = if let Some(header_value) = resp.headers().get("Content-Length") {
+            header_value.to_str()?.parse()?
+        } else {
+            0
+        };
+        Ok(content_length)
+    }
 
     /// download_file 下载文件
     fn download_file<P: AsRef<Path>>(
@@ -780,9 +721,7 @@ fn archive_url(registry: &str, archive_filename: &str) -> (String, String) {
 
 #[cfg(test)]
 mod tests {
-    use semver::VersionReq;
-
-    use super::CacheGoVersion;
+    use super::LocalGoIndex;
     use super::{archive_go_version, archive_sha256, archive_url};
 
     #[test]
@@ -794,10 +733,10 @@ mod tests {
             ];
 
             let v2 = v1.iter().map(|s| s.to_string()).collect::<Vec<String>>();
-            let cgv: CacheGoVersion = v2.into();
+            let cgv: LocalGoIndex = v2.into();
             assert_eq!(cgv.versions, v1);
             assert_eq!(cgv.latest, "1.25.3");
-            assert_eq!(cgv.second_latest, "1.24.2");
+            assert_eq!(cgv.secondary, "1.24.2");
         }
         {
             let v1 = vec![
@@ -814,140 +753,11 @@ mod tests {
                 "1.25beta1",
             ];
             let v2 = v1.iter().map(|s| s.to_string()).collect::<Vec<String>>();
-            let cgv: CacheGoVersion = v2.into();
+            let cgv: LocalGoIndex = v2.into();
             assert_eq!(cgv.versions, v1);
             assert_eq!(cgv.latest, "1.24.2");
-            assert_eq!(cgv.second_latest, "1.23.1");
+            assert_eq!(cgv.secondary, "1.23.1");
         }
-    }
-
-    #[test]
-    fn test_is_match_archived() -> Result<(), anyhow::Error> {
-        let versions = vec![
-            "0.9.9", "1", "1.23rc1", "1.23rc2", "1.23.0", "1.23.1", "1.23.2", "1.24rc1", "1.24rc2",
-            "1.24rc3", "1.24.0", "1.24.1", "1.24.2", "1.25rc1", "1.25rc2", "1.25.0", "1.25.1",
-            "1.25.2", "1.26rc0",
-        ];
-        let v: CacheGoVersion = versions
-            .iter()
-            .map(|s| s.to_string())
-            .collect::<Vec<String>>()
-            .into();
-        {
-            // = 精确匹配
-            assert!(v.is_match_archived(&VersionReq::parse("=0.9.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("=1.23.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("=1.24.2")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("=1.24.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("=1.24.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("=1.25.2")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("=1.25.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("=1.25.9")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("=0.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("=1.23")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("=1.24")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("=1.25")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("=0")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("=1")?)?);
-        }
-
-        {
-            // ~ 波浪匹配
-            assert!(v.is_match_archived(&VersionReq::parse("~0.9.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("~1.23.9")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("~1.24.2")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("~1.24.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("~1.24.9")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("~1.25.2")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("~1.25.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("~1.25.9")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("~0.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("~1.23")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("~1.24")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("~1.25")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("~0")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("~1")?)?);
-        }
-
-        {
-            // <= 小于等于匹配
-            assert!(v.is_match_archived(&VersionReq::parse("<=0.9.9")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("<=1.23.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("<=1.25.2")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<=1.25.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<=1.25.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("<=1.24.2")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<=1.24.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<=1.24.9")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("<=0.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("<=1.23")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<=1.24")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<=1.25")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("<=0")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<=1")?)?);
-        }
-
-        {
-            // < 小于匹配
-            assert!(v.is_match_archived(&VersionReq::parse("<0.9.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("<1.23.2")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("<1.24.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<1.24.4")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<1.24.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("<1.25.2")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("<1.25.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<1.25.4")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<1.25.9")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("<0.9")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("<1.23")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("<1.24")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<1.25")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("<1")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("<2")?)?);
-        }
-
-        {
-            // * 通配符匹配
-            assert!(v.is_match_archived(&VersionReq::parse("0.9.*")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("1.23.*")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("1.24.*")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("1.25.*")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("0.*")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("1.*")?)?);
-        }
-
-        {
-            // ^ 匹配
-            assert!(v.is_match_archived(&VersionReq::parse("^0.9.9")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("^1.23.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("^1.24.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("^1.25.3")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("0.9.9")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("1.23.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("1.24.3")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("1.25.3")?)?);
-
-            assert!(v.is_match_archived(&VersionReq::parse("^0.9")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("^1.23")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("^1.24")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("^1.25")?)?);
-            assert!(v.is_match_archived(&VersionReq::parse("0.9")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("1.23")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("1.24")?)?);
-            assert!(!v.is_match_archived(&VersionReq::parse("1.25")?)?);
-        }
-
-        Ok(())
     }
 
     #[test]

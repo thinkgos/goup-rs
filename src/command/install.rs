@@ -3,10 +3,9 @@ use clap::Args;
 
 use super::Run;
 use crate::{
-    consts,
+    command::utils::InstallOptions,
     registry::{NightlyRegistry, Registry, RegistryIndex},
-    toolchain,
-    toolchain::{Toolchain, ToolchainFilter},
+    toolchain::{self, Toolchain, ToolchainFilter},
     version::Version,
 };
 
@@ -21,30 +20,28 @@ pub struct Install {
     /// only install the version, but do not switch.
     #[arg(long)]
     dry: bool,
-    /// skip sha256 verification.
-    #[arg(long)]
-    skip_verify: bool,
     /// use raw version, disable semver, toolchain name such as '1.21.4'
     #[arg(long)]
-    use_raw_version: bool,
-    /// registry index that is used to update Go version index.
-    #[arg(long, default_value_t = consts::GO_REGISTRY_INDEX.to_owned(), env = consts::GOUP_GO_REGISTRY_INDEX)]
-    registry_index: String,
-    /// registry that is used to download Go archive file.
-    #[arg(long, default_value_t = consts::GO_REGISTRY.to_owned(), env = consts::GOUP_GO_REGISTRY)]
-    registry: String,
+    pub use_raw_version: bool,
+    #[command(flatten)]
+    install_options: InstallOptions,
 }
 
 impl Run for Install {
     fn run(&self) -> Result<(), anyhow::Error> {
+        let opt = &self.install_options;
         let toolchain = self.toolchain.parse()?;
-        let registry_index = RegistryIndex::new(&self.registry_index);
-        let registry = Registry::new(&self.registry);
+        let registry_index = RegistryIndex::new(&opt.registry_index);
+        let registry = Registry::new(
+            &opt.registry,
+            opt.skip_verify,
+            opt.enable_check_archive_size,
+        );
         let version = match toolchain {
             Toolchain::Stable => {
                 let version = registry_index.get_upstream_latest_go_version()?;
                 let version = toolchain::normalize(&version);
-                registry.install_go(&version, &self.skip_verify)?;
+                registry.install_go(&version)?;
                 version
             }
             Toolchain::Unstable => {
@@ -54,7 +51,7 @@ impl Run for Install {
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest unstable version"))?;
                 let version = toolchain::normalize(version);
-                registry.install_go(&version, &self.skip_verify)?;
+                registry.install_go(&version)?;
                 version
             }
             Toolchain::Beta => {
@@ -64,7 +61,7 @@ impl Run for Install {
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest beta version"))?;
                 let version = toolchain::normalize(version);
-                registry.install_go(&version, &self.skip_verify)?;
+                registry.install_go(&version)?;
                 version
             }
             Toolchain::Version(ver_req) => {
@@ -72,11 +69,11 @@ impl Run for Install {
                     ver_req
                 } else {
                     registry_index.match_version_req( &ver_req).inspect_err(|_| {
-                        log::warn!("'semver' parse failure, If you want to use versions like '1.19beta1' or '1.25rc2' (non-standard semantic versions), try add option '--use-raw-version'");
+                        log::warn!("'semver' match failure, If you want to use version like '1.19beta1' or '1.25rc2', try add option '--use-raw-version'");
                     })?
                 };
                 let version = toolchain::normalize(&version);
-                registry.install_go(&version, &self.skip_verify)?;
+                registry.install_go(&version)?;
                 version
             }
             Toolchain::Nightly => {

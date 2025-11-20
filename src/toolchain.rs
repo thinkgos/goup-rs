@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use anyhow::Result;
-use semver::Version;
+use semver::{Op, Version, VersionReq};
 
 /// support toolchain
 #[derive(Debug, Eq, Hash, PartialEq)]
@@ -91,6 +91,113 @@ pub fn semantic(ver: &str) -> Result<Version> {
             },
         );
     Ok(Version::parse(&name)?)
+}
+
+/// is_match_archived 是否版本请求匹配归档版本.
+pub fn is_match_archived(latest: &Version, secondary: &Version, ver_req: &VersionReq) -> bool {
+    if ver_req.comparators.len() != 1 {
+        return false;
+    }
+    let comp = ver_req.comparators.first().unwrap();
+    if !comp.pre.is_empty() {
+        return false;
+    }
+    let major = comp.major;
+    match comp.op {
+        // = 精确匹配
+        //  =1.24.1 精确匹配
+        //  =1.24 匹配1.24.*
+        //  =1 匹配1.*.*
+        Op::Exact => match (comp.minor, comp.patch) {
+            // =1.24.1
+            (Some(minor), Some(patch)) => {
+                // 主版本号 < 次新版本号
+                // 主版本号 == 次新版本号 且 (次版号比次新版本的小 或则 次版本号一致, 修订版版本 < 次修订版本号)
+                // 主版本号 == 最新版本号 且 次版号 == 最新版本号 且 修订版版本 <= 最新版本号
+                major < secondary.major
+                    || (major == secondary.major
+                        && (minor < secondary.minor
+                            || (minor == secondary.minor && patch <= secondary.patch)))
+                    || (major == latest.major && minor == latest.minor && patch <= latest.patch)
+            }
+            // =1.24
+            (Some(minor), None) => {
+                major < secondary.major || (major == secondary.major && minor < secondary.minor)
+            }
+            (None, None) => major < secondary.major,
+            _ => false,
+        },
+        // <= 小于等于
+        //  <=1.24.1 匹配 <=1.24.1
+        //  <=1.24   匹配 1.24.*
+        //  <=1      匹配 1.*.*
+        Op::LessEq => match (comp.minor, comp.patch) {
+            // <=1.24.1
+            (Some(minor), Some(patch)) => {
+                // 主版本号 < 次新版本号
+                // 主版本号 == 次新版本号 且 (次版号比次新版本的小 或则 次版本号一致, 修订版版本 < 次修订版本号)
+                // 主版本号 == 最新版本号 且 次版号 == 最新版本号 且 修订版版本 <= 最新版本号
+                major < secondary.major
+                    || (major == secondary.major
+                        && (minor < secondary.minor
+                            || (minor == secondary.minor && patch <= secondary.patch)))
+                    || (major == latest.major && minor == latest.minor && patch <= latest.patch)
+            }
+            // <=1.24
+            (Some(minor), None) => {
+                major < secondary.major || (major == secondary.major && minor < secondary.minor)
+            }
+            (None, None) => major < secondary.major,
+            _ => false,
+        },
+        // < 小于
+        //  <1.24.1 匹配 <1.24.1
+        //  <1.24   匹配 <1.24.0即(1.23.*)
+        //  <1      匹配 <1.0.0即(0.*.*)
+        Op::Less => match (comp.minor, comp.patch) {
+            (Some(minor), Some(patch)) => {
+                major < secondary.major
+                    || (major == secondary.major
+                        && (minor < secondary.minor
+                            || (minor == secondary.minor && (patch - 1) <= secondary.patch)))
+                    || (major == latest.major
+                        && minor == latest.minor
+                        && (patch - 1) <= latest.patch)
+            }
+            (Some(minor), None) => {
+                major < secondary.major || (major == secondary.major && minor - 1 < secondary.minor)
+            }
+            (None, None) => major - 1 < secondary.major,
+            _ => false,
+        },
+        // * 通配符
+        //  1.24.* 匹配 1.24.*
+        //  1.*    匹配 1.*.*
+        //  *      匹配 最新版本
+        Op::Wildcard => {
+            if let Some(minor) = comp.minor {
+                major < secondary.major || (major == secondary.major && minor < secondary.minor)
+            } else {
+                major < secondary.major
+            }
+        }
+        // ~ 不改变主次版本的最新版本
+        //  ~1.24.1 匹配1.24.*
+        //  ~1.24   匹配1.24.*
+        //  ~1      匹配1.*.*
+        Op::Tilde => {
+            if let Some(minor) = comp.minor {
+                major < secondary.major || (major == secondary.major && minor < secondary.minor)
+            } else {
+                major < secondary.major
+            }
+        }
+        // ^ 不改变主版本的最新版本
+        //  ^1.24.1, ^1.24, ^1 均匹配 1.*.*
+        //  1.24.1, 1.24, 1 均匹配 1.*.*
+        Op::Caret => comp.major < secondary.major,
+        _ => false, // Op::Greater | Op::GreaterEq
+    }
 }
 
 #[cfg(test)]
@@ -468,5 +575,442 @@ mod tests {
         for ver in go_versions {
             assert!(semantic(ver).is_ok())
         }
+    }
+
+    #[test]
+    fn test_is_match_archived() -> Result<(), anyhow::Error> {
+        let latest = Version::parse("1.25.2")?;
+        let secondary = Version::parse("1.24.2")?;
+        {
+            // = 精确匹配
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=0.9.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.23.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.24.2")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.24.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.24.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.25.2")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.25.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.25.9")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=0.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.23")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.24")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1.25")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=0")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("=1")?
+            ));
+        }
+
+        {
+            // ~ 波浪匹配
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~0.9.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.23.9")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.24.2")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.24.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.24.9")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.25.2")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.25.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.25.9")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~0.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.23")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.24")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1.25")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~0")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("~1")?
+            ));
+        }
+
+        {
+            // <= 小于等于匹配
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=0.9.9")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.23.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.25.2")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.25.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.25.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.24.2")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.24.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.24.9")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=0.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.23")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.24")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1.25")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=0")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<=1")?
+            ));
+        }
+
+        {
+            // < 小于匹配
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<0.9.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.23.2")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.24.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.24.4")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.24.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.25.2")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.25.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.25.4")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.25.9")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<0.9")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.23")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.24")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1.25")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<1")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("<2")?
+            ));
+        }
+
+        {
+            // * 通配符匹配
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("0.9.*")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.23.*")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.24.*")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.25.*")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("0.*")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.*")?
+            ));
+        }
+
+        {
+            // ^ 匹配
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("^0.9.9")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("^1.23.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("^1.24.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("^1.25.3")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("0.9.9")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.23.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.24.3")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.25.3")?
+            ));
+
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("^0.9")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("^1.23")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("^1.24")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("^1.25")?
+            ));
+            assert!(is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("0.9")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.23")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.24")?
+            ));
+            assert!(!is_match_archived(
+                &latest,
+                &secondary,
+                &VersionReq::parse("1.25")?
+            ));
+        }
+
+        Ok(())
     }
 }
