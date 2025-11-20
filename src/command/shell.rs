@@ -11,7 +11,10 @@ use anyhow::anyhow;
 use clap::Args;
 use dialoguer::{Select, theme::ColorfulTheme};
 
-use crate::{consts::GOUP_GO_VERSION, dir::Dir, shell::ShellType, toolchain, version::Version};
+use crate::{
+    command::utils::InstallOptions, consts::GOUP_GO_VERSION, dir::Dir, registry::Registry,
+    shell::ShellType, toolchain, version::Version,
+};
 
 use super::Run;
 
@@ -23,34 +26,13 @@ pub struct Shell {
     /// custom shell type
     #[arg(short, long)]
     shell: Option<ShellType>,
+    #[command(flatten)]
+    install_options: InstallOptions,
 }
 
 impl Run for Shell {
     fn run(&self) -> Result<(), anyhow::Error> {
-        let go_version = if let Some(version) = &self.version {
-            toolchain::normalize(version)
-        } else {
-            let vers = Version::list_go_version()?;
-            if vers.is_empty() {
-                return Err(anyhow!(
-                    "Not any go is installed, Install it with `goup install`."
-                ));
-            }
-            let mut items = Vec::new();
-            let mut pos = 0;
-            for (i, v) in vers.iter().enumerate() {
-                items.push(v.version.as_ref());
-                if v.default {
-                    pos = i;
-                }
-            }
-            let selection = Select::with_theme(&ColorfulTheme::default())
-                .with_prompt("Select a version")
-                .items(&items)
-                .default(pos)
-                .interact()?;
-            toolchain::normalize(items[selection])
-        };
+        let go_version = self.get_target_version()?;
         let goup_home = Dir::goup_home()?;
         if !goup_home.is_dot_unpacked_success_file_exists(&go_version) {
             return Err(anyhow!(
@@ -112,5 +94,43 @@ impl Run for Shell {
 
             Ok(())
         }
+    }
+}
+
+impl Shell {
+    fn get_target_version(&self) -> Result<String, anyhow::Error> {
+        let versions = Version::list_go_version()?;
+        let target_version = if let Some(version) = &self.version {
+            if !versions.iter().any(|v| v.version == *version) {
+                let registry = Registry::new(
+                    &self.install_options.registry,
+                    self.install_options.skip_verify,
+                    self.install_options.enable_check_archive_size,
+                );
+                registry.install_go(&toolchain::normalize(version))?
+            }
+            version
+        } else {
+            if versions.is_empty() {
+                return Err(anyhow!(
+                    "Not any go is installed, Install it with `goup install`."
+                ));
+            }
+            let mut items = Vec::new();
+            let mut pos = 0;
+            for (i, v) in versions.iter().enumerate() {
+                items.push(&v.version);
+                if v.default {
+                    pos = i;
+                }
+            }
+            let selection = Select::with_theme(&ColorfulTheme::default())
+                .with_prompt("Select a version")
+                .items(&items)
+                .default(pos)
+                .interact()?;
+            items[selection]
+        };
+        Ok(toolchain::normalize(target_version))
     }
 }
