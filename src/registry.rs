@@ -108,8 +108,8 @@ impl LocalGoIndex {
             return Ok(search_type);
         }
 
-        let latest = Version::parse(&self.latest)?;
-        let secondary = Version::parse(&self.secondary)?;
+        let latest = toolchain::semantic(&self.latest)?;
+        let secondary = toolchain::semantic(&self.secondary)?;
         let is_match_archived = toolchain::is_match_archived(&latest, &secondary, ver_req);
         if is_match_archived {
             self.versions

@@ -579,8 +579,8 @@ mod tests {
 
     #[test]
     fn test_is_match_archived() -> Result<(), anyhow::Error> {
-        let latest = Version::parse("1.25.2")?;
-        let secondary = Version::parse("1.24.2")?;
+        let latest = semantic("1.25.2")?;
+        let secondary = semantic("1.24.2")?;
         {
             // = 精确匹配
             assert!(is_match_archived(
