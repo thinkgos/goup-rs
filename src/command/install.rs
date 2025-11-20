@@ -64,11 +64,11 @@ impl Run for Install {
                 registry.install_go(&version)?;
                 version
             }
-            Toolchain::Version(ver_req) => {
+            Toolchain::Version(version_req) => {
                 let version = if self.use_raw_version {
-                    ver_req
+                    version_req
                 } else {
-                    registry_index.match_version_req( &ver_req).inspect_err(|_| {
+                    registry_index.match_version_req( &version_req).inspect_err(|_| {
                         log::warn!("'semver' match failure, If you want to use version like '1.19beta1' or '1.25rc2', try add option '--use-raw-version'");
                     })?
                 };
