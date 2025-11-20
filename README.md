@@ -29,6 +29,7 @@
 - Manage locally cache files(such as `*.tar.gz`, `*.tar.gz.sha256`).
 - Upgrade `goup` itself.
 - Customize `GOUP_HOME`(default `$HOME/.goup`)(>= v0.11.x);
+- Support multiple download backend via environment `GOUP_GO_REGISTRY_INDEX`/`GOUP_GO_REGISTRY`(>=v0.16.x).
 - Friendly prompt.
 - Should be pretty fast.
 
