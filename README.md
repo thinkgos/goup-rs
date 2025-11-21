@@ -252,7 +252,7 @@ goup completion zsh > _goup
 
 | Registry | url | Support SHA256 file | Support HTTP get archive file length |
 |---|---|---|---|
-| Official 1 | https://dl.google.com/go | ✅ | ✅ |
+| Official 1(default) | https://dl.google.com/go | ✅ | ✅ |
 | Official 2 | https://go.dev/dl | ❌ | ✅ |
 | Official 3 | https://golang.org/dl | ❌ | ✅ |
 | Aliyun | https://mirrors.aliyun.com/golang | ❌ | ❌ |
@@ -260,7 +260,7 @@ goup completion zsh > _goup
 | Huazhong University of Science and Technology | https://mirrors.hust.edu.cn/golang | ✅ | ✅ |
 | University of Science and Technology of China | https://mirrors.ustc.edu.cn/golang | ✅ | ✅ |
 
-***NOTE***: **SHA256 checksum files** are not provided by the mirror sites, and you need to use the `--skip-verify` option when downloading.
+***NOTE***: **SHA256 checksum files** are not provided by some mirror sites, and you need to use the `--skip-verify` option when downloading.
 
 ### Set registry mirror site environment variables
 

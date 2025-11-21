@@ -261,7 +261,7 @@ goup completion zsh > _goup
 | 华中科技大学 | https://mirrors.hust.edu.cn/golang | ✅ | ✅ |
 | 中国科学技术大学 | https://mirrors.ustc.edu.cn/golang | ✅ | ✅ |
 
-***NOTE***: 镜像站不提供**SHA256校验文件**, 在下载时需要使用`--skip-verify`选项.
+***NOTE***: 有些镜像站不提供**SHA256校验文件**, 在下载时需要使用`--skip-verify`选项.
 
 ### 设置镜像站环境变量
 
