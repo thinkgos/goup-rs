@@ -32,6 +32,9 @@ pub struct Shell {
     /// custom shell type
     #[arg(short, long)]
     shell: Option<ShellType>,
+    /// skip autodetect go.work/go.mod.
+    #[arg(short, long)]
+    skip_autodetect: bool,
     #[command(flatten)]
     install_options: InstallOptions,
 }
@@ -136,7 +139,9 @@ impl Shell {
             }
             return Ok(version.to_owned());
         }
-        if let Some(ver) = self.get_mod_file_version(local_versions) {
+        if !self.skip_autodetect
+            && let Some(ver) = self.get_mod_file_version(local_versions)
+        {
             // 自动从 go.work/go.mod 文件中获取到版本号
             return Ok(ver);
         }
