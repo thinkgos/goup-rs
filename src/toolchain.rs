@@ -82,7 +82,7 @@ pub fn semantic(ver: &str) -> Result<Version> {
                 _ => ver.to_string(),
             },
             |idx| {
-                let start = &ver[..idx].trim_end_matches('-');
+                let start = ver[..idx].trim_end_matches('-');
                 if count_dot(start) == 2 {
                     format!("{}-{}", start, &ver[idx..])
                 } else {
