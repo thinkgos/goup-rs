@@ -246,8 +246,8 @@ goup completion zsh > _goup
 
 ### 索引镜像站
 
-- 官方1(默认): https://golang.google.cn
-- 官方2: https://go.dev
+- 官方1(默认): https://go.dev
+- 官方2: https://golang.google.cn
 
 ### 仓库镜像站
 

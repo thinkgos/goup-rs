@@ -245,8 +245,8 @@ goup completion zsh > _goup
 
 ### Registry index mirror site
 
-- Official 1(default): https://golang.google.cn
-- Official 2: https://go.dev
+- Official 1(default): https://go.dev
+- Official 2: https://golang.google.cn
 
 ### Registry mirror site
 

@@ -7,7 +7,7 @@ pub const GOUP_GO_REGISTRY_INDEX: &str = "GOUP_GO_REGISTRY_INDEX";
 pub const GOUP_GO_REGISTRY: &str = "GOUP_GO_REGISTRY";
 pub const GOUP_GO_SOURCE_GIT_URL: &str = "GOUP_GO_SOURCE_GIT_URL";
 // env value
-pub const GO_REGISTRY_INDEX: &str = "https://golang.google.cn";
+pub const GO_REGISTRY_INDEX: &str = "https://go.dev";
 pub const GO_REGISTRY: &str = "https://dl.google.com/go";
 pub const GO_SOURCE_GIT_URL: &str = "https://github.com/golang/go";
 pub const GO_SOURCE_UPSTREAM_GIT_URL: &str = "https://go.googlesource.com/go";
