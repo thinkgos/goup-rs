@@ -265,8 +265,8 @@ goup completion zsh > _goup
 ### Set registry mirror site environment variables
 
 ```shell
-export GOUP_GO_REGISTRY_INDEX=https://golang.google.cn
-export GOUP_GO_REGISTRY=https://mirrors.aliyun.com/golang
+export GOUP_GO_REGISTRY_INDEX=https://go.dev
+export GOUP_GO_REGISTRY=https://mirrors.hust.edu.cn/golang
 ```
 
 ## How it works

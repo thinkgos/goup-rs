@@ -266,8 +266,8 @@ goup completion zsh > _goup
 ### 设置镜像站环境变量
 
 ```shell
-export GOUP_GO_REGISTRY_INDEX=https://golang.google.cn
-export GOUP_GO_REGISTRY=https://mirrors.aliyun.com/golang
+export GOUP_GO_REGISTRY_INDEX=https://go.dev
+export GOUP_GO_REGISTRY=https://mirrors.hust.edu.cn/golang
 ```
 
 ## 工作原理
