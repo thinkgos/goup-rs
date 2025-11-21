@@ -175,9 +175,9 @@ $ goup rm
 ✔ Select multiple version · 1.21.5
 ```
 
-### 使用特定的Go版本在shell会话中
+### 在shell会话中使用特定的Go版本
 
-`goup shell [VERSION]`, 使用特定的Go版本在shell会话中, 如果没有提供版本, 将提示选择一个已安装的Go版本.
+`goup shell [VERSION]`, 在shell会话中使用特定的Go版本, 如果没有提供版本, 将自动检测执行路径下的`go.work`/`go.mod`的Go版本(可以使用`--skip-autodetect`跳过), 仍旧没有的话将提示用户选择一个已安装的Go版本.
 
 ```bash
 $ goup shell 1.21.10
@@ -266,6 +266,7 @@ goup completion zsh > _goup
 ### 设置镜像站环境变量
 
 ```shell
+# 推存值
 export GOUP_GO_REGISTRY_INDEX=https://go.dev
 export GOUP_GO_REGISTRY=https://mirrors.hust.edu.cn/golang
 ```

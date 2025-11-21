@@ -177,7 +177,7 @@ $ goup rm
 
 ### Using a specific Go version in a shell session
 
-`goup shell [VERSION]`, Using a specific Go version in a shell session, If no version is provided, a prompt will show to select a installed Go version.
+`goup shell [VERSION]`, Using a specific Go version in a shell session, If no version is provided, it will automatically detect the Go version from the `go.work`/`go.mod` in the current directory (use `--skip-autodetect` to skip). If no version is found, will be prompted to choose an installed version.
 
 ```bash
 $ goup shell 1.21.10
@@ -265,6 +265,7 @@ goup completion zsh > _goup
 ### Set registry mirror site environment variables
 
 ```shell
+# recommended value
 export GOUP_GO_REGISTRY_INDEX=https://go.dev
 export GOUP_GO_REGISTRY=https://mirrors.hust.edu.cn/golang
 ```
