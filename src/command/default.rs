@@ -8,14 +8,14 @@ use super::Run;
 
 #[derive(Args, Debug, PartialEq)]
 #[command(disable_version_flag = true)]
-pub struct Set {
+pub struct Default {
     /// target go version
     version: Option<String>,
     #[command(flatten)]
     install_options: InstallOptions,
 }
 
-impl Run for Set {
+impl Run for Default {
     fn run(&self) -> Result<(), anyhow::Error> {
         let versions = Version::list_go_version()?;
         let target_version = if let Some(version) = &self.version {

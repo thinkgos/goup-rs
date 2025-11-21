@@ -1,5 +1,6 @@
 mod cache;
 mod completion;
+mod default;
 mod env;
 #[cfg(unix)]
 mod init;
@@ -8,7 +9,6 @@ mod list;
 mod oneself;
 mod remove;
 mod search;
-mod set;
 mod shell;
 mod utils;
 
@@ -22,6 +22,7 @@ use std::io::prelude::Write;
 
 use self::cache::Cache;
 use self::completion::Completion;
+use self::default::Default;
 use self::env::Env;
 #[cfg(unix)]
 use self::init::Init;
@@ -30,7 +31,6 @@ use self::list::List;
 use self::oneself::Oneself;
 use self::remove::Remove;
 use self::search::Search;
-use self::set::Set;
 
 shadow!(build);
 const VERSION: &str = shadow_rs::formatcp!(
@@ -113,11 +113,10 @@ enum Command {
     /// Search Go versions to install
     #[command(visible_aliases = ["ls-remote"])]
     Search(Search),
-    /// Set the default Go version to one specified.
+    /// Set the default Go version.
     /// If no version is provided, a prompt will show to select a installed Go version.
-    #[command(name = "default")]
-    #[command(visible_aliases = ["set", "use"])]
-    Set(Set),
+    #[command(visible_aliases = ["use", "set"])]
+    Default(Default),
     /// Generate the autocompletion script for the specified shell
     Completion(Completion),
     #[cfg(unix)]
@@ -160,7 +159,7 @@ impl Run for Cli {
             Command::List(cmd) => cmd.run(),
             Command::Remove(cmd) => cmd.run(),
             Command::Search(cmd) => cmd.run(),
-            Command::Set(cmd) => cmd.run(),
+            Command::Default(cmd) => cmd.run(),
             Command::Oneself(cmd) => cmd.run(),
             #[cfg(unix)]
             Command::Init(cmd) => cmd.run(),

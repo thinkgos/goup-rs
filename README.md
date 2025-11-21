@@ -145,12 +145,12 @@ $ goup install =1.21.4 --dry
 [2024-01-30T00:38:48Z INFO ] go1.21.10 installed in /home/thinkgo/.goup/go1.21.4
 ```
 
-### Switches to selected Go version
+### Set the default Go version
 
-`goup use/set [VERSION]`, switches to selected Go version.
+`goup default/use/set [VERSION]`, set the default Go version.
 
 ```bash
-$ goup use 
+$ goup default 
 ? Select a version ›
   1.21.5
 ❯ 1.21.10
@@ -275,7 +275,7 @@ export GOUP_GO_REGISTRY=https://mirrors.aliyun.com/golang
 - `goup completion <SHELL>` Generate the autocompletion script for the specified shell.
 - `goup [help]` Print this message or the help of the given subcommand(s).
 - `goup install/update/i [TOOLCHAIN]` downloads specified version of Go to`$HOME/.goup/go<VERSION|tip>/go` and symlinks it to `$HOME/.goup/current`.
-- `goup use/set [VERSION]` switches to selected Go version.
+- `goup default/use/set [VERSION]` Set the default Go version.
 - `goup ls/list/show` list all installed Go version located at `$HOME/.goup`.
 - `goup remove/rm [VERSION]...` remove the specified Go version list.
 - `goup search/ls-remote [FILTER]` lists all available Go versions.
