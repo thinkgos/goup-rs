@@ -5,8 +5,8 @@ use std::env;
 use super::Run;
 use crate::version::Version;
 
-const SETUP_ENV_UNIX: &str = include_str!("../../setup_env_unix");
-const SETUP_ENV_FISH: &str = include_str!("../../setup_env_fish");
+const SETUP_ENV_UNIX: &str = include_str!("../assets/setup_env_unix");
+const SETUP_ENV_FISH: &str = include_str!("../assets/setup_env_fish");
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Init {
