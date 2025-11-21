@@ -53,13 +53,13 @@ impl Run for Env {
                 write,
                 "+-{}-+-{}-+-{}-+",
                 "-".repeat(22),
-                "-".repeat(30),
+                "-".repeat(35),
                 "-".repeat(60)
             )
         };
         write_separator(&mut stdout)?;
         for (i, (k, v, e)) in envs.iter().enumerate() {
-            writeln!(stdout, "| {:<22} | {:<30} | {:<60} |", k, v, e)?;
+            writeln!(stdout, "| {:<22} | {:<35} | {:<60} |", k, v, e)?;
             if i == 0 {
                 write_separator(&mut stdout)?;
             }
