@@ -252,8 +252,8 @@ goup completion zsh > _goup
 ### 仓库镜像站
 
 | 仓库 | 地址 | 支持SHA256文件 | 支持HTTP获取压缩包长度 |
-|---|---|---|---|---|
-| 官方1 | https://dl.google.com/go | ✅ | ✅ |
+|---|---|---|---
+| 官方1(默认) | https://dl.google.com/go | ✅ | ✅ |
 | 官方2 | https://go.dev/dl | ❌ | ✅ |
 | 官方3 | https://golang.org/dl | ❌ | ✅ |
 | 阿里云 | https://mirrors.aliyun.com/golang | ❌ | ❌ |
