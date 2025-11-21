@@ -2,7 +2,6 @@ mod cache;
 mod completion;
 mod default;
 mod env;
-#[cfg(unix)]
 mod init;
 mod install;
 mod list;
@@ -24,7 +23,6 @@ use self::cache::Cache;
 use self::completion::Completion;
 use self::default::Default;
 use self::env::Env;
-#[cfg(unix)]
 use self::init::Init;
 use self::install::Install;
 use self::list::List;
@@ -119,7 +117,6 @@ enum Command {
     Default(Default),
     /// Generate the autocompletion script for the specified shell
     Completion(Completion),
-    #[cfg(unix)]
     /// write all necessary environment variables and values.
     Init(Init),
     /// Show the specified goup environment variables and values.
@@ -161,7 +158,6 @@ impl Run for Cli {
             Command::Search(cmd) => cmd.run(),
             Command::Default(cmd) => cmd.run(),
             Command::Oneself(cmd) => cmd.run(),
-            #[cfg(unix)]
             Command::Init(cmd) => cmd.run(),
             Command::Env(cmd) => cmd.run(),
             Command::Cache(cmd) => cmd.run(),

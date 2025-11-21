@@ -5,7 +5,7 @@ use clap_complete::{Generator, Shell};
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Completion {
-    // outputs the completion content for given shell
+    /// outputs the completion content for given shell
     #[arg(value_enum)]
     pub shell: Shell,
 }

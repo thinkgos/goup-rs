@@ -1,6 +1,5 @@
-#![allow(dead_code)]
-
 use clap::Args;
+use clap_complete::Shell;
 use std::env;
 
 use super::Run;
@@ -10,29 +9,52 @@ const SETUP_ENV_UNIX: &str = include_str!("../../setup_env_unix");
 const SETUP_ENV_FISH: &str = include_str!("../../setup_env_fish");
 
 #[derive(Args, Debug, PartialEq)]
-pub struct Init;
+pub struct Init {
+    /// name of the environment file.
+    #[arg(long, default_value = "env")]
+    name: String,
+    /// detect the shell environment, if not provided, it will be autodetected from the current environment.
+    #[arg(value_enum)]
+    pub shell: Option<Shell>,
+}
 
 impl Run for Init {
     fn run(&self) -> Result<(), anyhow::Error> {
-        let shell_script = Self::detect_shell_and_get_script();
-        Version::init_env(shell_script)?;
+        if let Some(shell_script) = Self::get_shell_setup_script(self.shell) {
+            Version::init_env(&self.name, shell_script)?;
+        } else {
+            log::error!("Unsupported shell setup script.");
+        }
         Ok(())
     }
 }
 
 impl Init {
     /// Detect the current shell and return the appropriate setup script
-    fn detect_shell_and_get_script() -> &'static str {
-        // Check if SHELL environment variable is set
-        if let Ok(shell) = env::var("SHELL")
-            && shell.contains("fish")
-        {
-            log::info!("Detected fish shell, using fish setup script");
-            return SETUP_ENV_FISH;
+    fn get_shell_setup_script(shell: Option<Shell>) -> Option<&'static str> {
+        let shell = shell.unwrap_or_else(|| {
+            if cfg!(windows) {
+                Shell::PowerShell
+            } else if let Ok(shell) = env::var("SHELL")
+                && shell.contains("fish")
+            // Check if SHELL environment variable is set
+            {
+                Shell::Fish
+            } else {
+                Shell::Zsh
+            }
+        });
+        match shell {
+            Shell::Fish => {
+                log::info!("Using fish setup script");
+                Some(SETUP_ENV_FISH)
+            }
+            Shell::PowerShell => None,
+            _ => {
+                // Fallback to POSIX shell script (bash, zsh, etc.)
+                log::info!("Using POSIX shell setup script");
+                Some(SETUP_ENV_UNIX)
+            }
         }
-
-        // Fallback to POSIX shell script (bash, zsh, etc.)
-        log::info!("Using POSIX shell setup script");
-        SETUP_ENV_UNIX
     }
 }

@@ -21,13 +21,13 @@ pub struct Version {
 impl Version {
     /// initializes the environment file.
     #[allow(dead_code)]
-    pub fn init_env(s: &str) -> Result<(), anyhow::Error> {
+    pub fn init_env(name: &str, content: &str) -> Result<(), anyhow::Error> {
         let goup_home = Dir::goup_home()?;
         if !goup_home.exists() {
             fs::create_dir_all(&goup_home)?;
         }
-        let env_file = goup_home.env();
-        fs::write(env_file, s)?;
+        let env_file = goup_home.env(name);
+        fs::write(env_file, content)?;
         Ok(())
     }
 

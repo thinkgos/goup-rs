@@ -45,9 +45,9 @@ impl Dir {
             path: self.path.join(path),
         }
     }
-    /// Extends `self` with `env`
-    pub fn env(&self) -> Self {
-        self.join_path("env")
+    /// Extends `self` with name
+    pub fn env(&self, name: &str) -> Self {
+        self.join_path(name)
     }
     /// Extends `self` with `current`.
     pub fn current(&self) -> Self {
@@ -155,7 +155,7 @@ mod tests {
         assert_eq!(Dir::new(home_dir).file_name(), Some(OsStr::new(".goup")));
 
         assert_eq!(
-            Dir::new(home_dir).env().as_ref(),
+            Dir::new(home_dir).env("env").as_ref(),
             Path::new("/home/dev/.goup/env")
         );
         assert_eq!(
