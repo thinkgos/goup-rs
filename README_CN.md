@@ -35,6 +35,10 @@
 
 `goup` 是对上述特性的一种尝试, 其灵感主要来自于 [Rustup](https://rustup.rs/), [golang/dl](https://github.com/golang/dl), [goup](https://github.com/owenthereal/goup), [goenv](https://github.com/syndbg/goenv), [gvm](https://github.com/moovweb/gvm) and [getgo](https://github.com/golang/tools/tree/master/cmd/getgo).
 
+## 构建功能标志
+
+- `no-self-update` 关闭自我更新.
+
 ## 安装
 
 ### 使用Cargo
@@ -282,13 +286,9 @@ export GOUP_GO_REGISTRY=https://mirrors.aliyun.com/golang
 - `goup search/ls-remote [FILTER]` 列出所有可用的Go版本.
 - `goup cache [COMMAND]` 管理缓存归档文件.
 - `goup self <COMMAND>` 修改`goup`安装程序.
-- `goup init` 将所有必要的环境变量和值写入`$HOME/.goup/env`.
+- `goup init [SHELL]` 将所有必要的环境变量和值写入`$HOME/.goup/env`.
 - `goup env`  显示`goup`的环境变量和值.
 - `goup shell [VERSION]` 在shell会话中使用特定的Go版本.
-
-## 构建功能标志
-
-- `no-self-update` 关闭自我更新.
 
 ## How to Debug
 

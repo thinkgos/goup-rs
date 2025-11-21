@@ -35,6 +35,10 @@
 
 `goup` is an attempt to fulfill the above features and is heavily inspired by [Rustup](https://rustup.rs/), [golang/dl](https://github.com/golang/dl), [goup](https://github.com/owenthereal/goup), [goenv](https://github.com/syndbg/goenv), [gvm](https://github.com/moovweb/gvm) and [getgo](https://github.com/golang/tools/tree/master/cmd/getgo).
 
+## Build feature flags
+
+- `no-self-update` Disable self-update feature.
+
 ## Installation
 
 ### Cargo
@@ -281,13 +285,9 @@ export GOUP_GO_REGISTRY=https://mirrors.aliyun.com/golang
 - `goup search/ls-remote [FILTER]` lists all available Go versions.
 - `goup cache [COMMAND]` Manage cache archive files.
 - `goup self <COMMAND>` Modify the goup installation.
-- `goup init` write all necessary environment variables and values to `$HOME/.goup/env`.
+- `goup init [SHELL]` write all necessary environment variables and values to `$HOME/.goup/env`.
 - `goup env` Show the specified goup environment variables and values.
 - `goup shell [VERSION]` Using a specific Go version in a shell session.
-
-## Build feature flags
-
-- `no-self-update` Disable self-update feature.
 
 ## How to Debug
 
