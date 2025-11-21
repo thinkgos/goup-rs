@@ -217,21 +217,16 @@ Checking latest released version... v0.9.0
 
 ```bash
 $ goup env
-+------------------------+--------------------------------+-----------------------------------------------------------+
-| Key                    | Value                          | Explain                                                   |
-+------------------------+--------------------------------+-----------------------------------------------------------+
-| GOUP_HOME              | /home/thinkgo/.goup            | Get goup home directory, default: '$HOME/.goup'           |
-+------------------------+--------------------------------+-----------------------------------------------------------+
-| GOUP_GO_VERSION        | current                        | Shell session target go version, default: 'current'       |
-+------------------------+--------------------------------+-----------------------------------------------------------+
-| GOUP_GO_REGISTRY_INDEX | https://golang.google.cn       | Registry index of go version                              |
-+------------------------+--------------------------------+-----------------------------------------------------------+
-| GOUP_GO_REGISTRY       | https://dl.google.com/go       | Registry of go archive file                               |
-+------------------------+--------------------------------+-----------------------------------------------------------+
-| GOUP_GO_SOURCE_GIT_URL | https://github.com/golang/go   | Source git url, use by tip|nightly or index of go version |
-+------------------------+--------------------------------+-----------------------------------------------------------+
-| GOUP_GO_SOURCE_GIT_URL | https://go.googlesource.com/go | Source upstream git url, use by tip|nightly               |
-+------------------------+--------------------------------+-----------------------------------------------------------+
++------------------------+--------------------------------+--------------------------------------------------------------+
+| Key                    | Value                          | Explain                                                      |
++------------------------+--------------------------------+--------------------------------------------------------------+
+| GOUP_HOME              | /home/thinkgo/.goup            | Get goup home directory, default: '$HOME/.goup'              |
+| GOUP_GO_VERSION        | current                        | Shell session target go version, default: 'current'          |
+| GOUP_GO_REGISTRY_INDEX | https://golang.google.cn       | Registry index of go version                                 |
+| GOUP_GO_REGISTRY       | https://dl.google.com/go       | Registry of go archive file                                  |
+| GOUP_GO_SOURCE_GIT_URL | https://github.com/golang/go   | Source git url, use by tip|nightly or index of go version    |
+| GOUP_GO_SOURCE_GIT_URL | https://go.googlesource.com/go | Source upstream git url, use by tip|nightly                  |
++------------------------+--------------------------------+--------------------------------------------------------------+
 ```
 
 ### Autocompletion
