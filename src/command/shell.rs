@@ -10,12 +10,13 @@ use std::{
 use anyhow::anyhow;
 use clap::Args;
 use dialoguer::{Select, theme::ColorfulTheme};
+use semver::VersionReq;
 
 use crate::{
     command::utils::InstallOptions,
     consts::GOUP_GO_VERSION,
     dir::Dir,
-    registry::{Registry, RegistryIndex},
+    registry::{LocalGoIndex, Registry},
     shell::ShellType,
     toolchain,
     version::Version,
@@ -176,9 +177,12 @@ impl Shell {
             0 | 1 => format!("~{mod_go_version}"),
             _ => format!("={mod_go_version}"),
         };
-        let version = RegistryIndex::new(&self.install_options.registry_index)
-            .match_version_req(&version_req)
-            .ok()?;
+        // let version = RegistryIndex::new(&self.install_options.registry_index)
+        //     .match_version_req(&version_req)
+        //     .ok()?;
+        // 从本地索引中匹配版本号
+        let ver_req = VersionReq::parse(&version_req).ok()?;
+        let version = LocalGoIndex::read().and_then(|v| v.match_version(&ver_req))?;
         if !local_versions.iter().any(|v| v.version == version) {
             let registry = Registry::new(
                 &self.install_options.registry,

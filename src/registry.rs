@@ -49,9 +49,9 @@ struct GoRelease {
 }
 
 #[derive(Debug)]
-enum SearchType {
-    Upstream,
-    Local(String),
+pub enum Resolution {
+    Resolved(String), // 已确定版本
+    Unresolved,       // 未确定, 需要进一步确定
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -63,7 +63,7 @@ pub struct LocalGoIndex {
 }
 
 impl LocalGoIndex {
-    fn read() -> Option<LocalGoIndex> {
+    pub fn read() -> Option<LocalGoIndex> {
         let goup_home = Dir::goup_home().ok()?;
         let index_go = goup_home.index_go();
         if index_go.exists() {
@@ -73,37 +73,49 @@ impl LocalGoIndex {
             None
         }
     }
-    fn write_if_modify(&self) -> Result<(), anyhow::Error> {
+    fn write_if_change(index: &LocalGoIndex) -> Result<(), anyhow::Error> {
         let index_go = Dir::goup_home()?.index_go();
         if index_go.exists()
             && let Ok(file) = File::open(&index_go)
             && let Ok(old) = serde_json::from_reader::<_, LocalGoIndex>(file)
-            && old.sha256 == self.sha256
+            && old.sha256 == index.sha256
         {
             return Ok(());
         }
         let file = File::create(&index_go)?;
-        serde_json::to_writer(file, self)?;
+        serde_json::to_writer(file, index)?;
         Ok(())
     }
-    fn try_search(&self, ver_req: &VersionReq) -> Result<SearchType, anyhow::Error> {
-        if self.versions.is_empty() || self.latest.is_empty() || self.secondary.is_empty() {
-            return Ok(SearchType::Upstream);
-        }
-        if ver_req.comparators.len() != 1 {
-            // 先匹配本地版本
-            let ver = self.versions.iter().rev().find_map(|v| {
+    // 匹配本地版本
+    pub fn match_version(&self, ver_req: &VersionReq) -> Option<String> {
+        self.versions
+            .iter()
+            .rev()
+            .find_map(|v| {
                 toolchain::semantic(v)
                     .ok()
                     .filter(|semver| ver_req.matches(semver))
                     .map(|_| v)
-            });
+            })
+            .map(ToOwned::to_owned)
+    }
+    // 尝试匹配归档版本
+    fn try_match_archived_version(
+        &self,
+        ver_req: &VersionReq,
+    ) -> Result<Resolution, anyhow::Error> {
+        if self.versions.is_empty() || self.latest.is_empty() || self.secondary.is_empty() {
+            return Ok(Resolution::Unresolved);
+        }
+        if ver_req.comparators.len() != 1 {
+            // 先匹配本地版本
+            let ver = self.match_version(ver_req);
             let search_type = if let Some(ver) = ver
-                && (ver != &self.latest || ver != &self.secondary)
+                && (ver != self.latest || ver != self.secondary)
             {
-                SearchType::Local(ver.to_owned())
+                Resolution::Resolved(ver)
             } else {
-                SearchType::Upstream
+                Resolution::Unresolved
             };
             return Ok(search_type);
         }
@@ -112,19 +124,11 @@ impl LocalGoIndex {
         let secondary = toolchain::semantic(&self.secondary)?;
         let is_match_archived = toolchain::is_match_archived(&latest, &secondary, ver_req);
         if is_match_archived {
-            self.versions
-                .iter()
-                .rev()
-                .find_map(|v| {
-                    toolchain::semantic(v)
-                        .ok()
-                        .filter(|semver| ver_req.matches(semver))
-                        .map(|_| v)
-                })
-                .map(|v| SearchType::Local(v.to_owned()))
+            self.match_version(ver_req)
+                .map(Resolution::Resolved)
                 .ok_or_else(|| anyhow!("no matching version found!"))
         } else {
-            Ok(SearchType::Upstream)
+            Ok(Resolution::Unresolved)
         }
     }
 }
@@ -190,16 +194,19 @@ impl RegistryIndex {
             .ok_or_else(|| anyhow!("Getting latest Go version failed"))
             .map(|v| v.to_owned())
     }
+
     pub fn match_version_req(&self, version_req: &str) -> Result<String, anyhow::Error> {
         log::debug!("version request: {version_req}");
         let ver_req = VersionReq::parse(version_req)?;
-        let index_go = LocalGoIndex::read();
-        let search_type = index_go.map_or(Ok(SearchType::Upstream), |v| v.try_search(&ver_req))?;
-        if let SearchType::Local(ver) = search_type {
-            log::debug!("use local!!!");
+
+        let search_type = LocalGoIndex::read().map_or(Ok(Resolution::Unresolved), |v| {
+            v.try_match_archived_version(&ver_req)
+        })?;
+        if let Resolution::Resolved(ver) = search_type {
+            log::debug!("use archived!!!");
             Ok(ver)
         } else {
-            log::debug!("use upstream!!!");
+            log::debug!("use active!!!");
             self.list_upstream_go_versions_filter(None)?
                 .iter()
                 .rev()
@@ -220,7 +227,7 @@ impl RegistryIndex {
         filter: Option<ToolchainFilter>,
     ) -> Result<Vec<String>, anyhow::Error> {
         let ver = self.list_upstream_go_versions()?;
-        LocalGoIndex::write_if_modify(&ver.clone().into()).ok();
+        LocalGoIndex::write_if_change(&ver.clone().into()).ok();
         let Some(filter) = filter else {
             return Ok(ver);
         };
