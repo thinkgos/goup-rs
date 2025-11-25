@@ -4,7 +4,7 @@ use anyhow::Result;
 use semver::{Op, Version, VersionReq};
 
 /// support toolchain
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum Toolchain {
     Stable,
     Unstable,
@@ -28,7 +28,7 @@ impl FromStr for Toolchain {
 }
 
 /// a toolchain filter.
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum ToolchainFilter {
     Stable,
     Unstable,

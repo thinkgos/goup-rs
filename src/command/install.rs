@@ -13,8 +13,8 @@ use crate::{
 #[command(disable_version_flag = true)]
 pub struct Install {
     /// toolchain name, such as 'stable', 'nightly'('tip', 'gotip'), 'unstable', 'beta' or '=1.21.4'
-    #[arg(default_value = "stable")]
-    toolchain: String,
+    #[arg(default_value = "stable", value_parser = clap::value_parser!(Toolchain))]
+    toolchain: Toolchain,
     /// an optional change list (CL), If the version is 'tip'
     cl: Option<String>,
     /// only install the version, but do not switch.
@@ -30,7 +30,7 @@ pub struct Install {
 impl Run for Install {
     fn run(&self) -> Result<(), anyhow::Error> {
         let opt = &self.install_options;
-        let toolchain = self.toolchain.parse()?;
+        let toolchain = self.toolchain.clone();
         let registry_index = RegistryIndex::new(&opt.registry_index);
         let registry = Registry::new(
             &opt.registry,
