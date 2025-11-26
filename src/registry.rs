@@ -221,10 +221,10 @@ impl RegistryIndex {
         }
     }
     /// list upstream go versions filter by toolchain filter.
-    /// NOTE: 此方法每次都更新缓存!
+    /// NOTE: 此方法每次都尝试更新缓存!
     pub fn list_upstream_go_versions_filter(
         &self,
-        filter: Option<ToolchainFilter>,
+        filter: Option<&ToolchainFilter>,
     ) -> Result<Vec<String>, anyhow::Error> {
         let ver = self.list_upstream_go_versions()?;
         LocalGoIndex::write_if_change(&ver.clone().into()).ok();

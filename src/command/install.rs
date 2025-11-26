@@ -30,14 +30,13 @@ pub struct Install {
 impl Run for Install {
     fn run(&self) -> Result<(), anyhow::Error> {
         let opt = &self.install_options;
-        let toolchain = self.toolchain.clone();
         let registry_index = RegistryIndex::new(&opt.registry_index);
         let registry = Registry::new(
             &opt.registry,
             opt.skip_verify,
             opt.enable_check_archive_size,
         );
-        let version = match toolchain {
+        let version = match self.toolchain {
             Toolchain::Stable => {
                 let version = registry_index.get_upstream_latest_go_version()?;
                 let version = toolchain::normalize(&version);
@@ -46,7 +45,7 @@ impl Run for Install {
             }
             Toolchain::Unstable => {
                 let version = registry_index
-                    .list_upstream_go_versions_filter(Some(ToolchainFilter::Unstable))?;
+                    .list_upstream_go_versions_filter(Some(&ToolchainFilter::Unstable))?;
                 let version = version
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest unstable version"))?;
@@ -55,8 +54,8 @@ impl Run for Install {
                 version
             }
             Toolchain::Beta => {
-                let version =
-                    registry_index.list_upstream_go_versions_filter(Some(ToolchainFilter::Beta))?;
+                let version = registry_index
+                    .list_upstream_go_versions_filter(Some(&ToolchainFilter::Beta))?;
                 let version = version
                     .last()
                     .ok_or_else(|| anyhow!("failed get latest beta version"))?;
@@ -64,11 +63,11 @@ impl Run for Install {
                 registry.install_go(&version)?;
                 version
             }
-            Toolchain::Version(version_req) => {
+            Toolchain::Version(ref version_req) => {
                 let version = if self.use_raw_version {
-                    version_req
+                    version_req.to_owned()
                 } else {
-                    registry_index.match_version_req( &version_req).inspect_err(|_| {
+                    registry_index.match_version_req( version_req).inspect_err(|_| {
                         log::warn!("'semver' match failure, If you want to use version like '1.19beta1' or '1.25rc2', try add option '--use-raw-version'");
                     })?
                 };

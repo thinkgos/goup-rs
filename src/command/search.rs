@@ -18,9 +18,8 @@ pub struct Search {
 
 impl Run for Search {
     fn run(&self) -> Result<(), anyhow::Error> {
-        let filter = self.filter.clone();
-        let remote_versions =
-            RegistryIndex::new(&self.registry_index).list_upstream_go_versions_filter(filter)?;
+        let remote_versions = RegistryIndex::new(&self.registry_index)
+            .list_upstream_go_versions_filter(self.filter.as_ref())?;
         let local_versions = Version::list_go_version().unwrap_or_default();
         let local_versions: HashSet<_> = local_versions.iter().map(|v| &v.version).collect();
         remote_versions.iter().for_each(|version| {
