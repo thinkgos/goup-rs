@@ -4,7 +4,8 @@ use clap::Args;
 use owo_colors::OwoColorize;
 
 use super::Run;
-use crate::{consts, registry::RegistryIndex, toolchain::ToolchainFilter, version::Version};
+use crate::registries::registry_index::RegistryIndex;
+use crate::{consts, toolchain::ToolchainFilter, version::Version};
 
 #[derive(Args, Debug, PartialEq)]
 pub struct Search {

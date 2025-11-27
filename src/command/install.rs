@@ -4,7 +4,10 @@ use clap::Args;
 use super::Run;
 use crate::{
     command::utils::InstallOptions,
-    registry::{NightlyRegistry, Registry, RegistryIndex},
+    registries::{
+        registry::{NightlyRegistry, Registry},
+        registry_index::RegistryIndex,
+    },
     toolchain::{self, Toolchain, ToolchainFilter},
     version::Version,
 };

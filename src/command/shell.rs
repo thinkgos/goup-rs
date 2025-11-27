@@ -16,7 +16,7 @@ use crate::{
     command::utils::InstallOptions,
     consts::GOUP_GO_VERSION,
     dir::Dir,
-    registry::{LocalGoIndex, Registry},
+    registries::{local_go_index::LocalGoIndex, registry::Registry},
     shell::ShellType,
     toolchain,
     version::Version,

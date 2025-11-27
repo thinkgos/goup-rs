@@ -2,7 +2,9 @@ use anyhow::anyhow;
 use clap::Args;
 use dialoguer::{Select, theme::ColorfulTheme};
 
-use crate::{command::utils::InstallOptions, registry::Registry, toolchain, version::Version};
+use crate::{
+    command::utils::InstallOptions, registries::registry::Registry, toolchain, version::Version,
+};
 
 use super::Run;
 
