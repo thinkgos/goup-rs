@@ -4,7 +4,7 @@ use clap::Args;
 use owo_colors::OwoColorize;
 
 use super::Run;
-use crate::registries::registry_index::RegistryIndex;
+use crate::registries::registry_index::RegistryIndexType;
 use crate::{consts, toolchain::ToolchainFilter, version::Version};
 
 #[derive(Args, Debug, PartialEq)]
@@ -13,13 +13,15 @@ pub struct Search {
     #[arg(value_parser = clap::value_parser!(ToolchainFilter))]
     filter: Option<ToolchainFilter>,
     /// registry index that is used to update Go version index.
-    #[arg(long, default_value_t = consts::GO_REGISTRY_INDEX.to_owned(), env = consts::GO_REGISTRY_INDEX)]
-    registry_index: String,
+    #[arg(long, default_value_t = RegistryIndexType::Official(consts::GO_REGISTRY_INDEX.to_owned()), env = consts::GO_REGISTRY_INDEX, value_parser = clap::value_parser!(RegistryIndexType))]
+    registry_index: RegistryIndexType,
 }
 
 impl Run for Search {
     fn run(&self) -> Result<(), anyhow::Error> {
-        let remote_versions = RegistryIndex::new(&self.registry_index)
+        let remote_versions = self
+            .registry_index
+            .as_registry_index()
             .list_upstream_go_versions_filter(self.filter.as_ref())?;
         let local_versions = Version::list_go_version().unwrap_or_default();
         let local_versions: HashSet<_> = local_versions.iter().map(|v| &v.version).collect();

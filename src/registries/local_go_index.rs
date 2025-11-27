@@ -130,3 +130,44 @@ impl From<Vec<String>> for LocalGoIndex {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::LocalGoIndex;
+
+    #[test]
+    fn test_cache_go_version_impl_from_vec_trait() {
+        {
+            let v1 = vec![
+                "1.24.0", "1.25.2", "1.24.1", "1.25rc1", "1.25.1", "1.23.2", "1.25.3", "1.24rc1",
+                "1.23rc1", "1.23.0", "1.24.2", "1.23.1", "1.25.0",
+            ];
+
+            let v2 = v1.iter().map(|s| s.to_string()).collect::<Vec<String>>();
+            let cgv: LocalGoIndex = v2.into();
+            assert_eq!(cgv.versions, v1);
+            assert_eq!(cgv.latest, "1.25.3");
+            assert_eq!(cgv.secondary, "1.24.2");
+        }
+        {
+            let v1 = vec![
+                "1.24.0",
+                "1.24rc1",
+                "1.24.2",
+                "1.25rc2",
+                "1.25beta2",
+                "1.23.1",
+                "1.25rc1",
+                "1.24.1",
+                "1.23rc1",
+                "1.23.0",
+                "1.25beta1",
+            ];
+            let v2 = v1.iter().map(|s| s.to_string()).collect::<Vec<String>>();
+            let cgv: LocalGoIndex = v2.into();
+            assert_eq!(cgv.versions, v1);
+            assert_eq!(cgv.latest, "1.24.2");
+            assert_eq!(cgv.secondary, "1.23.1");
+        }
+    }
+}

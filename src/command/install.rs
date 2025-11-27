@@ -4,10 +4,7 @@ use clap::Args;
 use super::Run;
 use crate::{
     command::utils::InstallOptions,
-    registries::{
-        registry::{NightlyRegistry, Registry},
-        registry_index::RegistryIndex,
-    },
+    registries::registry::{NightlyRegistry, Registry},
     toolchain::{self, Toolchain, ToolchainFilter},
     version::Version,
 };
@@ -33,7 +30,7 @@ pub struct Install {
 impl Run for Install {
     fn run(&self) -> Result<(), anyhow::Error> {
         let opt = &self.install_options;
-        let registry_index = RegistryIndex::new(&opt.registry_index);
+        let registry_index = opt.registry_index.as_registry_index();
         let registry = Registry::new(
             &opt.registry,
             opt.skip_verify,
