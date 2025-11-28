@@ -13,7 +13,7 @@ pub struct Search {
     #[arg(value_parser = clap::value_parser!(ToolchainFilter))]
     filter: Option<ToolchainFilter>,
     /// registry index that is used to update Go version index.
-    #[arg(long, default_value_t = RegistryIndexType::Official(consts::GO_REGISTRY_INDEX.to_owned()), env = consts::GO_REGISTRY_INDEX, value_parser = clap::value_parser!(RegistryIndexType))]
+    #[arg(long, default_value_t = RegistryIndexType::Official(consts::GO_REGISTRY_INDEX.to_owned()), env = consts::GOUP_GO_REGISTRY_INDEX, value_parser = clap::value_parser!(RegistryIndexType))]
     registry_index: RegistryIndexType,
 }
 

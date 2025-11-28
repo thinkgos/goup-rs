@@ -246,20 +246,27 @@ goup completion zsh > _goup
 
 ### 索引镜像站
 
-- 官方1(默认): https://go.dev
-- 官方2: https://golang.google.cn
+| 索引 | 地址 | 使用选项`--registry-index` | 备注 |
+|---|---|---|---|
+| 官方1(默认) | https://go.dev | `official` 或 `official\|https://go.dev` | |
+| 官方2 | https://golang.google.cn | `official\|https://golang.google.cn` | |
+| 官方git 1 | https://github.com/golang/go | `git` 或 `git\|https://github.com/golang/go` | 通过git |
+| 官方git 2 | https://go.googlesource.com/go | `git\|https://go.googlesource.com/go` | 通过git |
+| 阿里云 | https://mirrors.aliyun.com/golang | `ngx-fancy-index\|https://mirrors.aliyun.com/golang` | |
+| 南京大学 | https://mirrors.nju.edu.cn/golang | `ngx-fancy-index\|https://mirrors.nju.edu.cn/golang` | |
+| 华中科技大学 | https://mirrors.hust.edu.cn/golang | `ngx-fancy-index\|https://mirrors.hust.edu.cn/golang` | |
 
 ### 仓库镜像站
 
-| 仓库 | 地址 | 支持SHA256文件 | 支持HTTP获取压缩包长度 |
-|---|---|---|---
-| 官方1(默认) | https://dl.google.com/go | ✅ | ✅ |
-| 官方2 | https://go.dev/dl | ❌ | ✅ |
-| 官方3 | https://golang.org/dl | ❌ | ✅ |
-| 阿里云 | https://mirrors.aliyun.com/golang | ❌ | ❌ |
-| 南京大学 | https://mirrors.nju.edu.cn/golang | ✅ | ✅ |
-| 华中科技大学 | https://mirrors.hust.edu.cn/golang | ✅ | ✅ |
-| 中国科学技术大学 | https://mirrors.ustc.edu.cn/golang | ✅ | ✅ |
+| 仓库 | 地址 | 支持SHA256文件 | 支持HTTP获取压缩包长度 | 备注 |
+|---|---|---|---|---|
+| 官方1(默认) | https://dl.google.com/go | ✅ | ✅ | |
+| 官方2 | https://go.dev/dl | ❌ | ✅ | |
+| 官方3 | https://golang.org/dl | ❌ | ✅ | |
+| 阿里云 | https://mirrors.aliyun.com/golang | ❌ | ❌ | |
+| 南京大学 | https://mirrors.nju.edu.cn/golang | ✅ | ✅ | |
+| 华中科技大学 | https://mirrors.hust.edu.cn/golang | ✅ | ✅ | |
+| 中国科学技术大学 | https://mirrors.ustc.edu.cn/golang | ✅ | ✅ | ❌ 不建议使用 |
 
 ***NOTE***: 有些镜像站不提供**SHA256校验文件**, 在下载时需要使用`--skip-verify`选项.
 
@@ -267,6 +274,8 @@ goup completion zsh > _goup
 
 ```shell
 # 推存值
+# export GOUP_GO_REGISTRY_INDEX='ngx-fancy-index|https://mirrors.nju.edu.cn/golang'
+# export GOUP_GO_REGISTRY_INDEX='git|https://github.com/golang/go'
 export GOUP_GO_REGISTRY_INDEX=https://go.dev
 export GOUP_GO_REGISTRY=https://mirrors.hust.edu.cn/golang
 ```

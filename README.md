@@ -245,20 +245,27 @@ goup completion zsh > _goup
 
 ### Registry index mirror site
 
-- Official 1(default): https://go.dev
-- Official 2: https://golang.google.cn
+| index | url | use option `--registry-index` | remark |
+|---|---|---|---|
+| Official 1(default) | https://go.dev | `official` 或 `official\|https://go.dev` | |
+| Official 2 | https://golang.google.cn | `official\|https://golang.google.cn` | |
+| 官方git 1 | https://github.com/golang/go | `git` 或 `git\|https://github.com/golang/go` | via git |
+| 官方git 2 | https://go.googlesource.com/go | `git\|https://go.googlesource.com/go` | via git |
+| Aliyun | https://mirrors.aliyun.com/golang | `ngx-fancy-index\|https://mirrors.aliyun.com/golang` | |
+| Nanjing University | https://mirrors.nju.edu.cn/golang | `ngx-fancy-index\|https://mirrors.nju.edu.cn/golang` | |
+| Huazhong University of Science and Technology | https://mirrors.hust.edu.cn/golang | `ngx-fancy-index\|https://mirrors.hust.edu.cn/golang` | |
 
 ### Registry mirror site
 
-| Registry | url | Support SHA256 file | Support HTTP get archive file length |
-|---|---|---|---|
-| Official 1(default) | https://dl.google.com/go | ✅ | ✅ |
-| Official 2 | https://go.dev/dl | ❌ | ✅ |
-| Official 3 | https://golang.org/dl | ❌ | ✅ |
-| Aliyun | https://mirrors.aliyun.com/golang | ❌ | ❌ |
-| Nanjing University | https://mirrors.nju.edu.cn/golang | ✅ | ✅ |
-| Huazhong University of Science and Technology | https://mirrors.hust.edu.cn/golang | ✅ | ✅ |
-| University of Science and Technology of China | https://mirrors.ustc.edu.cn/golang | ✅ | ✅ |
+| Registry | url | Support SHA256 file | Support HTTP get archive file length | remark |
+|---|---|---|---|---|
+| Official 1(default) | https://dl.google.com/go | ✅ | ✅ | |
+| Official 2 | https://go.dev/dl | ❌ | ✅ | |
+| Official 3 | https://golang.org/dl | ❌ | ✅ | |
+| Aliyun | https://mirrors.aliyun.com/golang | ❌ | ❌ | |
+| Nanjing University | https://mirrors.nju.edu.cn/golang | ✅ | ✅ | |
+| Huazhong University of Science and Technology | https://mirrors.hust.edu.cn/golang | ✅ | ✅ | |
+| University of Science and Technology of China | https://mirrors.ustc.edu.cn/golang | ✅ | ✅ | ❌ not suggest |
 
 ***NOTE***: **SHA256 checksum files** are not provided by some mirror sites, and you need to use the `--skip-verify` option when downloading.
 
