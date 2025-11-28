@@ -1,3 +1,3 @@
-pub(crate) mod local_go_index;
-pub(crate) mod registry;
-pub(crate) mod registry_index;
+pub mod go_index;
+pub mod registry;
+pub mod registry_index;

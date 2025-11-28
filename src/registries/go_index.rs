@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, fs::File};
+use std::fs::File;
 
 use anyhow::anyhow;
 use semver::{Version, VersionReq};
@@ -16,15 +16,15 @@ pub enum Resolution {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub(crate) struct LocalGoIndex {
+pub struct GoIndex {
     pub versions: Vec<String>, // 已发布go版本列表
     pub latest: String,        // 最新稳定版本
     pub secondary: String,     // 次新稳定版本
     pub sha256: String,        // 版本列表的sha256
 }
 
-impl LocalGoIndex {
-    pub fn read() -> Option<LocalGoIndex> {
+impl GoIndex {
+    pub fn read() -> Option<GoIndex> {
         let goup_home = Dir::goup_home().ok()?;
         let index_go = goup_home.index_go();
         if index_go.exists() {
@@ -34,11 +34,11 @@ impl LocalGoIndex {
             None
         }
     }
-    pub fn write_if_change(index: &LocalGoIndex) -> Result<(), anyhow::Error> {
+    pub fn write_if_change(index: &GoIndex) -> Result<(), anyhow::Error> {
         let index_go = Dir::goup_home()?.index_go();
         if index_go.exists()
             && let Ok(file) = File::open(&index_go)
-            && let Ok(old) = serde_json::from_reader::<_, LocalGoIndex>(file)
+            && let Ok(old) = serde_json::from_reader::<_, GoIndex>(file)
             && old.sha256 == index.sha256
         {
             return Ok(());
@@ -94,33 +94,41 @@ impl LocalGoIndex {
     }
 }
 
-impl From<Vec<String>> for LocalGoIndex {
+impl From<Vec<String>> for GoIndex {
     fn from(versions: Vec<String>) -> Self {
-        let mut context = Sha256::new();
-        // major.minor -> 最新稳定版本
-        let mut latest_stable: BTreeMap<(u64, u64), (Version, &str)> = BTreeMap::new();
-        for v in versions.iter() {
-            context.update(v);
-            // 注意跳过 rc/beta/alpha）
-            if let Ok(ver) = toolchain::semantic(v)
-                && ver.pre.is_empty()
-            {
-                latest_stable
-                    .entry((ver.major, ver.minor))
-                    .and_modify(|existing| {
-                        if ver > existing.0 {
-                            *existing = (ver.clone(), v);
-                        }
-                    })
-                    .or_insert((ver, v));
+        let mut version: Vec<(Version, String)> = versions
+            .into_iter()
+            .filter_map(|v| toolchain::semantic(&v).ok().map(|ver| (ver, v)))
+            .collect();
+        version.sort_by(|a, b| a.0.cmp(&b.0));
+
+        let mut latest: Option<(u64, u64, String)> = None;
+        let mut secondary: Option<String> = None;
+        // 反向迭代, 找到最新的稳定版本和次新的稳定版本
+        for (ver, raw) in version.iter().rev() {
+            if !ver.pre.is_empty() {
+                continue; // 跳过 prerelease (rc/beta/alpha)
+            }
+            let Some(ref cur) = latest else {
+                latest = Some((ver.major, ver.minor, raw.clone()));
+                continue;
+            };
+            if ver.major <= cur.0 && ver.minor < cur.1 {
+                secondary = Some(raw.clone());
+                break;
             }
         }
-        let (latest, secondary) = {
-            let mut iter = latest_stable.values().rev().take(2).map(|v| v.1);
-            let latest = iter.next().unwrap_or_default();
-            let second_latest = iter.next().unwrap_or(latest);
-            (latest.to_owned(), second_latest.to_owned())
-        };
+        let latest = latest.map(|v| v.2).unwrap_or_default();
+        let secondary = secondary.unwrap_or_else(|| latest.clone());
+
+        let mut context = Sha256::new();
+        let versions = version
+            .into_iter()
+            .map(|v| {
+                context.update(&v.1);
+                v.1
+            })
+            .collect::<Vec<String>>();
         let sha256 = format!("{:x}", context.finalize());
         Self {
             versions,
@@ -133,19 +141,23 @@ impl From<Vec<String>> for LocalGoIndex {
 
 #[cfg(test)]
 mod tests {
-    use super::LocalGoIndex;
+    use super::GoIndex;
 
     #[test]
-    fn test_cache_go_version_impl_from_vec_trait() {
+    fn test_impl_from_trait() {
         {
             let v1 = vec![
                 "1.24.0", "1.25.2", "1.24.1", "1.25rc1", "1.25.1", "1.23.2", "1.25.3", "1.24rc1",
                 "1.23rc1", "1.23.0", "1.24.2", "1.23.1", "1.25.0",
             ];
+            let want = vec![
+                "1.23rc1", "1.23.0", "1.23.1", "1.23.2", "1.24rc1", "1.24.0", "1.24.1", "1.24.2",
+                "1.25rc1", "1.25.0", "1.25.1", "1.25.2", "1.25.3",
+            ];
 
             let v2 = v1.iter().map(|s| s.to_string()).collect::<Vec<String>>();
-            let cgv: LocalGoIndex = v2.into();
-            assert_eq!(cgv.versions, v1);
+            let cgv: GoIndex = v2.into();
+            assert_eq!(cgv.versions, want);
             assert_eq!(cgv.latest, "1.25.3");
             assert_eq!(cgv.secondary, "1.24.2");
         }
@@ -163,9 +175,22 @@ mod tests {
                 "1.23.0",
                 "1.25beta1",
             ];
+            let want = vec![
+                "1.23rc1",
+                "1.23.0",
+                "1.23.1",
+                "1.24rc1",
+                "1.24.0",
+                "1.24.1",
+                "1.24.2",
+                "1.25beta1",
+                "1.25beta2",
+                "1.25rc1",
+                "1.25rc2",
+            ];
             let v2 = v1.iter().map(|s| s.to_string()).collect::<Vec<String>>();
-            let cgv: LocalGoIndex = v2.into();
-            assert_eq!(cgv.versions, v1);
+            let cgv: GoIndex = v2.into();
+            assert_eq!(cgv.versions, want);
             assert_eq!(cgv.latest, "1.24.2");
             assert_eq!(cgv.secondary, "1.23.1");
         }

@@ -1,4 +1,7 @@
+pub mod ngx_auto_index;
+pub mod ngx_fancy_index;
 mod official;
+mod official_git;
 
 use std::fmt::Display;
 use std::str::FromStr;
@@ -9,7 +12,11 @@ use semver::VersionReq;
 
 use self::official::Official;
 
-use crate::registries::local_go_index::{LocalGoIndex, Resolution};
+use crate::consts;
+use crate::registries::go_index::{GoIndex, Resolution};
+use crate::registries::registry_index::ngx_auto_index::NgxAutoIndex;
+use crate::registries::registry_index::ngx_fancy_index::NgxFancyIndex;
+use crate::registries::registry_index::official_git::OfficialGit;
 use crate::{toolchain, toolchain::ToolchainFilter};
 
 pub trait RegistryIndex {
@@ -24,7 +31,7 @@ pub trait RegistryIndex {
         log::debug!("version request: {version_req}");
         let ver_req = VersionReq::parse(version_req)?;
 
-        let search_type = LocalGoIndex::read().map_or(Ok(Resolution::Unresolved), |v| {
+        let search_type = GoIndex::read().map_or(Ok(Resolution::Unresolved), |v| {
             v.try_match_archived_version(&ver_req)
         })?;
         if let Resolution::Resolved(ver) = search_type {
@@ -52,7 +59,7 @@ pub trait RegistryIndex {
         filter: Option<&ToolchainFilter>,
     ) -> Result<Vec<String>, anyhow::Error> {
         let ver = self.list_upstream_go_versions()?;
-        LocalGoIndex::write_if_change(&ver.clone().into()).ok();
+        GoIndex::write_if_change(&ver.clone().into()).ok();
         let Some(filter) = filter else {
             return Ok(ver);
         };
@@ -81,11 +88,17 @@ pub trait RegistryIndex {
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum RegistryIndexType {
     Official(String),
+    OfficialGit(String),
+    NgxAutoIndex(String),
+    NgxFancyIndex(String),
 }
 impl RegistryIndexType {
     pub fn as_registry_index(&self) -> Box<dyn RegistryIndex> {
         match self {
-            RegistryIndexType::Official(host) => Box::new(Official::new(host)),
+            Self::Official(host) => Box::new(Official::new(host)),
+            Self::OfficialGit(url) => Box::new(OfficialGit::new(url)),
+            Self::NgxAutoIndex(host) => Box::new(NgxAutoIndex::new(host)),
+            Self::NgxFancyIndex(host) => Box::new(NgxFancyIndex::new(host)),
         }
     }
 }
@@ -94,10 +107,18 @@ impl FromStr for RegistryIndexType {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (v, host) = s.split_once("|").unwrap_or(("official", s));
-        match v {
-            "official" => Ok(Self::Official(host.to_owned())),
-            _ => Ok(Self::Official(host.to_owned())),
+        let (t, host) = match s {
+            "git" => ("git", consts::GO_SOURCE_GIT_URL),
+            "official" => ("official", consts::GO_REGISTRY_INDEX),
+            _ => s.split_once("|").unwrap_or(("official", s)),
+        };
+        let host = host.to_owned();
+        match t {
+            "official" => Ok(Self::Official(host)),
+            "ngx-auto-index" => Ok(Self::NgxAutoIndex(host)),
+            "ngx-fancy-index" => Ok(Self::NgxFancyIndex(host)),
+            "git" => Ok(Self::OfficialGit(host)),
+            _ => Ok(Self::Official(consts::GO_REGISTRY_INDEX.to_owned())),
         }
     }
 }
@@ -105,7 +126,10 @@ impl FromStr for RegistryIndexType {
 impl Display for RegistryIndexType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            RegistryIndexType::Official(host) => write!(f, "official|{host}"),
+            Self::Official(host) => write!(f, "official|{host}"),
+            Self::NgxAutoIndex(host) => write!(f, "ngx-auto-index|{host}"),
+            Self::NgxFancyIndex(host) => write!(f, "ngx-fancy-index|{host}"),
+            Self::OfficialGit(url) => write!(f, "git|{url}"),
         }
     }
 }

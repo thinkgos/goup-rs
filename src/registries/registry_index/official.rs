@@ -1,13 +1,10 @@
-use std::{process::Command, sync::mpsc, thread, time::Duration};
+use std::time::Duration;
 
 use anyhow::anyhow;
-use regex::Regex;
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use serde::Serialize;
-use which::which;
 
-use crate::consts;
 use crate::registries::registry_index::RegistryIndex;
 
 const HTTP_TIMEOUT: Duration = Duration::from_secs(10);
@@ -53,48 +50,6 @@ impl RegistryIndex for Official {
 
     /// list upstream go versions.
     fn list_upstream_go_versions(&self) -> Result<Vec<String>, anyhow::Error> {
-        let (tx, rx) = mpsc::channel();
-        {
-            let tx = tx.clone();
-            let this = self.clone();
-            thread::spawn(move || {
-                let r = this.list_upstream_go_versions_via_http();
-                let _ = tx.send(r);
-            });
-        }
-
-        let thread_count = if which("git").is_ok() {
-            let tx = tx.clone();
-            thread::spawn(move || {
-                let r: Result<Vec<String>, anyhow::Error> =
-                    Self::list_upstream_go_versions_via_git();
-                let _ = tx.send(r);
-            });
-            2
-        } else {
-            1
-        };
-
-        let mut last_err = Ok(vec![]);
-        for _ in 0..thread_count {
-            match rx.recv()? {
-                ok @ Ok(_) => return ok,
-                Err(e) => last_err = Err(e),
-            }
-        }
-        last_err
-    }
-}
-
-impl Official {
-    pub fn new(host: &str) -> Self {
-        Self {
-            host: host.to_owned(),
-        }
-    }
-    /// list upstream go versions via http.
-    fn list_upstream_go_versions_via_http(&self) -> Result<Vec<String>, anyhow::Error> {
-        log::trace!("list upstream go versions via http: {:?}", self.host);
         Ok(Client::builder()
             .timeout(HTTP_TIMEOUT)
             .build()?
@@ -106,22 +61,12 @@ impl Official {
             .rev()
             .collect())
     }
-    /// list upstream go versions via git.
-    fn list_upstream_go_versions_via_git() -> Result<Vec<String>, anyhow::Error> {
-        let go_source_git_url = consts::go_source_git_url();
-        log::trace!("list upstream go versions via git: {:?}", go_source_git_url);
-        let output = Command::new("git")
-            .args([
-                "ls-remote",
-                "--sort=version:refname",
-                "--tags",
-                &go_source_git_url,
-            ])
-            .output()?
-            .stdout;
-        Ok(Regex::new("refs/tags/go(.+)")?
-            .captures_iter(&String::from_utf8_lossy(&output))
-            .map(|capture| capture[1].to_string())
-            .collect())
+}
+
+impl Official {
+    pub fn new(host: &str) -> Self {
+        Self {
+            host: host.to_owned(),
+        }
     }
 }

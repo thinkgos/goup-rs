@@ -16,7 +16,7 @@ use crate::{
     command::utils::InstallOptions,
     consts::GOUP_GO_VERSION,
     dir::Dir,
-    registries::{local_go_index::LocalGoIndex, registry::Registry},
+    registries::{go_index::GoIndex, registry::Registry},
     shell::ShellType,
     toolchain,
     version::Version,
@@ -187,7 +187,7 @@ impl Shell {
         //     .ok()?;
         // 从本地索引中匹配版本号
         let ver_req = VersionReq::parse(&version_req).ok()?;
-        let version = LocalGoIndex::read().and_then(|v| v.match_version(&ver_req))?;
+        let version = GoIndex::read().and_then(|v| v.match_version(&ver_req))?;
         if !local_versions.iter().any(|v| v.version == version) {
             let registry = Registry::new(
                 &self.install_options.registry,
