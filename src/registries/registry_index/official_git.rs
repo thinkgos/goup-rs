@@ -1,6 +1,8 @@
 use std::process::Command;
 
+use anyhow::anyhow;
 use regex::Regex;
+use which::which;
 
 use crate::registries::{go_index::GoIndex, registry_index::RegistryIndex};
 
@@ -25,6 +27,12 @@ impl OfficialGit {
         }
     }
     fn inner_list_upstream_go_versions(&self) -> Result<GoIndex, anyhow::Error> {
+        if which("git").is_err() {
+            return Err(anyhow!(
+                r#""git" binary not found, make sure it is installed!"#,
+            ));
+        }
+
         let output = Command::new("git")
             .args(["ls-remote", "--sort=version:refname", "--tags", &self.url])
             .output()?
@@ -34,5 +42,18 @@ impl OfficialGit {
             .map(|capture| capture[1].to_string())
             .collect();
         Ok(versions.into())
+
+        // miss --tags
+        // let mut remote = Remote::create_detached(self.url.clone())?;
+        // remote.connect(Direction::Fetch)?;
+        // let refs = remote.list()?;
+        // let re: Regex = Regex::new(r"refs/tags/go(.+)")?;
+        // let versions = refs
+        //     .iter()
+        //     .filter_map(|r| re.captures(r.name()))
+        //     .map(|caps| caps[1].to_string())
+        //     .collect::<Vec<_>>();
+        // remote.disconnect()?;
+        // Ok(versions.into())
     }
 }
