@@ -246,7 +246,7 @@ goup completion zsh > _goup
 
 ### 索引镜像站
 
-| 索引 | 地址 | 使用选项`--registry-index` | 备注 |
+| 索引 | 地址 | 使用选项`--registry-index`或环境变量 | 备注 |
 |---|---|---|---|
 | 官方1(默认) | https://go.dev | `official` 或 `official\|https://go.dev` | |
 | 官方2 | https://golang.google.cn | `official\|https://golang.google.cn` | |

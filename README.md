@@ -245,7 +245,7 @@ goup completion zsh > _goup
 
 ### Registry index mirror site
 
-| index | url | use option `--registry-index` | remark |
+| index | url | use option `--registry-index` or environment variables | remark |
 |---|---|---|---|
 | Official 1(default) | https://go.dev | `official` 或 `official\|https://go.dev` | |
 | Official 2 | https://golang.google.cn | `official\|https://golang.google.cn` | |
