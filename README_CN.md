@@ -322,8 +322,8 @@ export GOUP_GO_REGISTRY=https://mirrors.hust.edu.cn/golang
 - 如何自定义 `GOUP_HOME`? (>= v0.11.x)  
   `goup`使用`$HOME/.goup`目录作为 `GOUP_HOME`. 如果需要自定义`GOUP_HOME`(大多数是Windows用户), 可以设置`GOUP_HOME`环境变量来使用其他目录, 安装`goup`之前, 请确保已设置自定义`GOUP_HOME`环境变量和目标目录权限, 否则可能会导致令人惊讶的结果, 请参阅issue [#265](https://github.com/thinkgos/goup-rs/issues/265) [#270](https://github.com/thinkgos/goup-rs/pull/270)
 
-- 有一些版本没有ha256文件, 如何安装这些版本?
-  `goup`(>= v0.12.x) 支持 `--skip-verify` 选项, 如果这些版本没有ha256文件, 你可以尝试添加选项. 请参阅issue [#300](https://github.com/thinkgos/goup-rs/issues/300) [#301](https://github.com/thinkgos/goup-rs/pull/301) [#305](https://github.com/thinkgos/goup-rs/pull/305)
+- 有一些版本没有sha256文件, 如何安装这些版本?
+  `goup`(>= v0.12.x) 支持 `--skip-verify` 选项, 如果这些版本没有sha256文件, 你可以尝试添加选项. 请参阅issue [#300](https://github.com/thinkgos/goup-rs/issues/300) [#301](https://github.com/thinkgos/goup-rs/pull/301) [#305](https://github.com/thinkgos/goup-rs/pull/305)
 
 - 如何安装特定版本? 为什么会出现错误`Error: expected comma after minor version number, found 'r'`?
   有时, 我们知道确切的版本, 可以使用 `goup install =1.24.5`, 但有些版本不符合[`semver`](https://semver.org/), 如 `1.25rc1`, 我们可以使用`goup install unstable`, 但这只能安装最新的不稳定版本. 所以我添加了一个 `--use-raw-version` 选项(>= v0.12.x), 这样我们就可以安装任何我们确切知道的版本. 请参阅issue [#299](https://github.com/thinkgos/goup-rs/issues/299) [#307](https://github.com/thinkgos/goup-rs/pull/307)
