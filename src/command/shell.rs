@@ -2,8 +2,9 @@
 use std::os::unix::process::CommandExt;
 
 use std::{
+    collections::{HashMap, HashSet},
     env, fs,
-    path::Path,
+    path::{Path, PathBuf},
     process::{Command, Stdio},
 };
 
@@ -33,33 +34,36 @@ pub struct Shell {
     #[arg(short, long)]
     shell: Option<ShellType>,
     /// skip autodetect go.work/go.mod.
-    #[arg(short, long)]
+    #[arg(long)]
     skip_autodetect: bool,
+    /// env file path
+    #[arg(short, long)]
+    filename: Option<PathBuf>,
     #[command(flatten)]
     install_options: InstallOptions,
 }
 
 impl Run for Shell {
     fn run(&self) -> Result<(), anyhow::Error> {
+        let envs = if let Some(ref filename) = self.filename {
+            dotenvy::from_filename_iter(filename)?
+                .filter_map(|v| {
+                    v.ok().and_then(|(k, v)| {
+                        // 过滤 GOROOT 和 GOUP_GO_VERSION
+                        if k == "GOROOT" || k == GOUP_GO_VERSION {
+                            None
+                        } else {
+                            Some((k, v))
+                        }
+                    })
+                })
+                .collect()
+        } else {
+            HashMap::new()
+        };
+
         let local_versions = Version::list_go_version()?;
         let target_go_version = self.get_target_version(&local_versions)?;
-        let current_go_version = local_versions.iter().fold(None, |acc, v| {
-            if v.session {
-                Some(&v.version)
-            } else if v.default {
-                acc.or(Some(&v.version))
-            } else {
-                acc
-            }
-        });
-        if current_go_version == Some(&target_go_version) {
-            // 如果当前会话活跃版本和目标版本一致，则不需要进入新 shell
-            log::info!(
-                "Current environment already uses Go {target_go_version}, skip enter new shell session.",
-            );
-            return Ok(());
-        }
-
         let target_go_version = toolchain::normalize(&target_go_version);
         let goup_home = Dir::goup_home()?;
         if !goup_home.is_dot_unpacked_success_file_exists(&target_go_version) {
@@ -84,21 +88,16 @@ impl Run for Shell {
         });
         let parent_env_path = env::var("PATH").unwrap_or_default();
 
+        let extra_path = envs.get("path").map(|v| v.as_ref());
         let child_env_go_root = go_root_path.to_string_lossy();
         let child_go_root_bin = go_root_bin_path.to_string_lossy();
-        let child_env_path = parent_env_path
-            .split(env_separator)
-            .filter(|v| {
-                if let Some(ref parent_bin) = parent_go_root_bin
-                    && *v == parent_bin
-                {
-                    return false;
-                }
-                true
-            })
-            .chain(std::iter::once(child_go_root_bin.as_ref()))
-            .collect::<Vec<_>>()
-            .join(env_separator);
+        let child_env_path = Self::merger_env_path_as_child_path(
+            &parent_env_path,
+            extra_path,
+            parent_go_root_bin.as_deref(),
+            &child_go_root_bin,
+            env_separator,
+        );
 
         log::info!("Enter new shell session with Go {target_go_version}");
         let mut command = Command::new(shell.to_string());
@@ -108,7 +107,8 @@ impl Run for Shell {
             .stderr(Stdio::inherit())
             .env(GOUP_GO_VERSION, target_go_version)
             .env("GOROOT", child_env_go_root.as_ref())
-            .env("PATH", &child_env_path);
+            .env("PATH", &child_env_path)
+            .envs(envs.into_iter().filter(|v| v.0 != "path"));
         #[cfg(unix)]
         {
             let err = command.exec();
@@ -126,6 +126,45 @@ impl Run for Shell {
 }
 
 impl Shell {
+    fn merger_env_path_as_child_path(
+        parent_env_path: &str,
+        extra_path: Option<&str>,
+        parent_go_root_bin: Option<&str>,
+        child_go_root_bin: &str,
+        env_separator: &str,
+    ) -> String {
+        // parent_env_path
+        //     .split(env_separator)
+        //     .filter(|v| {
+        //         if let Some(parent_bin) = parent_go_root_bin
+        //             && *v == parent_bin
+        //         {
+        //             return false;
+        //         }
+        //         true
+        //     })
+        //     .chain(std::iter::once(child_go_root_bin))
+        //     .collect::<Vec<_>>()
+        //     .join(env_separator)
+        let mut seen = HashSet::new();
+        extra_path
+            .map(|v| v.split(env_separator))
+            .into_iter()
+            .flatten()
+            .chain(std::iter::once(child_go_root_bin))
+            .chain(parent_env_path.split(env_separator).filter(|v| {
+                if let Some(parent_bin) = parent_go_root_bin
+                    && *v == parent_bin
+                {
+                    return false;
+                }
+                true
+            }))
+            .filter(|v| seen.insert(*v)) // 去重，保持顺序
+            .collect::<Vec<_>>()
+            .join(env_separator)
+    }
+
     fn get_target_version(&self, local_versions: &[Version]) -> Result<String, anyhow::Error> {
         if let Some(version) = &self.version {
             // 指定了版本号，直接使用该版本

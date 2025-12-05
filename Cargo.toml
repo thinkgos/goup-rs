@@ -55,6 +55,7 @@ dirs = "6.0"
 semver = "1.0"
 owo-colors="4"
 scraper="0.24"
+dotenvy = "0.15"
 # git2 = "0.20"
 
 [target.'cfg(windows)'.dependencies]
