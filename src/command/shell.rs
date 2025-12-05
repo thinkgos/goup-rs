@@ -14,7 +14,7 @@ use dialoguer::{Select, theme::ColorfulTheme};
 use semver::VersionReq;
 
 use crate::{
-    command::utils::InstallOptions,
+    command::utils::{InstallOptions, KeyValuePair},
     consts::GOUP_GO_VERSION,
     dir::Dir,
     registries::{go_index::GoIndex, registry::Registry},
@@ -36,6 +36,9 @@ pub struct Shell {
     /// skip autodetect go.work/go.mod.
     #[arg(long)]
     skip_autodetect: bool,
+    /// custom env vars
+    #[arg(short, long)]
+    envs: Vec<KeyValuePair>,
     /// env file path
     #[arg(short, long)]
     filename: Option<PathBuf>,
@@ -45,22 +48,26 @@ pub struct Shell {
 
 impl Run for Shell {
     fn run(&self) -> Result<(), anyhow::Error> {
-        let envs = if let Some(ref filename) = self.filename {
+        let filter_keys = ["GOROOT", GOUP_GO_VERSION];
+
+        let mut envs = if let Some(ref filename) = self.filename {
             dotenvy::from_filename_iter(filename)?
                 .filter_map(|v| {
                     v.ok().and_then(|(k, v)| {
                         // 过滤 GOROOT 和 GOUP_GO_VERSION
-                        if k == "GOROOT" || k == GOUP_GO_VERSION {
-                            None
-                        } else {
-                            Some((k, v))
-                        }
+                        (!filter_keys.contains(&k.as_str())).then_some((k, v))
                     })
                 })
                 .collect()
         } else {
             HashMap::new()
         };
+        // 合并命令行的 -e KEY=VALUE
+        for kv in &self.envs {
+            if !filter_keys.contains(&kv.key.as_str()) {
+                envs.insert(kv.key.clone(), kv.value.clone());
+            }
+        }
 
         let local_versions = Version::list_go_version()?;
         let target_go_version = self.get_target_version(&local_versions)?;
@@ -88,16 +95,27 @@ impl Run for Shell {
         });
         let parent_env_path = env::var("PATH").unwrap_or_default();
 
-        let extra_path = envs.get("path").map(|v| v.as_ref());
         let child_env_go_root = go_root_path.to_string_lossy();
         let child_go_root_bin = go_root_bin_path.to_string_lossy();
-        let child_env_path = Self::merger_env_path_as_child_path(
-            &parent_env_path,
-            extra_path,
-            parent_go_root_bin.as_deref(),
-            &child_go_root_bin,
-            env_separator,
-        );
+        let child_env_path = {
+            let mut seen = HashSet::new();
+            envs.get("path")
+                .map(|v| v.split(env_separator))
+                .into_iter()
+                .flatten()
+                .chain(std::iter::once(child_go_root_bin.as_ref()))
+                .chain(parent_env_path.split(env_separator).filter(|v| {
+                    if let Some(parent_bin) = parent_go_root_bin.as_deref()
+                        && *v == parent_bin
+                    {
+                        return false;
+                    }
+                    true
+                }))
+                .filter(|v| seen.insert(*v)) // 去重，保持顺序
+                .collect::<Vec<_>>()
+                .join(env_separator)
+        };
 
         log::info!("Enter new shell session with Go {target_go_version}");
         let mut command = Command::new(shell.to_string());
@@ -126,45 +144,6 @@ impl Run for Shell {
 }
 
 impl Shell {
-    fn merger_env_path_as_child_path(
-        parent_env_path: &str,
-        extra_path: Option<&str>,
-        parent_go_root_bin: Option<&str>,
-        child_go_root_bin: &str,
-        env_separator: &str,
-    ) -> String {
-        // parent_env_path
-        //     .split(env_separator)
-        //     .filter(|v| {
-        //         if let Some(parent_bin) = parent_go_root_bin
-        //             && *v == parent_bin
-        //         {
-        //             return false;
-        //         }
-        //         true
-        //     })
-        //     .chain(std::iter::once(child_go_root_bin))
-        //     .collect::<Vec<_>>()
-        //     .join(env_separator)
-        let mut seen = HashSet::new();
-        extra_path
-            .map(|v| v.split(env_separator))
-            .into_iter()
-            .flatten()
-            .chain(std::iter::once(child_go_root_bin))
-            .chain(parent_env_path.split(env_separator).filter(|v| {
-                if let Some(parent_bin) = parent_go_root_bin
-                    && *v == parent_bin
-                {
-                    return false;
-                }
-                true
-            }))
-            .filter(|v| seen.insert(*v)) // 去重，保持顺序
-            .collect::<Vec<_>>()
-            .join(env_separator)
-    }
-
     fn get_target_version(&self, local_versions: &[Version]) -> Result<String, anyhow::Error> {
         if let Some(version) = &self.version {
             // 指定了版本号，直接使用该版本
