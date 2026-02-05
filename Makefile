@@ -26,7 +26,7 @@ typos:
 lint: typos fmt.check clippy check test
 
 coverage:
-	cargo tarpaulin -p ${Package} --out lcov
+	cargo tarpaulin --out lcov
 
 publish:
 	cargo publish --registry crates-io

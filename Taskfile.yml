@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+vars:
+  GREETING: Hello, world!
+
+tasks:
+  default:
+    cmds:
+      - task: lint
+
+  lint:
+    cmds:
+      - task: typos
+      - task: fmt.check
+      - task: clippy
+      - task: check
+      - task: test
+
+  fmt.check:
+    cmd: cargo fmt -- --check
+
+  clippy:
+    cmd: cargo clippy --all-targets --all-features -- -D warnings
+
+  check:
+    cmd: cargo check --all
+
+  test:
+    cmd: cargo test --all-features
+
+  udeps:
+    cmd: cargo +nightly udeps
+
+  shear:
+    cmd: cargo shear
+
+  audit:
+    cmd: cargo audit
+
+  typos:
+    cmd: typos
+
+  coverage:
+    cmd: cargo tarpaulin --out lcov
+
+  publish:
+    cmd: cargo publish --registry crates-io
