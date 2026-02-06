@@ -4,25 +4,28 @@ on:
   pull_request:
     paths:
       # Run if workflow changes
-      - '.github/workflows/audit.yml'
+      - ".github/workflows/audit.yml"
       # Run on changed dependencies
-      - '**/Cargo.toml'
-      - '**/Cargo.lock'
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
       # Run if the configuration file changes
-      - '**/audit.toml'
+      - "**/audit.toml"
   push:
     paths:
       # Run if workflow changes
-      - '.github/workflows/audit.yml'
+      - ".github/workflows/audit.yml"
       # Run on changed dependencies
-      - '**/Cargo.toml'
-      - '**/Cargo.lock'
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
       # Run if the configuration file changes
-      - '**/audit.toml'
+      - "**/audit.toml"
 
 jobs:
   security_audit:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: Set up Rust
         uses: actions/checkout@v6
