@@ -124,7 +124,7 @@ impl Run for Shell {
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit())
             .env(GOUP_GO_VERSION, target_go_version)
-            .env("GOROOT", child_env_go_root.as_ref())
+            .env::<&str, &str>("GOROOT", child_env_go_root.as_ref())
             .env("PATH", &child_env_path)
             .envs(envs.into_iter().filter(|v| v.0 != "path"));
         #[cfg(unix)]

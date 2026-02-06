@@ -55,9 +55,10 @@ impl Version {
                         let ver = ver.to_string_lossy();
                         (ver.starts_with("go")
                             && (ver == "gotip"
-                                || goup_home.is_dot_unpacked_success_file_exists(ver.as_ref())))
+                                || goup_home
+                                    .is_dot_unpacked_success_file_exists::<&str>(ver.as_ref())))
                         .then(|| {
-                            let vvx = goup_home.version(ver.as_ref());
+                            let vvx = goup_home.version::<&str>(ver.as_ref());
                             Version {
                                 version: ver.trim_start_matches("go").into(),
                                 default: default.as_ref().is_some_and(|vv| vv == vvx.as_ref()),
