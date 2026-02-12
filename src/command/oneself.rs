@@ -49,6 +49,7 @@ impl Run for Oneself {
                 let status = Update::configure()
                     .repo_owner("thinkgos")
                     .repo_name("goup-rs")
+                    .identifier(self_update_asset_identifier())
                     .bin_name(cmd.get_name())
                     .show_download_progress(true)
                     .no_confirm(true)
@@ -77,6 +78,17 @@ impl Run for Oneself {
             }
         }
         Ok(())
+    }
+}
+
+fn self_update_asset_identifier() -> &'static str {
+    #[cfg(windows)]
+    {
+        ".zip"
+    }
+    #[cfg(not(windows))]
+    {
+        ".tar.gz"
     }
 }
 
