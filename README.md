@@ -25,8 +25,8 @@
 - List locally installed versions.
 - Switch between multiple installed versions.
 - Search available version of Go.
-- ✨Using a specific Go version in a shell session(>= v0.15.x).
-- ✨Support multiple download backend via environment `GOUP_GO_REGISTRY_INDEX`/`GOUP_GO_REGISTRY`(>=v0.16.x).
+- ✨Using a specific Go version in a shell session(>= v0.15.x). [Using a specific Go version in a shell session](#using-a-specific-go-version-in-a-shell-session)
+- ✨Support multiple download backend via environment `GOUP_GO_REGISTRY_INDEX`/`GOUP_GO_REGISTRY`(>=v0.16.x). [Mirror site](#mirror-site)
 - Manage locally cache files(such as `*.tar.gz`, `*.tar.gz.sha256`).
 - Upgrade `goup` itself.
 - Customize `GOUP_HOME`(default `$HOME/.goup`)(>= v0.11.x);
