@@ -839,7 +839,7 @@ dependencies = [
 
 [[package]]
 name = "goup-rs"
-version = "0.16.10"
+version = "0.16.11"
 dependencies = [
  "anyhow",
  "chrono",
