@@ -1,6 +1,6 @@
 use shadow_rs::ShadowBuilder;
 
-const MIN_VERSION: &str = "1.91";
+const MIN_VERSION: &str = "1.93";
 
 fn main() -> Result<(), shadow_rs::ShadowError> {
     match version_check::is_min_version(MIN_VERSION) {
