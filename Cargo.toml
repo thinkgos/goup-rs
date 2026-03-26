@@ -49,7 +49,7 @@ self_update = { version = "0.42", default-features = false, features = [
 shadow-rs = "1.7"
 env_logger = { version = "0.11", features = ["color"] }
 chrono = "0.4.43"
-sha2 = "0.10"
+sha2 = "0.11"
 flate2 = "1.1"
 tar = "0.4"
 zip = "8.4"
