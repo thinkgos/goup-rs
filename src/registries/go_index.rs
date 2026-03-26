@@ -129,7 +129,7 @@ impl From<Vec<String>> for GoIndex {
                 v.1
             })
             .collect::<Vec<String>>();
-        let sha256 = format!("{:x}", context.finalize());
+        let sha256 = hex::encode(context.finalize());
         Self {
             versions,
             latest,

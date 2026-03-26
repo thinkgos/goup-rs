@@ -270,7 +270,7 @@ impl<'a> Registry<'a> {
             }
             context.update(&buffer[..bytes_read]);
         }
-        Ok(format!("{:x}", context.finalize()))
+        Ok(hex::encode(context.finalize()))
     }
 
     /// verify_archive_file_sha256 校验文件sha256是否合法
