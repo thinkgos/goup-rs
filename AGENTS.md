@@ -61,11 +61,14 @@ cargo clippy --all-targets --all-features -- -D warnings
 
 ## Architecture Overview
 
-### Technical Stack
+## Environment
 
 - **Language**: Rust (Edition 2024, MSRV 1.94)
 - **Build System**: Cargo
-- **CLI Framework**: clap (v4.6) with derive feature
+
+### Technical Stack
+
+- **CLI Framework**: clap with derive feature
 - **Package**: `goup-rs` (binary: `goup`)
 
 ### Project Structure
@@ -267,6 +270,6 @@ updates the installer to honor the environment variable.
 Refs: #42
 ```
 
-## Common Pitfalls
+## Boundaries
 
 **Don't panic on failure** (breaks user workflow) Always use `?` operator, Log to stdout if need.
