@@ -78,33 +78,13 @@ src/
 ├── lib.rs              # Library entry, exports Cli and Run
 ├── main.rs             # Binary entry, parses args and runs
 ├── command/            # Command implementations
-│   ├── mod.rs          # Command enum and Run impl
-│   ├── cache.rs
-│   ├── completion.rs
-│   ├── default.rs
-│   ├── env.rs
-│   ├── init.rs
-│   ├── install.rs
-│   ├── list.rs
-│   ├── oneself.rs
-│   ├── remove.rs
-│   ├── search.rs
-│   ├── shell.rs
-│   └── utils.rs
 ├── registries/         # Registry and index providers
 │   ├── mod.rs
 │   ├── registry.rs
 │   ├── registry_index.rs
 │   ├── go_index.rs
-│   └── registry_index/
-│       ├── ngx_auto_index.rs
-│       ├── ngx_fancy_index.rs
-│       ├── official.rs
-│       └── official_git.rs
+│   └── registry_index/ # Registry index providers
 ├── archived/           # Archive extraction
-│   ├── mod.rs
-│   ├── tgz.rs
-│   └── zip.rs
 ├── toolchain.rs        # Toolchain management
 ├── version.rs          # Version parsing and matching
 ├── dir.rs              # Directory utilities
