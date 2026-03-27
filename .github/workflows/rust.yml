@@ -2,13 +2,17 @@ name: Rust
 
 on:
   push:
-    branches: [main]
-    paths-ignore:
-      - "**.md"
+    paths:
+      - "src/**"
+      - "Cargo.*"
+      - "tests/**"
+      - ".github/workflows/**"
   pull_request:
-    branches: [main]
-    paths-ignore:
-      - "**.md"
+    paths:
+      - "src/**"
+      - "Cargo.*"
+      - "tests/**"
+      - ".github/workflows/**"
 
 env:
   CARGO_TERM_COLOR: always
