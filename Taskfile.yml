@@ -2,9 +2,6 @@
 
 version: "3"
 
-vars:
-  GREETING: Hello, world!
-
 tasks:
   default:
     cmds:
@@ -19,7 +16,7 @@ tasks:
       - task: test
 
   fmt.check:
-    cmd: cargo fmt -- --check
+    cmd: cargo fmt --all -- --check
 
   clippy:
     cmd: cargo clippy --all-targets --all-features -- -D warnings
