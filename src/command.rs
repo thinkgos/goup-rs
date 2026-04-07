@@ -62,7 +62,7 @@ BuildArch:       {}"#,
 );
 
 // run command.
-pub trait Run {
+pub(crate) trait Run {
     fn run(&self) -> Result<(), anyhow::Error>;
 }
 
@@ -81,18 +81,6 @@ impl Global {
             _ => LevelFilter::Trace,
         }
     }
-}
-
-#[derive(Parser, Debug, PartialEq)]
-#[command(author, about, long_about = None)]
-#[command(propagate_version = true)]
-#[command(version = VERSION)]
-#[command(name = "goup")]
-pub struct Cli {
-    #[command(flatten)]
-    global: Global,
-    #[command(subcommand)]
-    command: Command,
 }
 
 #[derive(Subcommand, Debug, PartialEq)]
@@ -131,6 +119,36 @@ enum Command {
     Shell(shell::Shell),
 }
 
+impl Run for Command {
+    fn run(&self) -> Result<(), anyhow::Error> {
+        match self {
+            Command::Install(cmd) => cmd.run(),
+            Command::List(cmd) => cmd.run(),
+            Command::Remove(cmd) => cmd.run(),
+            Command::Search(cmd) => cmd.run(),
+            Command::Default(cmd) => cmd.run(),
+            Command::Oneself(cmd) => cmd.run(),
+            Command::Init(cmd) => cmd.run(),
+            Command::Env(cmd) => cmd.run(),
+            Command::Cache(cmd) => cmd.run(),
+            Command::Completion(c) => completion::print_completions(c.shell, &mut Cli::command()),
+            Command::Shell(c) => c.run(),
+        }
+    }
+}
+
+#[derive(Parser, Debug, PartialEq)]
+#[command(author, about, long_about = None)]
+#[command(propagate_version = true)]
+#[command(version = VERSION)]
+#[command(name = "goup")]
+pub struct Cli {
+    #[command(flatten)]
+    global: Global,
+    #[command(subcommand)]
+    command: Command,
+}
+
 impl Run for Cli {
     fn run(&self) -> Result<(), anyhow::Error> {
         let level_filter = self.global.log_filter_level();
@@ -151,18 +169,12 @@ impl Run for Cli {
             })
             .filter_level(level_filter)
             .init();
-        match &self.command {
-            Command::Install(cmd) => cmd.run(),
-            Command::List(cmd) => cmd.run(),
-            Command::Remove(cmd) => cmd.run(),
-            Command::Search(cmd) => cmd.run(),
-            Command::Default(cmd) => cmd.run(),
-            Command::Oneself(cmd) => cmd.run(),
-            Command::Init(cmd) => cmd.run(),
-            Command::Env(cmd) => cmd.run(),
-            Command::Cache(cmd) => cmd.run(),
-            Command::Completion(c) => completion::print_completions(c.shell, &mut Self::command()),
-            Command::Shell(c) => c.run(),
-        }
+        self.command.run()
+    }
+}
+
+impl Cli {
+    pub fn run_main() -> Result<(), anyhow::Error> {
+        Self::parse().run()
     }
 }
