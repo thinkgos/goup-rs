@@ -122,10 +122,10 @@ cargo test <module_name>::
 
 ```sh
 # Check without building
-cargo check --all
+cargo check
 
 # Format code
-cargo fmt --all -- --check
+cargo fmt -- --check
 
 # Run clippy lints
 cargo clippy
@@ -149,7 +149,7 @@ Release profile (Cargo.toml:79-84):
 **CRITICAL**: After ANY Rust file edits, ALWAYS run the full quality check pipeline before committing:
 
 ```sh
-cargo fmt --all -- --check && cargo clippy --all-targets --all-features -- -D warnings && cargo check --all && cargo test --all-features
+cargo fmt -- --check && cargo clippy --all-targets --all-features -- -D warnings && cargo check && cargo test --all-features
 ```
 
 **Rules**:

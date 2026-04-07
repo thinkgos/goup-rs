@@ -16,13 +16,13 @@ tasks:
       - task: test
 
   fmt.check:
-    cmd: cargo fmt --all -- --check
+    cmd: cargo fmt -- --check
 
   clippy:
     cmd: cargo clippy --all-targets --all-features -- -D warnings
 
   check:
-    cmd: cargo check --all
+    cmd: cargo check
 
   test:
     cmd: cargo test --all-features

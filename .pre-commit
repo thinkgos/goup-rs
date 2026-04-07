@@ -2,7 +2,7 @@
 
 set -eu
 
-if ! cargo fmt --all -- --check; then
+if ! cargo fmt -- --check; then
     echo "There are some code style issues."
     echo "Run cargo fmt first."
     exit 1
@@ -13,7 +13,7 @@ if ! cargo clippy --all-targets --all-features -- -D warnings; then
     exit 1
 fi
 
-if ! cargo check --all; then
+if ! cargo check; then
     echo "There are some check issues."
     exit 1
 fi

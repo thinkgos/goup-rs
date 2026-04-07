@@ -1,12 +1,12 @@
 
 fmt.check:
-	cargo fmt --all -- --check
+	cargo fmt -- --check
 
 clippy: 
 	cargo clippy --all-targets --all-features -- -D warnings
 
 check:
-	cargo check --all
+	cargo check
 
 test:
 	cargo test --all-features
