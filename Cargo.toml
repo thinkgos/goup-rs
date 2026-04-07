@@ -29,9 +29,9 @@ shadow-rs = "1.7"
 anyhow = "1.0"
 log = "0.4"
 regex = "1.12"
-reqwest = { version = "0.12", default-features = false, features = [
+reqwest = { version = "0.13", default-features = false, features = [
     "blocking",
-    "rustls-tls-native-roots",
+    "rustls",
     "json",
 ] }
 serde = { version = "1", features = ["derive"] }
@@ -41,7 +41,8 @@ clap = { version = "4.6", features = ["derive", "env"] }
 clap_complete = "4.6"
 dialoguer = "0.12"
 indicatif = "0.18"
-self_update = { version = "0.42", default-features = false, features = [
+self_update = { version = "0.44", default-features = false, features = [
+    "reqwest",
     "rustls",
     "compression-flate2",
     "compression-zip-deflate",
