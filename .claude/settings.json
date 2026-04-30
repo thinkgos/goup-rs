@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(* --version)",
+      "Bash(* --help *)",
+      "Bash(date *)",
+      "Bash(echo *)",
+      "Bash(cat *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(wc *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(sort *)",
+      "Bash(grep *)",
+      "Bash(tr *)",
+      "Bash(git add *)",
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(cargo fmt *)",
+      "Bash(cargo check *)",
+      "Bash(cargo clippy *)",
+      "Bash(cargo test *)",
+      "Bash(cargo build *)",
+      "Bash(cargo clean *)"
+    ],
+    "ask": [
+      "Bash(git commit *)",
+      "Bash(git tag *)",
+      "Bash(git push *)",
+      "Bash(cargo install *)"
+    ]
+  },
+  "enabledPlugins": {
+    "code-simplifier@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
+  }
+}
