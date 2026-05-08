@@ -85,6 +85,28 @@ cargo install goup-rs --git https://github.com/thinkgos/goup-rs
 - 将`goup.exe`移至`$YOUR_PATH`.
 - 将`$YOUR_PATH`加到windows环境变量中.
 
+### Nix Flake
+
+#### 运行
+
+```shell
+nix run github:thinkgos/goup-rs
+```
+
+#### home-manager 配置
+
+```nix
+# input
+inputs = {
+  nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  
+  goup-rs = {
+    url = "github:thinkgos/goup-rs";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+}
+```
+
 ## 快速入门
 
 ```shell

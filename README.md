@@ -93,7 +93,7 @@ Install the latest version for your system with the MSI-installers from the [Rel
 nix run github:thinkgos/goup-rs
 ```
 
-#### home-manager module
+#### home-manager configuration
 
 ```nix
 # input
