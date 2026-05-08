@@ -2,7 +2,7 @@
   description = "A flake for goup-rs";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts"; # https://flake.parts/
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
@@ -35,23 +35,40 @@
         let
           nativeBuildInputs = with pkgs; [
             pkg-config
+            git
           ];
-          rustPlatform = pkgs.makeRustPlatform {
-            cargo = pkgs.rust-bin.stable.latest.default;
-            rustc = pkgs.rust-bin.stable.latest.default;
+          rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+            extensions = [
+              # includes already:
+              # rustc
+              # cargo
+              # rust-std
+              # rust-docs
+              # rustfmt-preview
+              # clippy-preview
+              "rust-analyzer"
+              "rust-src"
+            ];
           };
+          rustPlatform = pkgs.makeRustPlatform {
+            cargo = pkgs.rust-bin.stable.latest.minimal;
+            rustc = pkgs.rust-bin.stable.latest.minimal;
+          };
+          cargoToml = fromTOML (builtins.readFile ./Cargo.toml);
         in
         {
+          # overlay
           # https://flake.parts/overlays.html#consuming-an-overlay
           _module.args.pkgs = import inputs.nixpkgs {
             inherit system;
             overlays = [ (import inputs.rust-overlay) ];
           };
+          # build package
           packages.default = rustPlatform.buildRustPackage (finalAttrs: {
             inherit nativeBuildInputs;
 
-            pname = "goup-rs";
-            version = self'.shortRev or "dev";
+            pname = cargoToml.package.name;
+            version = cargoToml.package.version;
             src = ./.;
 
             cargoLock = {
@@ -72,15 +89,15 @@
               mainProgram = "goup";
             };
           });
+          # dev shell
           devShells.default = pkgs.mkShell {
             name = "develop-shell";
             # 直接继承 packages 里的依赖
             inputsFrom = [ self'.packages.default ];
-            packages = [
-            ];
+            packages = [ rustToolchain ];
             env = {
+              RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/library";
             };
-            # SHELL = "${pkgs.zsh}/bin/zsh";
             shellHook = ''
               echo "Rust development shell ready! 🦀 $(rustc --version)"
             '';

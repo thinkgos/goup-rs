@@ -85,6 +85,28 @@ Install the latest version for your system with the MSI-installers from the [Rel
 - Move the `goup.exe` to `$YOUR_PATH`.
 - Add the `$YOUR_PATH` to windows environment.
 
+### Nix Flake
+
+#### Run
+
+```shell
+nix run github:thinkgos/goup-rs
+```
+
+#### home-manager module
+
+```nix
+# input
+inputs = {
+  nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  
+  goup-rs = {
+    url = "github:thinkgos/goup-rs";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+}
+```
+
 ## Quick Start
 
 ```shell
