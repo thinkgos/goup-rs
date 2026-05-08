@@ -63,7 +63,7 @@ dotenvy = "0.15"
 # git2 = "0.20"
 
 [target.'cfg(windows)'.dependencies]
-junction = "1.4"
+junction = "2.0"
 
 [dev-dependencies]
 # dev
