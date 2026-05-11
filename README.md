@@ -85,7 +85,7 @@ Install the latest version for your system with the MSI-installers from the [Rel
 - Move the `goup.exe` to `$YOUR_PATH`.
 - Add the `$YOUR_PATH` to windows environment.
 
-### Nix Flake
+### Nix
 
 #### Run
 
