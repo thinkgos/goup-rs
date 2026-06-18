@@ -28,6 +28,6 @@ jobs:
       issues: write
     steps:
       - name: Set up Rust
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Run audit
         uses: actions-rust-lang/audit@v1
