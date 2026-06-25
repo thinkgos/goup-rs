@@ -53,9 +53,8 @@ Core dependencies (detail see Cargo.toml):
 - dialoguer: Interactive prompts
 - indicatif: Progress bars and spinners
 - self_update: Self-update capability (rustls, compression)
-- shadow-rs: Build-time version/git info
 - env_logger: Environment-based logging (with color)
-- chrono: Date/time handling
+- jiff: Date/time handling
 - sha2: SHA256 hashing (checksums)
 - hex: Hex encoding/decoding
 - flate2: Gzip compression/decompression
@@ -70,7 +69,6 @@ Core dependencies (detail see Cargo.toml):
 **Build dependencies:**
 
 - `version_check`: Rust version detection
-- `shadow-rs`: Build-time code generation
 
 **Platform-specific:**
 

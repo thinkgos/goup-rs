@@ -23,7 +23,6 @@ no-self-update = []
 
 [build-dependencies]
 version_check = "0.9"
-shadow-rs = "2.0"
 
 [dependencies]
 anyhow = "1.0"
@@ -47,7 +46,6 @@ self_update = { version = "0.44", default-features = false, features = [
     "compression-flate2",
     "compression-zip-deflate",
 ] }
-shadow-rs = "2.0"
 env_logger = { version = "0.11", features = ["color"] }
 jiff = "0.2"
 sha2 = "0.11"

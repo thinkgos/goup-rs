@@ -14,8 +14,6 @@ mod utils;
 use clap::CommandFactory;
 use clap::{Parser, Subcommand};
 use env_logger::Env as LoggerEnv;
-use shadow_rs::shadow;
-use std::env::consts::{ARCH, OS};
 use std::io::prelude::Write;
 
 use self::cache::Cache;
@@ -28,37 +26,6 @@ use self::list::List;
 use self::oneself::Oneself;
 use self::remove::Remove;
 use self::search::Search;
-
-shadow!(build);
-const VERSION: &str = shadow_rs::formatcp!(
-    r#"{}
--------------------------------------
-{}
-
-Author:          {}
-Email:           {}
-Repository:      {}
-Branch:          {}
-GitCommit:       {}
-GitFullCommit:   {}
-BuildTime:       {}
-BuildEnv:        {}, {}
-BuildOs:         {}
-BuildArch:       {}"#,
-    env!("CARGO_PKG_VERSION"),
-    env!("CARGO_PKG_DESCRIPTION"),
-    build::COMMIT_AUTHOR,
-    build::COMMIT_EMAIL,
-    env!("CARGO_PKG_REPOSITORY"),
-    build::BRANCH,
-    build::SHORT_COMMIT,
-    build::COMMIT_HASH,
-    build::BUILD_TIME_2822,
-    build::RUST_VERSION,
-    build::RUST_CHANNEL,
-    OS,
-    ARCH,
-);
 
 // run command.
 pub(crate) trait Run {
@@ -122,7 +89,7 @@ impl Run for Command {
 #[derive(Parser, Debug, PartialEq)]
 #[command(author, about, long_about = None)]
 #[command(propagate_version = true)]
-#[command(version = VERSION)]
+#[command(version = env!("CARGO_PKG_VERSION"))]
 #[command(name = "goup")]
 pub struct Cli {
     #[command(subcommand)]

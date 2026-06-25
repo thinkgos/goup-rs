@@ -1,8 +1,6 @@
-use shadow_rs::ShadowBuilder;
-
 const MIN_VERSION: &str = "1.94";
 
-fn main() -> Result<(), shadow_rs::ShadowError> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     match version_check::is_min_version(MIN_VERSION) {
         Some(true) => {}
         // rustc version too small or can't figure it out
@@ -11,6 +9,5 @@ fn main() -> Result<(), shadow_rs::ShadowError> {
             std::process::exit(1);
         }
     }
-    ShadowBuilder::builder().build()?;
     Ok(())
 }
