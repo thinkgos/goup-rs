@@ -316,7 +316,7 @@ export GOUP_GO_REGISTRY=https://mirrors.hust.edu.cn/golang
 
 ## How to Debug
 
-Default log level is `Info`. You can use `goup -v <subcommand>` or `goup -vv <subcommand>` to use `Debug` or `Trace` level.
+Default log level is `Info`. You can set `RUST_LOG` environment variable such as `RUST_LOG=DEBUG goup <subcommand>` to debug.
 
 ## FAQ
 

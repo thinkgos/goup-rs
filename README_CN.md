@@ -319,7 +319,7 @@ export GOUP_GO_REGISTRY=https://mirrors.hust.edu.cn/golang
 
 ## 如何调试
 
-默认日志级别为`Info`. 你可以使用`goup -v <subcommand>` 或 `goup -vv <subcommand>` 来使用 `Debug` 或 `Trace` 等级.
+默认日志级别为`Info`. 你可以设置`RUST_LOG`环境变量, 如`RUST_LOG=DEBUG goup <subcommand>`进行调试.
 
 ## FAQ
 

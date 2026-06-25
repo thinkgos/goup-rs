@@ -11,10 +11,9 @@ mod search;
 mod shell;
 mod utils;
 
-use chrono::Local;
-use clap::{ArgAction, Args, CommandFactory};
+use clap::CommandFactory;
 use clap::{Parser, Subcommand};
-use log::LevelFilter;
+use env_logger::Env as LoggerEnv;
 use shadow_rs::shadow;
 use std::env::consts::{ARCH, OS};
 use std::io::prelude::Write;
@@ -32,7 +31,7 @@ use self::search::Search;
 
 shadow!(build);
 const VERSION: &str = shadow_rs::formatcp!(
-    r#"{} 
+    r#"{}
 -------------------------------------
 {}
 
@@ -64,23 +63,6 @@ BuildArch:       {}"#,
 // run command.
 pub(crate) trait Run {
     fn run(&self) -> Result<(), anyhow::Error>;
-}
-
-#[derive(Args, Debug, PartialEq)]
-struct Global {
-    /// Verbose log
-    #[arg(short, long, action = ArgAction::Count)]
-    verbose: u8,
-}
-
-impl Global {
-    fn log_filter_level(&self) -> LevelFilter {
-        match self.verbose {
-            0 => LevelFilter::Info,
-            1 => LevelFilter::Debug,
-            _ => LevelFilter::Trace,
-        }
-    }
 }
 
 #[derive(Subcommand, Debug, PartialEq)]
@@ -143,38 +125,28 @@ impl Run for Command {
 #[command(version = VERSION)]
 #[command(name = "goup")]
 pub struct Cli {
-    #[command(flatten)]
-    global: Global,
     #[command(subcommand)]
     command: Command,
 }
 
-impl Run for Cli {
-    fn run(&self) -> Result<(), anyhow::Error> {
-        let level_filter = self.global.log_filter_level();
+impl Cli {
+    fn run_command(&self) -> Result<(), anyhow::Error> {
+        self.command.run()
+    }
+    pub fn run_main() -> Result<(), anyhow::Error> {
         env_logger::builder()
             .format(move |buf, record| {
                 let level = record.level();
                 let style = buf.default_level_style(level);
-                let time = Local::now().format("%Y-%m-%d %H:%M:%S");
+                let time = jiff::Zoned::now().strftime("%F %T%.8f %z %Z");
                 let args = record.args();
                 let target = record.target();
-                if level_filter >= LevelFilter::Debug {
-                    buf.write_fmt(format_args!(
-                        "[{time} {style}{level}{style:#} {target}] {args}\n",
-                    ))
-                } else {
-                    buf.write_fmt(format_args!("[{time} {style}{level}{style:#}] {args}\n",))
-                }
+                buf.write_fmt(format_args!(
+                    "[{time} {style}{level}{style:#} {target}] {args}\n"
+                ))
             })
-            .filter_level(level_filter)
+            .parse_env(LoggerEnv::default().default_filter_or("info"))
             .init();
-        self.command.run()
-    }
-}
-
-impl Cli {
-    pub fn run_main() -> Result<(), anyhow::Error> {
-        Self::parse().run()
+        Self::parse().run_command()
     }
 }
