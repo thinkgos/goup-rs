@@ -29,9 +29,9 @@ anyhow = "1.0"
 log = "0.4"
 regex = "1.12"
 reqwest = { version = "0.13", default-features = false, features = [
-    "blocking",
-    "rustls",
-    "json",
+  "blocking",
+  "rustls",
+  "json",
 ] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -41,10 +41,10 @@ clap_complete = "4.6"
 dialoguer = "0.12"
 indicatif = "0.18"
 self_update = { version = "0.44", default-features = false, features = [
-    "reqwest",
-    "rustls",
-    "compression-flate2",
-    "compression-zip-deflate",
+  "reqwest",
+  "rustls",
+  "compression-flate2",
+  "compression-zip-deflate",
 ] }
 env_logger = { version = "0.11", features = ["color"] }
 jiff = "0.2"
@@ -52,7 +52,7 @@ sha2 = "0.11"
 hex = "0.4"
 flate2 = "1.1"
 tar = "0.4"
-zip = "8.5"
+zip = "9.0"
 dirs = "7.0"
 semver = "1.0"
 owo-colors = "4"

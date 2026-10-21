@@ -18,7 +18,7 @@ impl Unpacker for Zip {
         let mut archive = ZipArchive::new(File::open(archive_file)?)?;
         for i in 0..archive.len() {
             let mut file = archive.by_index(i)?;
-            let path = file.mangled_name();
+            let path = file.mangled_name()?;
 
             if let Some(path_str) = path.to_str() {
                 // 标准化路径分隔符并检查是否在 go/ 目录下
