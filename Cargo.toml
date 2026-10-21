@@ -56,7 +56,7 @@ zip = "9.0"
 dirs = "7.0"
 semver = "1.0"
 owo-colors = "4"
-scraper = "0.27"
+scraper = "0.29"
 dotenvy = "0.15"
 # git2 = "0.20"
 
