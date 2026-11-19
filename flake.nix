@@ -36,6 +36,9 @@
           nativeBuildInputs = with pkgs; [
             pkg-config
             git
+            cmake
+          ];
+          buildInputs = with pkgs; [
             zstd
           ];
           rustToolchain = pkgs.rust-bin.stable.latest.default.override {
@@ -66,7 +69,7 @@
           };
           # build package
           packages.default = rustPlatform.buildRustPackage (finalAttrs: {
-            inherit nativeBuildInputs;
+            inherit nativeBuildInputs buildInputs;
 
             pname = cargoToml.package.name;
             version = cargoToml.package.version;
@@ -89,6 +92,10 @@
               ];
               mainProgram = "goup";
             };
+
+            preBuild = ''
+              unset AWS_LC_SYS_USE_SYSTEM
+            '';
           });
           # dev shell
           devShells.default = pkgs.mkShell {
