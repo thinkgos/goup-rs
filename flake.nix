@@ -36,6 +36,7 @@
           nativeBuildInputs = with pkgs; [
             pkg-config
             git
+            zstd
           ];
           rustToolchain = pkgs.rust-bin.stable.latest.default.override {
             extensions = [
